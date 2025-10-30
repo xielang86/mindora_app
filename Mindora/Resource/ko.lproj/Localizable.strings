@@ -1,0 +1,245 @@
+/*
+  Localizable.strings
+  mindora
+
+  Created by gao chao on 2025/9/18.
+  
+*/
+
+// MARK: - Tab Bar Titles
+"tab.home" = "홈";
+"tab.health" = "건강";
+"tab.settings" = "설정";
+
+// MARK: - Theme Modes
+"theme.system" = "시스템 따라가기";
+"theme.light" = "라이트 모드";
+"theme.dark" = "다크 모드";
+
+// MARK: - Home Screen
+"home.title" = "홈";
+"home.nearby_devices" = "근처 기기";
+"home.scan" = "스캔";
+"home.scanning" = "근처 기기 스캔 중…";
+"home.disconnect" = "연결 해제";
+"home.connected_format" = "연결됨: %@:%d";
+"home.connected_state" = "연결됨";
+"home.connection_success_title" = "연결됨";
+"home.connection_success_message" = "기기: %@ (%@)";
+"home.resolve_failed_title" = "해결 실패";
+"home.resolve_failed_message" = "해결 실패";
+"home.no_devices" = "기기를 찾을 수 없습니다";
+"home.find_devices" = "기기 검색";
+"home.search_finished_zero" = "기기를 찾을 수 없습니다";
+"home.search_finished_one" = "기기 1대 발견";
+"home.search_finished_many" = "기기 %d대 발견";
+
+// MARK: - Health Screen
+"health.title" = "건강";
+// MARK: - Health Metrics
+"health.status.initial" = "Health 접근 요청 중";
+"health.status.loading" = "건강 데이터 불러오는 중";
+"health.status.updated" = "최신 건강 데이터 로드됨";
+"health.status.error" = "건강 데이터 오류";
+"health.metric.heart_rate" = "심박수";
+"health.metric.hrv" = "심박 변이";
+"health.metric.glucose" = "혈당";
+"health.metric.spo2" = "혈중 산소 (SpO₂)";
+"health.metric.blood_pressure" = "혈압";
+"health.metric.sleep" = "수면";
+"health.metric.placeholder" = "최근 데이터 없음";
+"health.unit.bpm" = "bpm";
+"health.unit.ms" = "ms";
+"health.unit.mgdl" = "mg/dL";
+"health.unit.percent" = "%";
+"health.unit.mmhg" = "mmHg";
+"health.unit.hour" = "시간";
+"health.unit.hours" = "시간";
+"health.unit.minutes" = "분";
+"health.sleep.deep" = "깊은";
+"health.sleep.rem" = "REM";
+"health.sleep.light" = "얕은";
+"health.sleep.total_duration" = "총 시간";
+"health.sleep.stage.awake" = "깨어남";
+"health.sleep.stage.rem" = "REM";
+"health.sleep.stage.core" = "코어";
+"health.sleep.stage.deep" = "깊은 수면";
+"health.sleep.no_data" = "수면 데이터 없음";
+"health.period.day" = "일";
+"health.period.month" = "월";
+"health.period.year" = "년";
+"health.period.daily_average" = "일평균";
+"health.period.monthly_average" = "월평균";
+
+// MARK: - Settings Screen
+"settings.title" = "설정";
+"settings.subtitle" = "Mindora를 내 취향대로";
+"settings.profile_subtitle" = "기기 닉네임 및 아바타 수정";
+"settings.sync_subtitle" = "휴대폰의 건강 데이터 동기화";
+"settings.reset_subtitle" = "공장 초기화는 모든 설정과 기록을 재설정합니다";
+"settings.version_subtitle" = "소프트웨어 업그레이드로 새로운 기능과 버그 수정 제공";
+"settings.language" = "언어";
+"settings.theme" = "테마 모드";
+"settings.profile" = "프로필 편집";
+"settings.sync" = "건강 데이터 동기화";
+"settings.permission" = "권한 관리";
+"settings.version" = "앱 버전";
+"settings.version_with_number" = "소프트웨어 버전：%@";
+"settings.reset" = "공장 초기화";
+"settings.show_onboarding" = "가이드 페이지 다시 보기";
+
+// Language and Theme Selection
+"settings.select_language" = "언어 선택";
+"settings.select_theme" = "테마 모드 선택";
+
+// Reset Confirmation
+"settings.reset_confirm_title" = "공장 초기화를 실행하시겠습니까?";
+"settings.reset_confirm_message" = "공장 초기화를 실행하면 모든 설정이 재설정됩니다. 신중하게 선택해 주세요.";
+"settings.reset_done_message" = "공장 초기화가 실행되었습니다 (예시)";
+"settings.reset_cancel" = "취소";
+"settings.reset_confirm" = "확인";
+
+// Version Check
+"settings.version_checking" = "업데이트 확인 중...";
+"settings.version_latest_title" = "최신 버전입니다";
+"settings.version_latest_message" = "최신 버전 %@ 을(를) 사용 중입니다";
+"settings.version_update_title" = "새 버전 발견";
+"settings.version_update_message" = "새 버전 %@ 사용 가능, 현재 버전: %@";
+"settings.version_update_button" = "업데이트";
+"settings.version_check_failed" = "업데이트 확인 실패";
+
+// Sync Health Data
+"settings.sync_no_device_title" = "기기 연결 안됨";
+"settings.sync_no_device_message" = "동기화하기 전에 \"연결\" 페이지에서 기기에 연결해 주세요.";
+"settings.syncing" = "동기화 중...";
+"settings.sync_success_title" = "동기화 성공";
+"settings.sync_success_message" = "샘플 건강 데이터 배치가 전송되었습니다.";
+"settings.sync_error_title" = "동기화 실패";
+
+// MARK: - Settings Sections
+"settings.section.personalization" = "개인화";
+"settings.section.data_account" = "데이터 및 계정";
+"settings.section.other" = "기타";
+"settings.section.about" = "정보";
+
+// MARK: - Device Selection
+"device_selection.title" = "연결하려는 Mindora 기기를 선택해 주세요";
+
+// MARK: - Help Cards
+"help.title" = "연결 도움말";
+"help.done" = "완료";
+"help.connect_01_title" = "Mindora 연결 방법 01";
+"help.connect_01_content" = "블루투스가 켜져 있는지 확인하고 휴대폰을 Mindora에 가까이 가져오세요.";
+"help.connect_02_title" = "Mindora 연결 방법 02";
+"help.connect_02_content" = "앱의 연결 버튼을 탭하거나 시스템 설정에서 블루투스 설정을 찾으세요.";
+"help.connect_03_title" = "Mindora 연결 방법 03";
+"help.connect_03_content" = "사용 가능한 블루투스 기기에서 Mindora S1 MTL-01을 선택하여 연결을 완료하세요.";
+"help.connect_04_title" = "Mindora 연결 방법 04";
+"help.connect_04_content" = "Mindora가 다른 휴대폰이나 기기에 이미 연결되어 있다면 원래 휴대폰에서 블루투스 연결을 해제해야 합니다.";
+"help.connect_05_title" = "Mindora 연결 방법 05";
+"help.connect_05_content" = "연결을 설정할 수 없다면 지원 웹사이트를 방문하여 더 많은 도움을 받으세요.";
+
+// MARK: - Common UI Elements
+"common.ok" = "확인";
+"common.cancel" = "취소";
+"common.confirm" = "확인";
+"common.retry" = "재시도";
+
+// MARK: - Onboarding
+"onboarding.start" = "시작";
+"onboarding.no_device" = "Mindora가 없으신가요?";
+"onboarding.connect_mindora" = "Mindora 연결";
+"onboarding.page3.health_card_text" = "'건강' 앱에서 Mindora의 데이터 접근 권한을 설정하세요\n탭하여 '건강' 앱 열기";
+"onboarding.page3.bluetooth_card_text" = "현재 기기의 블루투스가 켜져 있지 않습니다\n탭하여 블루투스 설정 열기";
+"onboarding.page4.scanning_title" = "근처 기기 스캔";
+"onboarding.page4.searching" = "지속적으로 자동 검색 중";
+"onboarding.page4.device_found" = "Mindora 발견";
+"onboarding.page4.no_device_found" = "기기를 찾을 수 없습니다";
+"onboarding.page4.description" = "연결하려는 Mindora 기기를 선택해 주세요. 블루투스가 켜져 있는지 확인하세요.";
+"onboarding.page5.success_title" = "Mindora 연결 성공";
+"onboarding.page5.complete" = "완료";
+
+// MARK: - Help Manual
+"help_manual.page1.title" = "Mindora 연결 방법";
+"help_manual.page1.description" = "블루투스가 켜져 있는지 확인하고 휴대폰을 Mindora에 가까이 가져오세요.";
+"help_manual.page2.title" = "Mindora 연결 방법";
+"help_manual.page2.description" = "앱의 연결 버튼을 탭하거나 시스템 설정에서 블루투스 설정을 찾으세요.";
+"help_manual.page3.title" = "Mindora 연결 방법";
+"help_manual.page3.description" = "사용 가능한 블루투스 기기에서 Mindora를 선택하여 연결을 완료하세요.";
+"help_manual.page4.title" = "Mindora 연결 방법";
+"help_manual.page4.description" = "Mindora가 다른 휴대폰이나 기기에 이미 연결되어 있다면 원래 휴대폰에서 블루투스 연결을 해제해야 합니다.";
+"help_manual.page5.title" = "Mindora 연결 방법";
+"help_manual.page5.description" = "연결을 설정할 수 없다면 지원 웹사이트를 방문하여 더 많은 도움을 받으세요.";
+
+// MARK: - Health Sync Settings
+"health.sync.title" = "건강 동기화";
+"health.sync.enable" = "동기화 활성화";
+"health.sync.interval" = "동기화 주기";
+"health.sync.metrics" = "동기화 지표";
+"health.sync.manual" = "지금 동기화";
+"health.sync.interval.6s" = "6초";
+"health.sync.interval.12s" = "12초";
+"health.sync.interval.30s" = "30초";
+"health.sync.status.disabled" = "동기화가 꺼져 있습니다";
+"health.sync.status.no_run" = "아직 동기화가 실행되지 않았습니다";
+"health.sync.status.last_success_format" = "마지막 성공 %@ · %d개 지표";
+"health.sync.status.last_fail_format" = "마지막 실패 %@ · %@";
+"health.sync.status.interval_format" = "주기: %d초";
+"health.sync.status.metrics_format" = "활성: %@";
+"health.sync.section.basic" = "기본";
+"health.sync.section.metrics" = "지표";
+"health.sync.section.action" = "작업";
+"health.sync.section.status" = "상태";
+"health.sync.metric.heart_rate" = "심박수";
+"health.sync.metric.hrv" = "심박 변이";
+"health.sync.metric.spo2" = "혈중 산소";
+"health.sync.metric.blood_pressure" = "혈압";
+"health.sync.metric.sleep" = "수면";
+"health.sync.metric.all" = "전체 선택";
+"health.sync.metric.none" = "전체 해제";
+
+// MARK: - Permission Management
+"permission.title" = "권한 관리";
+
+// Network Permissions
+"permission.bluetooth" = "블루투스";
+"permission.local_network" = "로컬 네트워크";
+"permission.cellular_data" = "셀룰러 데이터";
+"permission.section.network" = "네트워크 권한";
+
+// Health Permissions
+"permission.health.status" = "건강 데이터";
+"permission.section.health" = "건강 데이터 권한";
+"permission.section.healthkit_footer_line1" = "접근이 제한된 경우 다음으로 이동하세요";
+"permission.section.healthkit_footer_line2" = "*설정 > 개인 정보 보호 및 보안 > 건강 > Mindora.\n*건강 앱 열기 > 공유 > 앱 > Mindora, 필요한 데이터 유형을 켜세요.";
+// Permission Status
+"permission.status.authorized" = "승인됨";
+"permission.status.partial" = "부분 승인";
+"permission.status.not_determined" = "승인되지 않음";
+"permission.status.unavailable" = "사용할 수 없음";
+
+// Permission Reminders
+"permission.health.reminder_title" = "건강 데이터 권한 필요";
+"permission.health.reminder_message" = "더 나은 건강 데이터 분석을 제공하기 위해 앱이 건강 데이터에 액세스해야 합니다.";
+"permission.bluetooth.reminder_title" = "블루투스 권한 필요";
+"permission.bluetooth.reminder_message" = "Mindora 기기에 연결하려면 앱에 블루투스 권한이 필요합니다.";
+"permission.request_authorization" = "액세스 승인";
+"permission.open_settings" = "설정 열기";
+"permission.open_health_app" = "건강 앱 열기";
+"permission.later" = "나중에";
+"permission.authorization_success" = "승인 성공";
+"permission.authorization_failed" = "승인 실패";
+
+// Health Permission Actions
+"permission.health.action_title" = "건강 데이터 권한";
+"permission.health.action_message" = "작업을 선택하세요";
+"permission.open_settings_hint" = "iOS 설정의 Mindora 항목에서 이 권한을 조정할 수 있습니다.";
+
+// Health Settings Guide
+"permission.health.settings_title" = "건강 개인 정보 보호 설정";
+"permission.health.settings_message" = "설정 > 개인 정보 보호 및 보안 > 건강으로 이동하여 Mindora를 찾아 필요한 데이터 유형을 켜세요.";
+"permission.health.guide_title" = "건강 데이터 권한 설정 방법";
+"permission.health.guide_message" = "1. 건강 앱을 열어요\n2. 하단의 '공유' 탭을 누르세요\n3. '앱'을 선택하세요\n4. Mindora를 찾으세요\n5. 필요한 데이터 유형을 켜세요";
+
+// Health Permission CTA (avoid misleading status)
+"permission.health.confirm" = "건강 앱에서 확인하기";

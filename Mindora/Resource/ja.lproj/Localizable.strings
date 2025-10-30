@@ -1,0 +1,246 @@
+// (Removed duplicate sync metrics block)
+/* 
+  Localizable.strings
+  mindora
+
+  Created by gao chao on 2025/9/18.
+  
+*/
+
+// MARK: - Tab Bar Titles
+"tab.home" = "ホーム";
+"tab.health" = "健康";
+"tab.settings" = "設定";
+
+// MARK: - Theme Modes
+"theme.system" = "システムに従う";
+"theme.light" = "ライトモード";
+"theme.dark" = "ダークモード";
+
+// MARK: - Home Screen
+"home.title" = "ホーム";
+"home.nearby_devices" = "近くのデバイス";
+"home.scan" = "スキャン";
+"home.scanning" = "近くのデバイスをスキャン中…";
+"home.disconnect" = "切断";
+"home.connected_format" = "接続済み：%@:%d";
+"home.connected_state" = "接続済み";
+"home.connection_success_title" = "接続済み";
+"home.connection_success_message" = "デバイス：%@ (%@)";
+"home.resolve_failed_title" = "解決失敗";
+"home.resolve_failed_message" = "解決に失敗しました";
+"home.no_devices" = "デバイスが見つかりません";
+"home.find_devices" = "デバイスを検索";
+"home.search_finished_zero" = "デバイスが見つかりません";
+"home.search_finished_one" = "1台のデバイスが見つかりました";
+"home.search_finished_many" = "%d台のデバイスが見つかりました";
+
+// MARK: - Health Screen
+"health.title" = "健康";
+// MARK: - Health Metrics
+"health.status.initial" = "ヘルスアクセスを要求";
+"health.status.loading" = "健康データを読み込み中";
+"health.status.updated" = "最新の健康データを読み込み済み";
+"health.status.error" = "健康データエラー";
+"health.metric.heart_rate" = "心拍数";
+"health.metric.hrv" = "心拍変動";
+"health.metric.glucose" = "血糖";
+"health.metric.spo2" = "血中酸素 (SpO₂)";
+"health.metric.blood_pressure" = "血圧";
+"health.metric.sleep" = "睡眠";
+"health.metric.placeholder" = "最近のデータなし";
+"health.unit.bpm" = "bpm";
+"health.unit.ms" = "ms";
+"health.unit.mgdl" = "mg/dL";
+"health.unit.percent" = "%";
+"health.unit.mmhg" = "mmHg";
+"health.unit.hour" = "時間";
+"health.unit.hours" = "時間";
+"health.unit.minutes" = "分";
+"health.sleep.deep" = "深睡";
+"health.sleep.rem" = "REM";
+"health.sleep.light" = "浅睡";
+"health.sleep.total_duration" = "合計時間";
+"health.sleep.stage.awake" = "覚醒";
+"health.sleep.stage.rem" = "REM";
+"health.sleep.stage.core" = "コア";
+"health.sleep.stage.deep" = "深睡";
+"health.sleep.no_data" = "睡眠データなし";
+"health.period.day" = "日";
+"health.period.month" = "月";
+"health.period.year" = "年";
+"health.period.daily_average" = "1日平均";
+"health.period.monthly_average" = "月平均";
+
+// MARK: - Settings Screen
+"settings.title" = "設定";
+"settings.subtitle" = "Mindora をカスタマイズ";
+"settings.profile_subtitle" = "デバイスのニックネームとアバターの変更";
+"settings.sync_subtitle" = "お使いの携帯電話の健康データを同期";
+"settings.reset_subtitle" = "工場出荷時設定にリセットすると、すべての設定と記録がリセットされます";
+"settings.version_subtitle" = "ソフトウェアアップグレードにより新機能とバグ修正が提供されます";
+"settings.language" = "言語";
+"settings.theme" = "テーマモード";
+"settings.profile" = "プロフィール編集";
+"settings.sync" = "健康データ同期";
+"settings.permission" = "権限管理";
+"settings.version" = "アプリバージョン";
+"settings.version_with_number" = "ソフトウェアバージョン：%@";
+"settings.reset" = "初期化";
+"settings.show_onboarding" = "ガイドページを再度表示";
+
+// Language and Theme Selection
+"settings.select_language" = "言語を選択";
+"settings.select_theme" = "テーマモードを選択";
+
+// Reset Confirmation
+"settings.reset_confirm_title" = "初期化を実行しますか？";
+"settings.reset_confirm_message" = "初期化により、すべての設定がリセットされます。慎重に選択してください。";
+"settings.reset_done_message" = "初期化がトリガーされました（例）";
+"settings.reset_cancel" = "キャンセル";
+"settings.reset_confirm" = "確認";
+
+// Version Check
+"settings.version_checking" = "更新を確認中...";
+"settings.version_latest_title" = "最新バージョンです";
+"settings.version_latest_message" = "最新バージョン %@ をお使いです";
+"settings.version_update_title" = "新しいバージョンが見つかりました";
+"settings.version_update_message" = "新しいバージョン %@ が利用可能です。現在のバージョン：%@";
+"settings.version_update_button" = "更新";
+"settings.version_check_failed" = "更新の確認に失敗しました";
+
+// Sync Health Data
+"settings.sync_no_device_title" = "デバイス未接続";
+"settings.sync_no_device_message" = "同期を行う前に\"接続\"ページでデバイスに接続してください。";
+"settings.syncing" = "同期中...";
+"settings.sync_success_title" = "同期成功";
+"settings.sync_success_message" = "サンプル健康データのバッチが送信されました。";
+"settings.sync_error_title" = "同期失敗";
+
+// MARK: - Settings Sections
+"settings.section.personalization" = "パーソナライズ";
+"settings.section.data_account" = "データとアカウント";
+"settings.section.other" = "その他";
+"settings.section.about" = "について";
+
+// MARK: - Device Selection
+"device_selection.title" = "接続したいMindoraデバイスを選択してください";
+
+// MARK: - Help Cards
+"help.title" = "接続ヘルプ";
+"help.done" = "完了";
+"help.connect_01_title" = "Mindoraの接続方法 01";
+"help.connect_01_content" = "Bluetoothがオンになっていることを確認し、携帯電話をMindoraに近づけてください。";
+"help.connect_02_title" = "Mindoraの接続方法 02";
+"help.connect_02_content" = "アプリの接続ボタンをタップするか、システム設定でBluetooth設定を見つけてください。";
+"help.connect_03_title" = "Mindoraの接続方法 03";
+"help.connect_03_content" = "利用可能なBluetoothデバイスからMindora S1 MTL-01を選択して接続を完了してください。";
+"help.connect_04_title" = "Mindoraの接続方法 04";
+"help.connect_04_content" = "Mindoraが他の携帯電話やデバイスに既に接続されている場合は、元の携帯電話でBluetooth接続を切断してください。";
+"help.connect_05_title" = "Mindoraの接続方法 05";
+"help.connect_05_content" = "接続を確立できない場合は、サポートWebサイトにアクセスしてさらなる支援を受けてください。";
+
+// MARK: - Common UI Elements
+"common.ok" = "OK";
+"common.cancel" = "キャンセル";
+"common.confirm" = "確認";
+"common.retry" = "再試行";
+
+// MARK: - Onboarding
+"onboarding.start" = "開始";
+"onboarding.no_device" = "Mindoraをお持ちではありませんか？";
+"onboarding.connect_mindora" = "Mindora を接続";
+"onboarding.page3.health_card_text" = "「ヘルスケア」アプリで Mindora のデータアクセス権限を設定してください\nタップして「ヘルスケア」アプリを開く";
+"onboarding.page3.bluetooth_card_text" = "現在のデバイスのBluetoothがオンになっていません\nタップしてBluetooth設定を開く";
+"onboarding.page4.scanning_title" = "近くのデバイスをスキャン";
+"onboarding.page4.searching" = "継続的に自動検索中";
+"onboarding.page4.device_found" = "Mindora が見つかりました";
+"onboarding.page4.no_device_found" = "デバイスが見つかりません";
+"onboarding.page4.description" = "接続したいMindoraデバイスを選択してください。Bluetoothがオンになっていることを確認してください。";
+"onboarding.page5.success_title" = "Mindora接続成功";
+"onboarding.page5.complete" = "完了";
+
+// MARK: - Help Manual
+"help_manual.page1.title" = "Mindoraの接続方法";
+"help_manual.page1.description" = "Bluetoothがオンになっていることを確認し、携帯電話をMindoraに近づけてください。";
+"help_manual.page2.title" = "Mindoraの接続方法";
+"help_manual.page2.description" = "アプリの接続ボタンをタップするか、システム設定でBluetooth設定を見つけてください。";
+"help_manual.page3.title" = "Mindoraの接続方法";
+"help_manual.page3.description" = "利用可能なBluetoothデバイスからMindoraを選択して接続を完了してください。";
+"help_manual.page4.title" = "Mindoraの接続方法";
+"help_manual.page4.description" = "Mindoraが他の携帯電話やデバイスに既に接続されている場合は、元の携帯電話でBluetooth接続を切断してください。";
+"help_manual.page5.title" = "Mindoraの接続方法";
+"help_manual.page5.description" = "接続を確立できない場合は、サポートWebサイトにアクセスしてさらなる支援を受けてください。";
+
+// MARK: - Health Sync Settings
+"health.sync.title" = "ヘルス同期";
+"health.sync.enable" = "同期を有効化";
+"health.sync.interval" = "同期周期";
+"health.sync.metrics" = "同期指標";
+"health.sync.manual" = "今すぐ同期";
+"health.sync.interval.6s" = "6秒";
+"health.sync.interval.12s" = "12秒";
+"health.sync.interval.30s" = "30秒";
+"health.sync.status.disabled" = "同期が無効になっています";
+"health.sync.status.no_run" = "まだ同期が実行されていません";
+"health.sync.status.last_success_format" = "前回成功 %@ · %d 指標";
+"health.sync.status.last_fail_format" = "前回失敗 %@ · %@";
+"health.sync.status.interval_format" = "周期: %d秒";
+"health.sync.status.metrics_format" = "有効: %@";
+"health.sync.section.basic" = "基本";
+"health.sync.section.metrics" = "指標";
+"health.sync.section.action" = "操作";
+"health.sync.section.status" = "ステータス";
+"health.sync.metric.heart_rate" = "心拍数";
+"health.sync.metric.hrv" = "心拍変動";
+"health.sync.metric.spo2" = "血中酸素";
+"health.sync.metric.blood_pressure" = "血圧";
+"health.sync.metric.sleep" = "睡眠";
+"health.sync.metric.all" = "全て選択";
+"health.sync.metric.none" = "全て解除";
+
+// MARK: - Permission Management
+"permission.title" = "権限管理";
+
+// Network Permissions
+"permission.bluetooth" = "Bluetooth";
+"permission.local_network" = "ローカルネットワーク";
+"permission.cellular_data" = "モバイルデータ通信";
+"permission.section.network" = "ネットワーク権限";
+
+// Health Permissions
+"permission.health.status" = "健康データ";
+"permission.section.health" = "健康データ権限";
+"permission.section.healthkit_footer_line1" = "アクセスが制限されている場合は、次の場所に移動してください";
+"permission.section.healthkit_footer_line2" = "*設定 > プライバシーとセキュリティ > ヘルスケア > Mindora。\n*「ヘルスケア」アプリを開く > 共有 > App > Mindora、必要なデータタイプを有効にします。";
+// Permission Status
+"permission.status.authorized" = "許可済み";
+"permission.status.partial" = "一部許可";
+"permission.status.not_determined" = "未許可";
+"permission.status.unavailable" = "利用不可";
+
+// Permission Reminders
+"permission.health.reminder_title" = "健康データ権限が必要です";
+"permission.health.reminder_message" = "より良い健康データ分析を提供するために、アプリは健康データへのアクセスが必要です。";
+"permission.bluetooth.reminder_title" = "Bluetooth権限が必要です";
+"permission.bluetooth.reminder_message" = "Mindora デバイスに接続するには、アプリにBluetooth権限が必要です。";
+"permission.request_authorization" = "アクセスを許可";
+"permission.open_settings" = "設定を開く";
+"permission.open_health_app" = "「ヘルスケア」Appを開く";
+"permission.later" = "後で";
+"permission.authorization_success" = "許可成功";
+"permission.authorization_failed" = "許可失敗";
+
+// Health Permission Actions
+"permission.health.action_title" = "健康データ権限";
+"permission.health.action_message" = "操作を選択してください";
+"permission.open_settings_hint" = "iOS の「設定 > Mindora」でこの権限を調整できます。";
+
+// Health Settings Guide
+"permission.health.settings_title" = "ヘルスケアプライバシー設定";
+"permission.health.settings_message" = "「設定 > プライバシーとセキュリティ > ヘルスケア」に移動し、Mindora を見つけて、必要なデータタイプをオンにしてください。";
+"permission.health.guide_title" = "健康データ権限の設定方法";
+"permission.health.guide_message" = "1. 「ヘルスケア」アプリを開く\n2. 画面下部の「共有」をタップ\n3. 「App」を選択\n4. Mindora を開く\n5. 必要なデータタイプをオンにする";
+
+// Health Permission CTA (avoid misleading status)
+"permission.health.confirm" = "ヘルスケアAppで確認する";

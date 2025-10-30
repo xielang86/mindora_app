@@ -1,0 +1,250 @@
+/* 
+  Localizable.strings
+  mindora
+
+  Created by gao chao on 2025/9/18.
+  
+*/
+
+// MARK: - Tab Bar Titles
+"tab.home" = "首页";
+"tab.health" = "健康";
+"tab.settings" = "设置";
+
+// MARK: - Theme Modes
+"theme.system" = "跟随系统";
+"theme.light" = "浅色模式";
+"theme.dark" = "深色模式";
+
+// MARK: - Home Screen
+"home.title" = "首页";
+"home.nearby_devices" = "附近的设备";
+"home.scan" = "扫描";
+"home.scanning" = "正在扫描附近设备…";
+"home.disconnect" = "断开";
+"home.connected_format" = "已连接：%@:%d";
+"home.connected_state" = "已连接";
+"home.connection_success_title" = "已连接";
+"home.connection_success_message" = "设备：%@ (%@)";
+"home.resolve_failed_title" = "解析失败";
+"home.resolve_failed_message" = "解析失败";
+"home.no_devices" = "没有找到设备";
+"home.find_devices" = "查找设备";
+"home.search_finished_zero" = "未找到设备";
+"home.search_finished_one" = "找到 1 台设备";
+"home.search_finished_many" = "找到 %d 台设备";
+
+// MARK: - Health Screen
+"health.title" = "健康";
+
+// MARK: - Health Metrics
+"health.status.initial" = "请求健康数据访问";
+"health.status.loading" = "正在加载健康数据";
+"health.status.updated" = "已加载最新健康数据";
+"health.status.error" = "健康数据错误";
+"health.metric.heart_rate" = "心率";
+"health.metric.hrv" = "心率变异性";
+"health.metric.glucose" = "血糖";
+"health.metric.spo2" = "血氧";
+"health.metric.blood_pressure" = "血压";
+"health.metric.sleep" = "睡眠";
+"health.metric.placeholder" = "暂无最近数据";
+"health.unit.bpm" = "次/分";
+"health.unit.ms" = "毫秒";
+"health.unit.mgdl" = "mg/dL";
+"health.unit.percent" = "%";
+"health.unit.mmhg" = "mmHg";
+"health.unit.hour" = "小时";
+"health.unit.hours" = "小时";
+"health.sleep.deep" = "深度睡眠";
+"health.sleep.rem" = "快速动眼睡眠";
+"health.sleep.light" = "核心睡眠";
+"health.unit.minutes" = "分钟";
+"health.sleep.total_duration" = "总时长";
+"health.sleep.stage.awake" = "清醒";
+"health.sleep.stage.rem" = "快速动眼";
+"health.sleep.stage.core" = "核心睡眠";
+"health.sleep.stage.deep" = "深度睡眠";
+"health.sleep.no_data" = "暂无睡眠数据";
+"health.period.day" = "日";
+"health.period.month" = "月";
+"health.period.year" = "年";
+"health.period.daily_average" = "日均";
+"health.period.monthly_average" = "月均";
+
+// MARK: - Settings Screen
+"settings.title" = "设置";
+"settings.subtitle" = "个性化你的 Mindora";
+"settings.profile_subtitle" = "设备昵称与头像的修改";
+"settings.sync_subtitle" = "同步您在手机上的健康数据";
+"settings.reset_subtitle" = "恢复出厂设置，会重置所有设置与记录";
+"settings.version_subtitle" = "软件升级会带来新功能与BUG修复";
+"settings.language" = "语言";
+"settings.theme" = "主题模式";
+"settings.profile" = "个人资料修改";
+"settings.sync" = "健康信息同步";
+"settings.permission" = "权限管理";
+"settings.version" = "软件版本";
+"settings.version_with_number" = "软件版本：%@";
+"settings.reset" = "恢复出厂设置";
+"settings.show_onboarding" = "重新查看引导页";
+
+// Language and Theme Selection
+"settings.select_language" = "选择语言";
+"settings.select_theme" = "选择主题模式";
+
+// Reset Confirmation
+"settings.reset_confirm_title" = "确认恢复出厂设置吗？";
+"settings.reset_confirm_message" = "恢复出厂设置，会重置所有的设置 请您谨慎选择该选项。";
+"settings.reset_done_message" = "已触发恢复出厂设置（示例）";
+"settings.reset_cancel" = "取消";
+"settings.reset_confirm" = "确认";
+
+// Version Check
+"settings.version_checking" = "正在检查更新...";
+"settings.version_latest_title" = "已是最新版本";
+"settings.version_latest_message" = "您正在使用最新版本 %@";
+"settings.version_update_title" = "发现新版本";
+"settings.version_update_message" = "新版本 %@ 可用，当前版本：%@";
+"settings.version_update_button" = "更新";
+"settings.version_check_failed" = "检查更新失败";
+
+// Sync Health Data
+"settings.sync_no_device_title" = "未连接设备";
+"settings.sync_no_device_message" = "请先在\"连接\"页连接设备后再尝试同步。";
+"settings.syncing" = "正在同步...";
+"settings.sync_success_title" = "同步成功";
+"settings.sync_success_message" = "已发送一批示例健康数据。";
+"settings.sync_error_title" = "同步失败";
+
+// MARK: - Settings Sections
+"settings.section.personalization" = "个性化";
+"settings.section.data_account" = "数据与账户";
+"settings.section.other" = "其他";
+"settings.section.about" = "关于";
+
+// MARK: - Device Selection
+"device_selection.title" = "请选择您想要连接的Mindora设备";
+
+// MARK: - Help Cards
+"help.title" = "连接帮助";
+"help.done" = "完成";
+"help.connect_01_title" = "如何连接Mindora? 01";
+"help.connect_01_content" = "请确认蓝牙保持开启状态,将手机靠近 Mindora。";
+"help.connect_02_title" = "如何连接Mindora? 02";
+"help.connect_02_content" = "点击APP上的连接键,或在系统设置中找到蓝牙设置选项。";
+"help.connect_03_title" = "如何连接Mindora? 03";
+"help.connect_03_content" = "在可选蓝牙设备中选择 Mindora S1 MTL-01, 即可连接成功。";
+"help.connect_04_title" = "如何连接Mindora? 04";
+"help.connect_04_content" = "如果 Mindora 已经连接其他手机或者设备, 需要在原来手机上断开蓝牙连接。";
+"help.connect_05_title" = "如何连接Mindora? 05";
+"help.connect_05_content" = "如果无法建立连接, 请访问我们的支持网站以获取更多帮助。";
+
+// MARK: - Common UI Elements
+"common.ok" = "好的";
+"common.cancel" = "取消";
+"common.confirm" = "确认";
+"common.retry" = "重试";
+
+// MARK: - Onboarding
+"onboarding.start" = "开始";
+"onboarding.no_device" = "没有Mindora吗？";
+"onboarding.connect_mindora" = "连接 Mindora";
+"onboarding.page3.health_card_text" = "请在'健康'App中设置 Mindora 的数据访问权限\n点击前往'健康'App";
+"onboarding.page3.bluetooth_card_text" = "检测到当前设备蓝牙未开启\n点击开启蓝牙设置";
+"onboarding.page4.scanning_title" = "扫描附近设备";
+"onboarding.page4.searching" = "持续自动搜索中";
+"onboarding.page4.device_found" = "已搜索到 Mindora";
+"onboarding.page4.no_device_found" = "未找到设备";
+"onboarding.page4.description" = "请选择您想要连接的Mindora设备,请确认蓝牙保持开启状态。";
+"onboarding.page5.success_title" = "Mindora连接成功";
+"onboarding.page5.complete" = "完成";
+
+// MARK: - Help Manual
+"help_manual.page1.title" = "如何连接Mindora?";
+"help_manual.page1.description" = "请确认蓝牙保持开启状态，将手机靠近Mindora。";
+"help_manual.page2.title" = "如何连接Mindora?";
+"help_manual.page2.description" = "点击APP上的连接键，或在系统设置中找到蓝牙设置选项。";
+"help_manual.page3.title" = "如何连接Mindora?";
+"help_manual.page3.description" = "在可选蓝牙设备中选择Mindora，即可连接成功。";
+"help_manual.page4.title" = "如何连接Mindora?";
+"help_manual.page4.description" = "如果Mindora已经连接其他手机或者设备，需要在原来手机上断开蓝牙连接。";
+"help_manual.page5.title" = "如何连接Mindora?";
+"help_manual.page5.description" = "如果无法建立连接，请访问我们的支持网站以获取更多帮助。";
+
+// MARK: - Health Sync Settings
+"health.sync.title" = "健康同步";
+"health.sync.enable" = "开启同步";
+"health.sync.interval" = "同步周期";
+"health.sync.metrics" = "同步指标";
+"health.sync.manual" = "立即同步";
+"health.sync.interval.6s" = "6秒";
+"health.sync.interval.12s" = "12秒";
+"health.sync.interval.30s" = "30秒";
+"health.sync.status.disabled" = "同步已关闭";
+"health.sync.status.no_run" = "尚未执行过同步";
+"health.sync.status.last_success_format" = "上次成功 %@ · %d 个指标";
+"health.sync.status.last_fail_format" = "上次失败 %@ · %@";
+"health.sync.status.interval_format" = "周期: %d秒";
+"health.sync.status.metrics_format" = "已启用: %@";
+"health.sync.section.basic" = "基础";
+"health.sync.section.metrics" = "指标";
+"health.sync.section.action" = "操作";
+"health.sync.section.status" = "状态";
+
+// Sync Metrics Names
+"health.sync.metric.heart_rate" = "心率";
+"health.sync.metric.hrv" = "心率变异性";
+"health.sync.metric.spo2" = "血氧";
+"health.sync.metric.blood_pressure" = "血压";
+"health.sync.metric.sleep" = "睡眠";
+"health.sync.metric.all" = "全选";
+"health.sync.metric.none" = "全不选";
+
+// MARK: - Permission Management
+"permission.title" = "权限管理";
+
+// Network Permissions
+"permission.bluetooth" = "蓝牙";
+"permission.local_network" = "本地网络";
+"permission.cellular_data" = "无线数据";
+"permission.section.network" = "网络权限";
+
+// Health Permissions
+"permission.health.status" = "健康数据";
+"permission.section.health" = "健康数据权限";
+"permission.section.healthkit_footer_line1" = "如权限受限，请前往";
+"permission.section.healthkit_footer_line2" = "*设置 > 隐私与安全性 > 健康 > Mindora。\n*打开'健康'APP > 共享 > APP > Mindora，开启所需的数据类型。";
+
+// Permission Status
+"permission.status.authorized" = "已授权";
+"permission.status.partial" = "部分授权";
+"permission.status.not_determined" = "未授权";
+"permission.status.unavailable" = "不可用";
+
+// Permission Reminders
+"permission.health.reminder_title" = "需要健康数据权限";
+"permission.health.reminder_message" = "为了更好地为您提供健康数据分析，应用需要访问您的健康数据。";
+"permission.bluetooth.reminder_title" = "需要蓝牙权限";
+"permission.bluetooth.reminder_message" = "为了连接您的 Mindora 设备，应用需要蓝牙权限。";
+"permission.request_authorization" = "授权访问";
+"permission.open_settings" = "打开设置";
+"permission.open_health_app" = "打开健康App";
+"permission.later" = "稍后";
+"permission.authorization_success" = "授权成功";
+"permission.authorization_failed" = "授权失败";
+
+// Health Permission Actions
+"permission.health.action_title" = "健康数据权限";
+"permission.health.action_message" = "请选择操作方式";
+"permission.open_settings_hint" = "您可以在 iOS 设置中的 Mindora 页面管理该权限。";
+
+// Health Settings Guide
+"permission.health.settings_title" = "健康隐私设置";
+"permission.health.settings_message" = "请前往设置 > 隐私与安全性 > 健康，找到 Mindora 并开启所需的数据类型。";
+"permission.health.guide_title" = "如何设置健康数据权限";
+"permission.health.guide_message" = "1. 打开健康App\n2. 点击底部的共享\n3. 选择App\n4. 找到 Mindora\n5. 开启所需的数据类型";
+
+// Health Permission CTA (避免误导性状态显示)
+"permission.health.confirm" = "去健康App确认";
+

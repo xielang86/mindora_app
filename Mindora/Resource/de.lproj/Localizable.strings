@@ -1,0 +1,246 @@
+// (Removed duplicate sync metrics block)
+/* 
+  Localizable.strings
+  mindora
+
+  Created by gao chao on 2025/9/18.
+  
+*/
+
+// MARK: - Tab Bar Titles
+"tab.home" = "Startseite";
+"tab.health" = "Gesundheit";
+"tab.settings" = "Einstellungen";
+
+// MARK: - Theme Modes
+"theme.system" = "System folgen";
+"theme.light" = "Heller Modus";
+"theme.dark" = "Dunkler Modus";
+
+// MARK: - Home Screen
+"home.title" = "Startseite";
+"home.nearby_devices" = "Geräte in der Nähe";
+"home.scan" = "Scannen";
+"home.scanning" = "Scannen nach Geräten in der Nähe…";
+"home.disconnect" = "Trennen";
+"home.connected_format" = "Verbunden: %@:%d";
+"home.connected_state" = "Verbunden";
+"home.connection_success_title" = "Verbunden";
+"home.connection_success_message" = "Gerät: %@ (%@)";
+"home.resolve_failed_title" = "Auflösung fehlgeschlagen";
+"home.resolve_failed_message" = "Auflösung fehlgeschlagen";
+"home.no_devices" = "Keine Geräte gefunden";
+"home.find_devices" = "Geräte suchen";
+"home.search_finished_zero" = "Keine Geräte gefunden";
+"home.search_finished_one" = "1 Gerät gefunden";
+"home.search_finished_many" = "%d Geräte gefunden";
+
+// MARK: - Health Screen
+"health.title" = "Gesundheit";
+// MARK: - Health Metrics
+"health.status.initial" = "Health-Zugriff wird angefordert";
+"health.status.loading" = "Gesundheitsdaten werden geladen";
+"health.status.updated" = "Aktuelle Gesundheitsdaten geladen";
+"health.status.error" = "Fehler bei Gesundheitsdaten";
+"health.metric.heart_rate" = "Herzfrequenz";
+"health.metric.hrv" = "Herzfrequenzvariabilität";
+"health.metric.glucose" = "Blutzucker";
+"health.metric.spo2" = "Blutsauerstoff (SpO₂)";
+"health.metric.blood_pressure" = "Blutdruck";
+"health.metric.sleep" = "Schlaf";
+"health.metric.placeholder" = "Keine aktuellen Daten";
+"health.unit.bpm" = "bpm";
+"health.unit.ms" = "ms";
+"health.unit.mgdl" = "mg/dL";
+"health.unit.percent" = "%";
+"health.unit.mmhg" = "mmHg";
+"health.unit.hour" = "h";
+"health.unit.hours" = "h";
+"health.unit.minutes" = "min";
+"health.sleep.deep" = "Tief";
+"health.sleep.rem" = "REM";
+"health.sleep.light" = "Leicht";
+"health.sleep.total_duration" = "Gesamtdauer";
+"health.sleep.stage.awake" = "Wach";
+"health.sleep.stage.rem" = "REM";
+"health.sleep.stage.core" = "Kern";
+"health.sleep.stage.deep" = "Tief";
+"health.sleep.no_data" = "Keine Schlafdaten";
+"health.period.day" = "Tag";
+"health.period.month" = "Monat";
+"health.period.year" = "Jahr";
+"health.period.daily_average" = "Tagesdurchschnitt";
+"health.period.monthly_average" = "Monatsdurchschnitt";
+
+// MARK: - Settings Screen
+"settings.title" = "Einstellungen";
+"settings.subtitle" = "Mindora personalisieren";
+"settings.profile_subtitle" = "Geräte-Spitznamen und Avatar ändern";
+"settings.sync_subtitle" = "Gesundheitsdaten auf Ihrem Telefon synchronisieren";
+"settings.reset_subtitle" = "Werkseinstellungen zurücksetzen wird alle Einstellungen und Aufzeichnungen zurücksetzen";
+"settings.version_subtitle" = "Software-Upgrades bringen neue Funktionen und Fehlerbehebungen";
+"settings.language" = "Sprache";
+"settings.theme" = "Design-Modus";
+"settings.profile" = "Profil bearbeiten";
+"settings.sync" = "Gesundheitsdaten synchronisieren";
+"settings.permission" = "Berechtigungsverwaltung";
+"settings.version" = "App-Version";
+"settings.version_with_number" = "Softwareversion: %@";
+"settings.reset" = "Werkseinstellungen zurücksetzen";
+"settings.show_onboarding" = "Anleitungsseite erneut anzeigen";
+
+// Language and Theme Selection
+"settings.select_language" = "Sprache auswählen";
+"settings.select_theme" = "Design-Modus auswählen";
+
+// Reset Confirmation
+"settings.reset_confirm_title" = "Werkseinstellungen zurücksetzen bestätigen?";
+"settings.reset_confirm_message" = "Das Zurücksetzen auf die Werkseinstellungen wird alle Einstellungen löschen. Bitte wählen Sie diese Option sorgfältig aus.";
+"settings.reset_done_message" = "Werkseinstellungen wurden zurückgesetzt (Demo)";
+"settings.reset_cancel" = "Abbrechen";
+"settings.reset_confirm" = "Bestätigen";
+
+// Version Check
+"settings.version_checking" = "Suche nach Updates...";
+"settings.version_latest_title" = "Bereits neueste Version";
+"settings.version_latest_message" = "Sie verwenden die neueste Version %@";
+"settings.version_update_title" = "Neue Version gefunden";
+"settings.version_update_message" = "Neue Version %@ verfügbar, aktuelle Version: %@";
+"settings.version_update_button" = "Aktualisieren";
+"settings.version_check_failed" = "Suche nach Updates fehlgeschlagen";
+
+// Sync Health Data
+"settings.sync_no_device_title" = "Kein Gerät verbunden";
+"settings.sync_no_device_message" = "Bitte verbinden Sie sich zuerst mit einem Gerät auf der \"Verbinden\"-Seite, bevor Sie synchronisieren.";
+"settings.syncing" = "Synchronisierung...";
+"settings.sync_success_title" = "Synchronisierung erfolgreich";
+"settings.sync_success_message" = "Ein Batch von Beispiel-Gesundheitsdaten wurde gesendet.";
+"settings.sync_error_title" = "Synchronisierung fehlgeschlagen";
+
+// MARK: - Settings Sections
+"settings.section.personalization" = "Personalisierung";
+"settings.section.data_account" = "Daten & Konto";
+"settings.section.other" = "Sonstiges";
+"settings.section.about" = "Über";
+
+// MARK: - Device Selection
+"device_selection.title" = "Bitte wählen Sie das Mindora-Gerät aus, mit dem Sie sich verbinden möchten";
+
+// MARK: - Help Cards
+"help.title" = "Verbindungshilfe";
+"help.done" = "Fertig";
+"help.connect_01_title" = "Wie verbinde ich Mindora? 01";
+"help.connect_01_content" = "Bitte stellen Sie sicher, dass Bluetooth aktiviert ist und bringen Sie Ihr Telefon in die Nähe von Mindora.";
+"help.connect_02_title" = "Wie verbinde ich Mindora? 02";
+"help.connect_02_content" = "Tippen Sie auf die Verbinden-Taste in der App oder finden Sie die Bluetooth-Einstellungen in den Systemeinstellungen.";
+"help.connect_03_title" = "Wie verbinde ich Mindora? 03";
+"help.connect_03_content" = "Wählen Sie Mindora S1 MTL-01 aus den verfügbaren Bluetooth-Geräten aus, um die Verbindung erfolgreich herzustellen.";
+"help.connect_04_title" = "Wie verbinde ich Mindora? 04";
+"help.connect_04_content" = "Wenn Mindora bereits mit einem anderen Telefon oder Gerät verbunden ist, müssen Sie die Bluetooth-Verbindung am ursprünglichen Telefon trennen.";
+"help.connect_05_title" = "Wie verbinde ich Mindora? 05";
+"help.connect_05_content" = "Wenn Sie keine Verbindung herstellen können, besuchen Sie bitte unsere Support-Website für weitere Hilfe.";
+
+// MARK: - Common UI Elements
+"common.ok" = "OK";
+"common.cancel" = "Abbrechen";
+"common.confirm" = "Bestätigen";
+"common.retry" = "Wiederholen";
+
+// MARK: - Onboarding
+"onboarding.start" = "Starten";
+"onboarding.no_device" = "Kein Mindora?";
+"onboarding.connect_mindora" = "Mindora verbinden";
+"onboarding.page3.health_card_text" = "Bitte konfigurieren Sie Mindoras Gesundheitsdaten-Zugriff in der Health-App\nTippen Sie, um die Health-App zu öffnen";
+"onboarding.page3.bluetooth_card_text" = "Bluetooth ist derzeit nicht aktiviert\nTippen Sie, um die Bluetooth-Einstellungen zu öffnen";
+"onboarding.page4.scanning_title" = "Geräte in der Nähe scannen";
+"onboarding.page4.searching" = "Kontinuierliche automatische Suche";
+"onboarding.page4.device_found" = "Mindora gefunden";
+"onboarding.page4.no_device_found" = "Keine Geräte gefunden";
+"onboarding.page4.description" = "Bitte wählen Sie das Mindora-Gerät aus, mit dem Sie sich verbinden möchten. Stellen Sie sicher, dass Bluetooth aktiviert ist.";
+"onboarding.page5.success_title" = "Mindora erfolgreich verbunden";
+"onboarding.page5.complete" = "Fertig";
+
+// MARK: - Help Manual
+"help_manual.page1.title" = "Wie verbinde ich Mindora?";
+"help_manual.page1.description" = "Bitte stellen Sie sicher, dass Bluetooth aktiviert ist und bringen Sie Ihr Telefon in die Nähe von Mindora.";
+"help_manual.page2.title" = "Wie verbinde ich Mindora?";
+"help_manual.page2.description" = "Tippen Sie auf die Verbinden-Taste in der App oder finden Sie die Bluetooth-Einstellungen in den Systemeinstellungen.";
+"help_manual.page3.title" = "Wie verbinde ich Mindora?";
+"help_manual.page3.description" = "Wählen Sie Mindora aus den verfügbaren Bluetooth-Geräten aus, um die Verbindung erfolgreich herzustellen.";
+"help_manual.page4.title" = "Wie verbinde ich Mindora?";
+"help_manual.page4.description" = "Wenn Mindora bereits mit einem anderen Telefon oder Gerät verbunden ist, müssen Sie die Bluetooth-Verbindung am ursprünglichen Telefon trennen.";
+"help_manual.page5.title" = "Wie verbinde ich Mindora?";
+"help_manual.page5.description" = "Wenn Sie keine Verbindung herstellen können, besuchen Sie bitte unsere Support-Website für weitere Hilfe.";
+
+// MARK: - Health Sync Settings
+"health.sync.title" = "Gesundheitssynchronisierung";
+"health.sync.enable" = "Synchronisierung aktivieren";
+"health.sync.interval" = "Synchronisierungszyklus";
+"health.sync.metrics" = "Synchronisierungsmetriken";
+"health.sync.manual" = "Jetzt synchronisieren";
+"health.sync.interval.6s" = "6 Sekunden";
+"health.sync.interval.12s" = "12 Sekunden";
+"health.sync.interval.30s" = "30 Sekunden";
+"health.sync.status.disabled" = "Synchronisierung deaktiviert";
+"health.sync.status.no_run" = "Noch keine Synchronisierung durchgeführt";
+"health.sync.status.last_success_format" = "Letzter Erfolg %@ · %d Metriken";
+"health.sync.status.last_fail_format" = "Letzter Fehlschlag %@ · %@";
+"health.sync.status.interval_format" = "Zyklus: %d Sekunden";
+"health.sync.status.metrics_format" = "Aktiviert: %@";
+"health.sync.section.basic" = "Grundlegend";
+"health.sync.section.metrics" = "Metriken";
+"health.sync.section.action" = "Aktion";
+"health.sync.section.status" = "Status";
+"health.sync.metric.heart_rate" = "Herzfrequenz";
+"health.sync.metric.hrv" = "Herzfrequenzvariabilität";
+"health.sync.metric.spo2" = "Blutsauerstoff";
+"health.sync.metric.blood_pressure" = "Blutdruck";
+"health.sync.metric.sleep" = "Schlaf";
+"health.sync.metric.all" = "Alle auswählen";
+"health.sync.metric.none" = "Alle abwählen";
+
+// MARK: - Permission Management
+"permission.title" = "Berechtigungsverwaltung";
+
+// Network Permissions
+"permission.bluetooth" = "Bluetooth";
+"permission.local_network" = "Lokales Netzwerk";
+"permission.cellular_data" = "Mobilfunkdaten";
+"permission.section.network" = "Netzwerkberechtigungen";
+
+// Health Permissions
+"permission.health.status" = "Gesundheitsdaten";
+"permission.section.health" = "Gesundheitsdatenberechtigungen";
+"permission.section.healthkit_footer_line1" = "Falls der Zugriff eingeschränkt ist, gehen Sie zu";
+"permission.section.healthkit_footer_line2" = "*Einstellungen > Datenschutz & Sicherheit > Gesundheit > Mindora.\n*Öffnen Sie die Health-App > Teilen > Apps > Mindora und aktivieren Sie die benötigten Datentypen.";
+// Permission Status
+"permission.status.authorized" = "Autorisiert";
+"permission.status.partial" = "Teilweise autorisiert";
+"permission.status.not_determined" = "Nicht autorisiert";
+"permission.status.unavailable" = "Nicht verfügbar";
+
+// Permission Reminders
+"permission.health.reminder_title" = "Gesundheitsdatenberechtigung erforderlich";
+"permission.health.reminder_message" = "Um eine bessere Gesundheitsdatenanalyse bereitzustellen, benötigt die App Zugriff auf Ihre Gesundheitsdaten.";
+"permission.bluetooth.reminder_title" = "Bluetooth-Berechtigung erforderlich";
+"permission.bluetooth.reminder_message" = "Um eine Verbindung zu Ihrem Mindora-Gerät herzustellen, benötigt die App Bluetooth-Berechtigung.";
+"permission.request_authorization" = "Zugriff autorisieren";
+"permission.open_settings" = "Einstellungen öffnen";
+"permission.open_health_app" = "Health-App öffnen";
+"permission.later" = "Später";
+"permission.authorization_success" = "Autorisierung erfolgreich";
+"permission.authorization_failed" = "Autorisierung fehlgeschlagen";
+
+// Health Permission Actions
+"permission.health.action_title" = "Gesundheitsdatenberechtigung";
+"permission.health.action_message" = "Bitte wählen Sie eine Aktion";
+"permission.open_settings_hint" = "Sie können diese Berechtigung in den iOS-Einstellungen für Mindora anpassen.";
+
+// Health Settings Guide
+"permission.health.settings_title" = "Datenschutz für Gesundheit";
+"permission.health.settings_message" = "Öffnen Sie Einstellungen > Datenschutz & Sicherheit > Gesundheit, wählen Sie Mindora und aktivieren Sie die benötigten Datentypen.";
+"permission.health.guide_title" = "So legen Sie Gesundheitsdatenberechtigungen fest";
+"permission.health.guide_message" = "1. Öffnen Sie die Health-App\n2. Tippen Sie unten auf 'Teilen'\n3. Wählen Sie 'Apps'\n4. Tippen Sie auf Mindora\n5. Aktivieren Sie die benötigten Datentypen";
+
+// Health Permission CTA (avoid misleading status)
+"permission.health.confirm" = "In Health-App bestätigen";

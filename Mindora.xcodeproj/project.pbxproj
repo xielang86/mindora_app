@@ -1,0 +1,592 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		CC234AB12E7BE89500CEE237 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC234A922E7BE89300CEE237 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC234A992E7BE89300CEE237;
+			remoteInfo = mindora;
+		};
+		CC234ABB2E7BE89600CEE237 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC234A922E7BE89300CEE237 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC234A992E7BE89300CEE237;
+			remoteInfo = mindora;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CC234A9A2E7BE89300CEE237 /* Mindora.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mindora.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC234AB02E7BE89500CEE237 /* MindoraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MindoraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC234ABA2E7BE89600CEE237 /* MindoraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MindoraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CC234AC22E7BE89600CEE237 /* Exceptions for "Mindora" folder in "Mindora" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CC234A992E7BE89300CEE237 /* Mindora */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CC234A9C2E7BE89300CEE237 /* Mindora */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CC234AC22E7BE89600CEE237 /* Exceptions for "Mindora" folder in "Mindora" target */,
+			);
+			path = Mindora;
+			sourceTree = "<group>";
+		};
+		CC234AB32E7BE89600CEE237 /* mindoraTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = mindoraTests;
+			sourceTree = "<group>";
+		};
+		CC234ABD2E7BE89600CEE237 /* mindoraUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = mindoraUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CC234A972E7BE89300CEE237 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC234AAD2E7BE89500CEE237 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC234AB72E7BE89600CEE237 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CC234A912E7BE89300CEE237 = {
+			isa = PBXGroup;
+			children = (
+				CC234A9C2E7BE89300CEE237 /* Mindora */,
+				CC234AB32E7BE89600CEE237 /* mindoraTests */,
+				CC234ABD2E7BE89600CEE237 /* mindoraUITests */,
+				CC234A9B2E7BE89300CEE237 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CC234A9B2E7BE89300CEE237 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CC234A9A2E7BE89300CEE237 /* Mindora.app */,
+				CC234AB02E7BE89500CEE237 /* MindoraTests.xctest */,
+				CC234ABA2E7BE89600CEE237 /* MindoraUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CC234A992E7BE89300CEE237 /* Mindora */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC234AC32E7BE89600CEE237 /* Build configuration list for PBXNativeTarget "Mindora" */;
+			buildPhases = (
+				CC234A962E7BE89300CEE237 /* Sources */,
+				CC234A972E7BE89300CEE237 /* Frameworks */,
+				CC234A982E7BE89300CEE237 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CC234A9C2E7BE89300CEE237 /* Mindora */,
+			);
+			name = Mindora;
+			packageProductDependencies = (
+			);
+			productName = mindora;
+			productReference = CC234A9A2E7BE89300CEE237 /* Mindora.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CC234AAF2E7BE89500CEE237 /* MindoraTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC234AC82E7BE89600CEE237 /* Build configuration list for PBXNativeTarget "MindoraTests" */;
+			buildPhases = (
+				CC234AAC2E7BE89500CEE237 /* Sources */,
+				CC234AAD2E7BE89500CEE237 /* Frameworks */,
+				CC234AAE2E7BE89500CEE237 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC234AB22E7BE89500CEE237 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC234AB32E7BE89600CEE237 /* mindoraTests */,
+			);
+			name = MindoraTests;
+			packageProductDependencies = (
+			);
+			productName = mindoraTests;
+			productReference = CC234AB02E7BE89500CEE237 /* MindoraTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CC234AB92E7BE89600CEE237 /* MindoraUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC234ACB2E7BE89600CEE237 /* Build configuration list for PBXNativeTarget "MindoraUITests" */;
+			buildPhases = (
+				CC234AB62E7BE89600CEE237 /* Sources */,
+				CC234AB72E7BE89600CEE237 /* Frameworks */,
+				CC234AB82E7BE89600CEE237 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC234ABC2E7BE89600CEE237 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC234ABD2E7BE89600CEE237 /* mindoraUITests */,
+			);
+			name = MindoraUITests;
+			packageProductDependencies = (
+			);
+			productName = mindoraUITests;
+			productReference = CC234ABA2E7BE89600CEE237 /* MindoraUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CC234A922E7BE89300CEE237 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					CC234A992E7BE89300CEE237 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					CC234AAF2E7BE89500CEE237 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = CC234A992E7BE89300CEE237;
+					};
+					CC234AB92E7BE89600CEE237 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = CC234A992E7BE89300CEE237;
+					};
+				};
+			};
+			buildConfigurationList = CC234A952E7BE89300CEE237 /* Build configuration list for PBXProject "Mindora" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				fr,
+				de,
+				ja,
+				es,
+				it,
+				"zh-Hans",
+				"zh-Hant",
+				ko,
+			);
+			mainGroup = CC234A912E7BE89300CEE237;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CC234A9B2E7BE89300CEE237 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CC234A992E7BE89300CEE237 /* Mindora */,
+				CC234AAF2E7BE89500CEE237 /* MindoraTests */,
+				CC234AB92E7BE89600CEE237 /* MindoraUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CC234A982E7BE89300CEE237 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC234AAE2E7BE89500CEE237 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC234AB82E7BE89600CEE237 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CC234A962E7BE89300CEE237 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC234AAC2E7BE89500CEE237 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC234AB62E7BE89600CEE237 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CC234AB22E7BE89500CEE237 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC234A992E7BE89300CEE237 /* Mindora */;
+			targetProxy = CC234AB12E7BE89500CEE237 /* PBXContainerItemProxy */;
+		};
+		CC234ABC2E7BE89600CEE237 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC234A992E7BE89300CEE237 /* Mindora */;
+			targetProxy = CC234ABB2E7BE89600CEE237 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CC234AC42E7BE89600CEE237 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = mindora/mindora.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = mindora/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "用于在局域网内发现并连接 Mindora 设备";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindora316.mindora;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CC234AC52E7BE89600CEE237 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = mindora/mindora.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = mindora/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "用于在局域网内发现并连接 Mindora 设备";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindora316.mindora;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CC234AC62E7BE89600CEE237 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CC234AC72E7BE89600CEE237 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CC234AC92E7BE89600CEE237 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mindora.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mindora";
+			};
+			name = Debug;
+		};
+		CC234ACA2E7BE89600CEE237 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mindora.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mindora";
+			};
+			name = Release;
+		};
+		CC234ACC2E7BE89600CEE237 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = mindora;
+			};
+			name = Debug;
+		};
+		CC234ACD2E7BE89600CEE237 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = mindora;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CC234A952E7BE89300CEE237 /* Build configuration list for PBXProject "Mindora" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC234AC62E7BE89600CEE237 /* Debug */,
+				CC234AC72E7BE89600CEE237 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC234AC32E7BE89600CEE237 /* Build configuration list for PBXNativeTarget "Mindora" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC234AC42E7BE89600CEE237 /* Debug */,
+				CC234AC52E7BE89600CEE237 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC234AC82E7BE89600CEE237 /* Build configuration list for PBXNativeTarget "MindoraTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC234AC92E7BE89600CEE237 /* Debug */,
+				CC234ACA2E7BE89600CEE237 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC234ACB2E7BE89600CEE237 /* Build configuration list for PBXNativeTarget "MindoraUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC234ACC2E7BE89600CEE237 /* Debug */,
+				CC234ACD2E7BE89600CEE237 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CC234A922E7BE89300CEE237 /* Project object */;
+}
