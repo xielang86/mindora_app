@@ -149,8 +149,9 @@
 "onboarding.start" = "開始";
 "onboarding.no_device" = "沒有Mindora嗎？";
 "onboarding.connect_mindora" = "連接 Mindora";
-"onboarding.page3.health_card_text" = "請在'健康'App中設定 Mindora 的數據訪問權限\n點擊前往'健康'App";
+"onboarding.page3.health_card_text" = "請在'健康'App中設定 Mindora 的資料存取權限\n點擊前往'健康'App";
 "onboarding.page3.bluetooth_card_text" = "檢測到當前設備藍牙未開啟\n點擊開啟藍牙設定";
+"onboarding.page3.bluetooth_card_text_authorized" = "藍牙權限已開啟\n設備可以正常連接";
 "onboarding.page4.scanning_title" = "掃描附近設備";
 "onboarding.page4.searching" = "持續自動搜尋中";
 "onboarding.page4.device_found" = "已搜尋到 Mindora";

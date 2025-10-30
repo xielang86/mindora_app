@@ -152,6 +152,7 @@
 "onboarding.connect_mindora" = "Connetti Mindora";
 "onboarding.page3.health_card_text" = "Si prega di configurare l'accesso ai dati sanitari di Mindora nell'app Salute\nTocca per aprire l'app Salute";
 "onboarding.page3.bluetooth_card_text" = "Il Bluetooth non è attualmente attivato\nTocca per aprire le impostazioni Bluetooth";
+"onboarding.page3.bluetooth_card_text_authorized" = "Autorizzazione Bluetooth attivata\nIl dispositivo può connettersi normalmente";
 "onboarding.page4.scanning_title" = "Scansione dispositivi nelle vicinanze";
 "onboarding.page4.searching" = "Ricerca automatica continua";
 "onboarding.page4.device_found" = "Mindora trovato";

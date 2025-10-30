@@ -150,8 +150,9 @@
 "onboarding.start" = "Starten";
 "onboarding.no_device" = "Kein Mindora?";
 "onboarding.connect_mindora" = "Mindora verbinden";
-"onboarding.page3.health_card_text" = "Bitte konfigurieren Sie Mindoras Gesundheitsdaten-Zugriff in der Health-App\nTippen Sie, um die Health-App zu öffnen";
+"onboarding.page3.health_card_text" = "Konfigurieren Sie die Gesundheitsdatenzugriffe von Mindora in der Health-App\nTippen Sie, um die Health-App zu öffnen";
 "onboarding.page3.bluetooth_card_text" = "Bluetooth ist derzeit nicht aktiviert\nTippen Sie, um die Bluetooth-Einstellungen zu öffnen";
+"onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth-Berechtigung ist aktiviert\nGerät kann normal verbunden werden";
 "onboarding.page4.scanning_title" = "Geräte in der Nähe scannen";
 "onboarding.page4.searching" = "Kontinuierliche automatische Suche";
 "onboarding.page4.device_found" = "Mindora gefunden";

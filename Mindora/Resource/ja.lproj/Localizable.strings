@@ -152,6 +152,7 @@
 "onboarding.connect_mindora" = "Mindora を接続";
 "onboarding.page3.health_card_text" = "「ヘルスケア」アプリで Mindora のデータアクセス権限を設定してください\nタップして「ヘルスケア」アプリを開く";
 "onboarding.page3.bluetooth_card_text" = "現在のデバイスのBluetoothがオンになっていません\nタップしてBluetooth設定を開く";
+"onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth権限が有効になっています\nデバイスは正常に接続できます";
 "onboarding.page4.scanning_title" = "近くのデバイスをスキャン";
 "onboarding.page4.searching" = "継続的に自動検索中";
 "onboarding.page4.device_found" = "Mindora が見つかりました";

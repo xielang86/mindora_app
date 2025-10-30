@@ -11,6 +11,8 @@
 //
 
 import UIKit
+import HealthKit
+import CoreBluetooth
 
 final class OnboardingPage3ViewController: UIViewController {
     
@@ -187,6 +189,9 @@ final class OnboardingPage3ViewController: UIViewController {
         setupActions()
         // 监听应用回到前台，返回设置或健康App后自动刷新卡片显示与布局
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        
+        // 主动触发健康和蓝牙权限申请，确保用户在相应设置中能看到Mindora的权限设置
+        requestHealthPermissionIfNeeded()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -318,14 +323,14 @@ final class OnboardingPage3ViewController: UIViewController {
         let cardTextTrailing = scale(designCardTextTrailing, basedOn: view.bounds.width, designDimension: designWidth)
         
         // 缓存用于动态切换的关键约束
-        // 我们将“蓝牙卡片在上，健康卡片在下”作为默认布局；当蓝牙已授权时，隐藏蓝牙卡片并让健康卡片贴顶。
+        // 布局策略：蓝牙卡片始终显示在上方，健康卡片在下方，根据权限状态更新卡片文案
 
-    // 顶部定位相关约束（会在运行时按需启用/禁用）
+    // 顶部定位相关约束
     let bluetoothTopToViewConstraint = bluetoothCardView.topAnchor.constraint(equalTo: view.topAnchor, constant: healthCardTop)
     let healthTopToBluetoothBottomConstraint = healthCardView.topAnchor.constraint(equalTo: bluetoothCardView.bottomAnchor, constant: cardSpacing)
-    // 健康卡片贴顶（备用，不作为仅显示健康卡片时的默认位置）
+    // 健康卡片贴顶（备用约束，当前不使用）
     let healthTopToViewConstraint = healthCardView.topAnchor.constraint(equalTo: view.topAnchor, constant: healthCardTop)
-    // 健康卡片“下方”位置：等同于蓝牙卡片高度 + 间距后的位置
+    // 健康卡片"下方"位置：等同于蓝牙卡片高度 + 间距后的位置（备用约束，当前不使用）
     let healthLowerTopConstant = healthCardTop + cardHeight + cardSpacing
     let healthTopToViewLowerConstraint = healthCardView.topAnchor.constraint(equalTo: view.topAnchor, constant: healthLowerTopConstant)
 
@@ -336,10 +341,10 @@ final class OnboardingPage3ViewController: UIViewController {
             backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            // 默认：蓝牙卡片在上
+            // 默认布局：蓝牙卡片在上，健康卡片在下
             bluetoothTopToViewConstraint,
             
-            // 健康数据卡片默认在蓝牙卡片下方 50px（当蓝牙已授权时，会改为贴顶）
+            // 健康数据卡片在蓝牙卡片下方
             healthTopToBluetoothBottomConstraint,
             healthCardView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             healthCardView.widthAnchor.constraint(equalToConstant: cardWidth),
@@ -443,16 +448,29 @@ final class OnboardingPage3ViewController: UIViewController {
     }
     
     @objc private func bluetoothCardTapped() {
-        print("Bluetooth card tapped - Request bluetooth permission")
+        let btAuth = BluetoothManager.shared.checkBluetoothAuthorization()
+        let isBluetoothAuthorized = (btAuth == .allowedAlways)
         
-        // 先请求蓝牙权限（这会触发系统权限弹窗）
-        BluetoothManager.shared.requestBluetoothAuthorization { authorization in
-            print("Bluetooth authorization status: \(authorization.rawValue)")
-            
-            // 延迟一下再跳转到设置，让用户有时间看到权限弹窗或处理结果
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                // 跳转到应用的设置页面
-                self.openAppSettings()
+        if isBluetoothAuthorized {
+            print("Bluetooth card tapped - Permission already granted, navigate to settings")
+            // 蓝牙权限已开启，直接跳转到设置页面
+            openAppSettings()
+        } else {
+            print("Bluetooth card tapped - Request bluetooth permission")
+            // 先请求蓝牙权限（这会触发系统权限弹窗）
+            BluetoothManager.shared.requestBluetoothAuthorization { [weak self] authorization in
+                print("Bluetooth authorization status: \(authorization.rawValue)")
+                
+                DispatchQueue.main.async {
+                    // 刷新卡片文案
+                    self?.updateCardVisibilityAndLayout()
+                    
+                    // 延迟一下再跳转到设置，让用户有时间看到权限弹窗或处理结果
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        // 跳转到应用的设置页面
+                        self?.openAppSettings()
+                    }
+                }
             }
         }
     }
@@ -485,6 +503,61 @@ final class OnboardingPage3ViewController: UIViewController {
     
     // MARK: - Private Helpers
     
+    /// 主动请求健康和蓝牙权限，确保用户在系统设置中能看到Mindora的权限设置
+    private func requestHealthPermissionIfNeeded() {
+        // 检查健康权限状态
+        Task {
+            // 首先检查 HealthKit 是否可用
+            guard HKHealthStore.isHealthDataAvailable() else {
+                print("[OnboardingPage3] HealthKit 不可用，跳过健康权限申请")
+                // 即使 HealthKit 不可用，仍然申请蓝牙权限
+                requestBluetoothPermissionIfNeeded()
+                return
+            }
+            
+            let healthStatus = await PermissionManager.shared.getHealthPermissionStatus()
+            
+            // 如果是 notDetermined（从未请求过），则主动触发权限申请
+            if healthStatus == .notDetermined {
+                print("[OnboardingPage3] 检测到健康权限从未申请过，主动触发权限申请")
+                do {
+                    try await HealthDataManager.shared.requestAuthorization()
+                    print("[OnboardingPage3] 健康权限申请完成，用户现在可以在健康App中看到Mindora设置")
+                } catch {
+                    print("[OnboardingPage3] 健康权限申请失败: \(error.localizedDescription)")
+                }
+            } else {
+                print("[OnboardingPage3] 健康权限状态: \(healthStatus.localizedDescription)")
+            }
+            
+            // 申请蓝牙权限
+            await MainActor.run {
+                requestBluetoothPermissionIfNeeded()
+            }
+        }
+    }
+    
+    /// 主动请求蓝牙权限，确保用户在系统设置中能看到Mindora的蓝牙权限设置
+    private func requestBluetoothPermissionIfNeeded() {
+        let bluetoothStatus = BluetoothManager.shared.checkBluetoothAuthorization()
+        
+        // 如果是 notDetermined（从未请求过），则主动触发权限申请
+        if bluetoothStatus == .notDetermined {
+            print("[OnboardingPage3] 检测到蓝牙权限从未申请过，主动触发权限申请")
+            BluetoothManager.shared.requestBluetoothAuthorization { [weak self] authorization in
+                print("[OnboardingPage3] 蓝牙权限申请完成，状态: \(authorization.rawValue)")
+                print("[OnboardingPage3] 用户现在可以在系统设置中看到Mindora的蓝牙权限设置")
+                
+                // 权限申请完成后，刷新卡片文案
+                DispatchQueue.main.async {
+                    self?.updateCardVisibilityAndLayout()
+                }
+            }
+        } else {
+            print("[OnboardingPage3] 蓝牙权限状态: \(bluetoothStatus.rawValue)")
+        }
+    }
+    
     /// 打开应用设置页面
     private func openAppSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -512,23 +585,35 @@ private extension OnboardingPage3ViewController {
         let btAuth = BluetoothManager.shared.checkBluetoothAuthorization()
         let isBluetoothAuthorized = (btAuth == .allowedAlways)
 
-        if isBluetoothAuthorized {
-            // 隐藏蓝牙卡片，并让健康卡片贴顶
-            bluetoothCardView.isHidden = true
-            _bluetoothTopToViewConstraint?.isActive = false
-            _healthTopToBluetoothBottomConstraint?.isActive = false
-            // 仅显示健康卡片时：放在“下方”位置（而不是贴顶）
-            _healthTopToViewConstraint?.isActive = false
-            _healthTopToViewLowerConstraint?.isActive = true
-        } else {
-            // 显示蓝牙卡片（在上），健康卡片在下
-            bluetoothCardView.isHidden = false
-            _healthTopToViewConstraint?.isActive = false
-            _healthTopToViewLowerConstraint?.isActive = false
-            _bluetoothTopToViewConstraint?.isActive = true
-            _healthTopToBluetoothBottomConstraint?.isActive = true
-        }
+        // 始终显示蓝牙卡片，但根据权限状态更新文案
+        bluetoothCardView.isHidden = false
+        updateBluetoothCardText(isAuthorized: isBluetoothAuthorized)
+        
+        // 布局约束保持不变：蓝牙卡片在上，健康卡片在下
+        _healthTopToViewConstraint?.isActive = false
+        _healthTopToViewLowerConstraint?.isActive = false
+        _bluetoothTopToViewConstraint?.isActive = true
+        _healthTopToBluetoothBottomConstraint?.isActive = true
 
         view.layoutIfNeeded()
+    }
+    
+    /// 根据蓝牙权限状态更新卡片文案
+    private func updateBluetoothCardText(isAuthorized: Bool) {
+        let cardTextFontSize = scale(designCardTextFontSize, basedOn: view.bounds.height, designDimension: designHeight)
+        let lineSpacing = scale(designCardTextLineSpacing, basedOn: view.bounds.height, designDimension: designHeight)
+        
+        // 根据权限状态选择对应的文案
+        let textKey = isAuthorized ? "onboarding.page3.bluetooth_card_text_authorized" : "onboarding.page3.bluetooth_card_text"
+        let newText = L(textKey)
+        
+        // 设置新的文案样式
+        let bluetoothParagraphStyle = NSMutableParagraphStyle()
+        bluetoothParagraphStyle.lineSpacing = lineSpacing
+        bluetoothParagraphStyle.alignment = .left
+        let bluetoothAttributedString = NSMutableAttributedString(string: newText)
+        bluetoothAttributedString.addAttribute(.paragraphStyle, value: bluetoothParagraphStyle, range: NSRange(location: 0, length: bluetoothAttributedString.length))
+        bluetoothAttributedString.addAttribute(.font, value: UIFont.systemFont(ofSize: cardTextFontSize, weight: .regular), range: NSRange(location: 0, length: bluetoothAttributedString.length))
+        bluetoothTextLabel.attributedText = bluetoothAttributedString
     }
 }

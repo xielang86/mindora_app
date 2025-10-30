@@ -151,6 +151,7 @@
 "onboarding.connect_mindora" = "Mindora 연결";
 "onboarding.page3.health_card_text" = "'건강' 앱에서 Mindora의 데이터 접근 권한을 설정하세요\n탭하여 '건강' 앱 열기";
 "onboarding.page3.bluetooth_card_text" = "현재 기기의 블루투스가 켜져 있지 않습니다\n탭하여 블루투스 설정 열기";
+"onboarding.page3.bluetooth_card_text_authorized" = "블루투스 권한이 활성화되었습니다\n기기가 정상적으로 연결될 수 있습니다";
 "onboarding.page4.scanning_title" = "근처 기기 스캔";
 "onboarding.page4.searching" = "지속적으로 자동 검색 중";
 "onboarding.page4.device_found" = "Mindora 발견";

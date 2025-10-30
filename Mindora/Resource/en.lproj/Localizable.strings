@@ -152,6 +152,7 @@
 "onboarding.connect_mindora" = "Connect Mindora";
 "onboarding.page3.health_card_text" = "Configure Mindora's health data access in the Health app\nTap to open Health app";
 "onboarding.page3.bluetooth_card_text" = "Bluetooth is not enabled\nTap to enable Bluetooth settings";
+"onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth permission is enabled\nDevice can connect normally";
 "onboarding.page4.scanning_title" = "Scanning Nearby Devices";
 "onboarding.page4.searching" = "Continuously searching";
 "onboarding.page4.device_found" = "Mindora Found";

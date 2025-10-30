@@ -152,6 +152,7 @@
 "onboarding.connect_mindora" = "连接 Mindora";
 "onboarding.page3.health_card_text" = "请在'健康'App中设置 Mindora 的数据访问权限\n点击前往'健康'App";
 "onboarding.page3.bluetooth_card_text" = "检测到当前设备蓝牙未开启\n点击开启蓝牙设置";
+"onboarding.page3.bluetooth_card_text_authorized" = "蓝牙权限已开启\n设备可以正常连接";
 "onboarding.page4.scanning_title" = "扫描附近设备";
 "onboarding.page4.searching" = "持续自动搜索中";
 "onboarding.page4.device_found" = "已搜索到 Mindora";
