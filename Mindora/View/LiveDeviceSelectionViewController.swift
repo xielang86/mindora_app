@@ -72,6 +72,28 @@ extension LiveDeviceSelectionViewController: BonjourDiscoveryDelegate {
         Log.info("DeviceSelect", "discovery update services=\(discovery.services.count)")
         tableView.reloadData()
     }
+    
+    func discoveryDidFail(_ discovery: BonjourDiscovery, errorCode: Int) {
+        Log.error("DeviceSelect", "discovery failed errorCode=\(errorCode)")
+        // 本地网络权限被拒绝或其他搜索错误，引导用户去设置
+        showLocalNetworkPermissionAlert()
+    }
+    
+    private func showLocalNetworkPermissionAlert() {
+        let customAlert = CustomAlertViewController(
+            title: L("permission.local_network.denied_title"),
+            description: L("permission.local_network.denied_message"),
+            confirmButtonTitle: L("permission.open_settings"),
+            cancelButtonTitle: L("common.cancel"),
+            onConfirm: {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            },
+            onCancel: nil
+        )
+        present(customAlert, animated: true)
+    }
 }
 
 extension LiveDeviceSelectionViewController: NetServiceDelegate {

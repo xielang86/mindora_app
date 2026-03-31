@@ -95,26 +95,12 @@ final class ConnectViewController: UIViewController {
                 Log.info("Connect", "resolved host=\(host)")
                 DeviceSession.shared.host = host
                 DeviceSession.shared.port = 9102
-                Log.info("Connect", "session saved host=\(host) port=9102, start initial sync")
-                // UI 立即跳转，不等待上传完成，上传放在后台异步执行
+                Log.info("Connect", "session saved host=\(host) port=9102")
+                // UI 立即跳转，不等待任何健康数据上传完成
                 self.switchToMainTab()
-                Task.detached(priority: .utility) { [weak self] in
-                    guard let self else { return }
-                    let payload = HealthDataUploader.makeFakePayload(uid: "demo-user")
-                    do {
-                        _ = try await HealthDataUploader.postUpdateProfile(host: host, port: 9102, payload: payload)
-                        Log.info("Connect", "initial background sync success http://\(host):9102/update_profile")
-                        await MainActor.run {
-                            if let window = self.view.window ?? UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.windows.first,
-                               let root = window.rootViewController { Toast.show("APP连接成功，已后台推送健康数据（示例）", in: root.view) }
-                        }
-                    } catch {
-                        Log.error("Connect", "initial background sync failed: \(error.localizedDescription)")
-                        await MainActor.run {
-                            if let window = self.view.window ?? UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.windows.first,
-                               let root = window.rootViewController { Toast.show("已连接，数据上传失败：\(error.localizedDescription)", in: root.view) }
-                        }
-                    }
+                Task.detached(priority: .background) {
+                    Log.info("Connect", "trigger background health sync after device connect")
+                    HealthSyncService.shared.performManualSync()
                 }
             }
         }

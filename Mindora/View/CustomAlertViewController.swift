@@ -19,12 +19,12 @@ final class CustomAlertViewController: UIViewController {
     
     // 设计稿中的像素值 - 弹出页容器
     private let designAlertWidth: CGFloat = 1100           // 弹出页宽度
-    private let designAlertHeight: CGFloat = 707           // 弹出页高度
+    private let designAlertMinHeight: CGFloat = 707        // 弹出页最小高度
     private let designAlertCornerRadius: CGFloat = 20      // 弹出页圆角
     private let designAlertBottomMargin: CGFloat = 405     // 弹出页距离底部
     
     // 设计稿中的像素值 - 标题和内容
-    private let designTitleTopMargin: CGFloat = 100        // 标题距离弹出页顶部
+    private let designTitleTopMargin: CGFloat = 80         // 标题距离弹出页顶部 (调整为 80, 让标题更靠上)
     private let designTitleFontSize: CGFloat = DesignConstants.subtitleFontSize  // 标题字体大小 (Semibold)
     private let designDescriptionFontSize: CGFloat = DesignConstants.bodyFontSize  // 描述文字字体大小 (Regular)
     private let designDescriptionLineSpacing: CGFloat = 21 // 描述文字行间距
@@ -51,7 +51,7 @@ final class CustomAlertViewController: UIViewController {
     private var titleText: String
     private var descriptionText: String
     private var confirmButtonTitle: String
-    private var cancelButtonTitle: String
+    private var cancelButtonTitle: String?
     private var onConfirm: (() -> Void)?
     private var onCancel: (() -> Void)?
     
@@ -86,7 +86,7 @@ final class CustomAlertViewController: UIViewController {
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
-        label.textAlignment = .left
+        label.textAlignment = .center
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -117,7 +117,7 @@ final class CustomAlertViewController: UIViewController {
     init(title: String,
          description: String,
          confirmButtonTitle: String,
-         cancelButtonTitle: String,
+         cancelButtonTitle: String? = nil,
          onConfirm: (() -> Void)? = nil,
          onCancel: (() -> Void)? = nil) {
         self.titleText = title
@@ -180,7 +180,7 @@ final class CustomAlertViewController: UIViewController {
         
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = lineSpacing
-        paragraphStyle.alignment = .left
+        paragraphStyle.alignment = .center
         
         let attributedString = NSMutableAttributedString(string: descriptionText)
         attributedString.addAttribute(.font, value: UIFont.systemFont(ofSize: descriptionFontSize, weight: .regular), range: NSRange(location: 0, length: descriptionText.count))
@@ -195,7 +195,13 @@ final class CustomAlertViewController: UIViewController {
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: buttonFontSize, weight: .medium)
         
         confirmButton.setTitle(confirmButtonTitle, for: .normal)
-        cancelButton.setTitle(cancelButtonTitle, for: .normal)
+        
+        if let cancelTitle = cancelButtonTitle {
+            cancelButton.setTitle(cancelTitle, for: .normal)
+            cancelButton.isHidden = false
+        } else {
+            cancelButton.isHidden = true
+        }
         
         // 按钮圆角 - 按设计稿比例计算
         let buttonCornerRadius = scale(designButtonCornerRadius, basedOn: view.bounds.height, designDimension: designHeight)
@@ -211,7 +217,7 @@ final class CustomAlertViewController: UIViewController {
     private func setupConstraints() {
         // 弹出页尺寸 - 按设计稿比例计算
         let alertWidth = scale(designAlertWidth, basedOn: view.bounds.width, designDimension: designWidth)
-        let alertHeight = scale(designAlertHeight, basedOn: view.bounds.height, designDimension: designHeight)
+        let alertMinHeight = scale(designAlertMinHeight, basedOn: view.bounds.height, designDimension: designHeight)
         let alertBottomMargin = scale(designAlertBottomMargin, basedOn: view.bounds.height, designDimension: designHeight)
         
         // 标题距离顶部 - 按设计稿比例计算
@@ -226,6 +232,11 @@ final class CustomAlertViewController: UIViewController {
         let buttonBottomMargin = scale(designButtonBottomMargin, basedOn: view.bounds.height, designDimension: designHeight)
         let buttonSpacing = scale(designButtonSpacing, basedOn: view.bounds.width, designDimension: designWidth)
         
+        // 标题与描述之间的间距
+        let titleToDescriptionSpacing = scale(50, basedOn: view.bounds.height, designDimension: designHeight)
+        // 描述文字与按钮之间的间距 (加大间距，让信息离按钮更远)
+        let descriptionToButtonSpacing = scale(100, basedOn: view.bounds.height, designDimension: designHeight)
+        
         NSLayoutConstraint.activate([
             // 半透明背景遮罩 - 完全填充整个屏幕
             dimmedBackgroundView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -233,10 +244,10 @@ final class CustomAlertViewController: UIViewController {
             dimmedBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             dimmedBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            // 弹出页容器 - 居中显示，距离底部固定距离
+            // 弹出页容器 - 恢复底部对齐 (CenterY 改回 Bottom)
             alertContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             alertContainerView.widthAnchor.constraint(equalToConstant: alertWidth),
-            alertContainerView.heightAnchor.constraint(equalToConstant: alertHeight),
+            alertContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: alertMinHeight),
             alertContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -alertBottomMargin),
             
             // 标题 - 距离弹出页顶部固定距离，水平居中
@@ -245,21 +256,39 @@ final class CustomAlertViewController: UIViewController {
             titleLabel.trailingAnchor.constraint(equalTo: alertContainerView.trailingAnchor, constant: -textHorizontalMargin),
             
             // 描述 - 在标题下方，水平居中
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: titleToDescriptionSpacing),
             descriptionLabel.leadingAnchor.constraint(equalTo: alertContainerView.leadingAnchor, constant: textHorizontalMargin),
             descriptionLabel.trailingAnchor.constraint(equalTo: alertContainerView.trailingAnchor, constant: -textHorizontalMargin),
-            
-            // 取消按钮（左侧）- 距离底部固定距离
-            cancelButton.widthAnchor.constraint(equalToConstant: buttonWidth),
-            cancelButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            cancelButton.bottomAnchor.constraint(equalTo: alertContainerView.bottomAnchor, constant: -buttonBottomMargin),
-            cancelButton.trailingAnchor.constraint(equalTo: alertContainerView.centerXAnchor, constant: -buttonSpacing / 2),
-            
-            // 确认按钮（右侧）- 距离底部固定距离
-            confirmButton.widthAnchor.constraint(equalToConstant: buttonWidth),
-            confirmButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            confirmButton.bottomAnchor.constraint(equalTo: alertContainerView.bottomAnchor, constant: -buttonBottomMargin),
-            confirmButton.leadingAnchor.constraint(equalTo: alertContainerView.centerXAnchor, constant: buttonSpacing / 2)
+        ])
+        
+        if cancelButtonTitle != nil {
+            // 两个按钮布局
+            NSLayoutConstraint.activate([
+                // 取消按钮（左侧）- 在描述文字下方，与确认按钮同高
+                cancelButton.widthAnchor.constraint(equalToConstant: buttonWidth),
+                cancelButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+                cancelButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: descriptionToButtonSpacing),
+                cancelButton.trailingAnchor.constraint(equalTo: alertContainerView.centerXAnchor, constant: -buttonSpacing / 2),
+                
+                // 确认按钮（右侧）- 在描述文字下方
+                confirmButton.widthAnchor.constraint(equalToConstant: buttonWidth),
+                confirmButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+                confirmButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: descriptionToButtonSpacing),
+                confirmButton.leadingAnchor.constraint(equalTo: alertContainerView.centerXAnchor, constant: buttonSpacing / 2)
+            ])
+        } else {
+            // 单个按钮布局（居中）
+            NSLayoutConstraint.activate([
+                confirmButton.widthAnchor.constraint(equalToConstant: buttonWidth),
+                confirmButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+                confirmButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: descriptionToButtonSpacing),
+                confirmButton.centerXAnchor.constraint(equalTo: alertContainerView.centerXAnchor)
+            ])
+        }
+        
+        NSLayoutConstraint.activate([
+            // 弹出页底部约束 - 按钮距离底部固定距离
+            alertContainerView.bottomAnchor.constraint(equalTo: confirmButton.bottomAnchor, constant: buttonBottomMargin)
         ])
     }
     
@@ -275,14 +304,18 @@ final class CustomAlertViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func confirmButtonTapped() {
-        dismiss(animated: true) { [weak self] in
-            self?.onConfirm?()
+        self.confirmButton.animateButtonTap { [weak self] in
+            self?.dismiss(animated: true) {
+                self?.onConfirm?()
+            }
         }
     }
     
     @objc private func cancelButtonTapped() {
-        dismiss(animated: true) { [weak self] in
-            self?.onCancel?()
+        self.cancelButton.animateButtonTap { [weak self] in
+            self?.dismiss(animated: true) {
+                self?.onCancel?()
+            }
         }
     }
     

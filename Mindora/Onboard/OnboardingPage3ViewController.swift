@@ -57,6 +57,12 @@ final class OnboardingPage3ViewController: UIViewController {
     private let designCardTextLeading: CGFloat = 190       // 文字距离卡片左边（图标右侧）
     private let designCardTextTrailing: CGFloat = 80       // 文字距离箭头的间距
     
+    // 设计稿中的像素值 - 退出按钮
+    private let designExitButtonTop: CGFloat = 186         // 退出按钮距离屏幕顶部
+    private let designExitButtonTrailing: CGFloat = 80     // 退出按钮距离屏幕右边 (避免被圆角屏幕切掉)
+    private let designExitButtonWidth: CGFloat = 54        // 退出按钮图标宽度
+    private let designExitButtonHeight: CGFloat = DesignConstants.subtitleFontSize  // 退出按钮图标高度
+    
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
         return designValue * (dimension / designDimension)
@@ -77,7 +83,7 @@ final class OnboardingPage3ViewController: UIViewController {
     // 第一个卡片容器 - 健康数据
     private let healthCardView: UIView = {
         let view = UIView()
-        view.backgroundColor = .clear  // 透明背景
+        view.backgroundColor = DesignConstants.cardBackgroundBlue  // 蓝色背景
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -114,7 +120,7 @@ final class OnboardingPage3ViewController: UIViewController {
     // 第二个卡片容器 - 蓝牙
     private let bluetoothCardView: UIView = {
         let view = UIView()
-        view.backgroundColor = .clear  // 透明背景
+        view.backgroundColor = DesignConstants.cardBackgroundBlue  // 蓝色背景（权限未开启时）
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -173,6 +179,12 @@ final class OnboardingPage3ViewController: UIViewController {
         label.textAlignment = .right
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    // 退出按钮
+    private let exitButton: OnboardingExitButton = {
+        let button = OnboardingExitButton()
+        return button
     }()
 
     // 动态切换布局所需的约束引用
@@ -239,6 +251,7 @@ final class OnboardingPage3ViewController: UIViewController {
         view.addSubview(bottomContainerView)
         bottomContainerView.addSubview(questionIconView)
         bottomContainerView.addSubview(connectLabel)
+        view.addSubview(exitButton)
         
         setupStyles()
         setupConstraints()
@@ -278,15 +291,15 @@ final class OnboardingPage3ViewController: UIViewController {
         // 卡片容器边框和圆角 - 按设计稿比例计算
         let cardCornerRadius = scale(designCardCornerRadius, basedOn: view.bounds.height, designDimension: designHeight)
         
-        // 健康数据卡片 - 白色边框，透明背景
+        // 健康数据卡片 - 蓝色背景，无边框
         healthCardView.layer.cornerRadius = cardCornerRadius
-        healthCardView.layer.borderWidth = 0.5
-        healthCardView.layer.borderColor = UIColor.white.cgColor
+        healthCardView.layer.borderWidth = 0
+        healthCardView.layer.borderColor = UIColor.clear.cgColor
         
-        // 蓝牙卡片 - 白色边框，透明背景
+        // 蓝牙卡片 - 默认蓝色背景，无边框（权限已开启时会更新为透明背景+边框）
         bluetoothCardView.layer.cornerRadius = cardCornerRadius
-        bluetoothCardView.layer.borderWidth = 0.5
-        bluetoothCardView.layer.borderColor = UIColor.white.cgColor
+        bluetoothCardView.layer.borderWidth = 0
+        bluetoothCardView.layer.borderColor = UIColor.clear.cgColor
     }
     
     private func setupConstraints() {
@@ -301,6 +314,12 @@ final class OnboardingPage3ViewController: UIViewController {
         
         // 按钮文字位置 - 按设计稿比例计算
         let buttonTextTrailing = scale(designButtonTextTrailing, basedOn: view.bounds.width, designDimension: designWidth)
+        
+        // 退出按钮尺寸 - 按设计稿比例计算
+        let exitButtonTop = scale(designExitButtonTop, basedOn: view.bounds.height, designDimension: designHeight)
+        let exitButtonTrailing = scale(designExitButtonTrailing, basedOn: view.bounds.width, designDimension: designWidth)
+        let exitButtonWidth = scale(designExitButtonWidth, basedOn: view.bounds.width, designDimension: designWidth)
+        let exitButtonHeight = scale(designExitButtonHeight, basedOn: view.bounds.height, designDimension: designHeight)
         
         // 卡片尺寸和位置 - 按设计稿比例计算
         let cardWidth = scale(designCardWidth, basedOn: view.bounds.width, designDimension: designWidth)
@@ -403,7 +422,13 @@ final class OnboardingPage3ViewController: UIViewController {
             
             // "连接 Mindora" 文字 - 在按钮内右侧，垂直居中
             connectLabel.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -buttonTextTrailing),
-            connectLabel.centerYAnchor.constraint(equalTo: bottomContainerView.centerYAnchor)
+            connectLabel.centerYAnchor.constraint(equalTo: bottomContainerView.centerYAnchor),
+            
+            // 退出按钮
+            exitButton.topAnchor.constraint(equalTo: view.topAnchor, constant: exitButtonTop),
+            exitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -exitButtonTrailing),
+            exitButton.widthAnchor.constraint(equalToConstant: exitButtonWidth),
+            exitButton.heightAnchor.constraint(equalToConstant: exitButtonHeight)
         ])
 
         // 将可切换的约束存储到属性，供运行时修改
@@ -438,37 +463,40 @@ final class OnboardingPage3ViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func healthCardTapped() {
-        print("Health card tapped - Open health settings")
-        // 跳转到健康 App
-        PermissionManager.shared.openHealthApp { success in
-            if !success {
-                print("Failed to open Health app, opening app settings instead")
+        self.healthCardView.animateButtonTap {
+            print("Health card tapped - Open Health Sharing page")
+            PermissionManager.shared.openHealthApp { success in
+                if !success {
+                    print("Failed to open Health app, opening app settings instead")
+                }
             }
         }
     }
     
     @objc private func bluetoothCardTapped() {
-        let btAuth = BluetoothManager.shared.checkBluetoothAuthorization()
-        let isBluetoothAuthorized = (btAuth == .allowedAlways)
-        
-        if isBluetoothAuthorized {
-            print("Bluetooth card tapped - Permission already granted, navigate to settings")
-            // 蓝牙权限已开启，直接跳转到设置页面
-            openAppSettings()
-        } else {
-            print("Bluetooth card tapped - Request bluetooth permission")
-            // 先请求蓝牙权限（这会触发系统权限弹窗）
-            BluetoothManager.shared.requestBluetoothAuthorization { [weak self] authorization in
-                print("Bluetooth authorization status: \(authorization.rawValue)")
-                
-                DispatchQueue.main.async {
-                    // 刷新卡片文案
-                    self?.updateCardVisibilityAndLayout()
+        self.bluetoothCardView.animateButtonTap { [weak self] in
+            let btAuth = BluetoothManager.shared.checkBluetoothAuthorization()
+            let isBluetoothAuthorized = (btAuth == .allowedAlways)
+            
+            if isBluetoothAuthorized {
+                print("Bluetooth card tapped - Permission already granted, navigate to settings")
+                // 蓝牙权限已开启，直接跳转到设置页面
+                self?.openAppSettings()
+            } else {
+                print("Bluetooth card tapped - Request bluetooth permission")
+                // 先请求蓝牙权限（这会触发系统权限弹窗）
+                BluetoothManager.shared.requestBluetoothAuthorization { [weak self] authorization in
+                    print("Bluetooth authorization status: \(authorization.rawValue)")
                     
-                    // 延迟一下再跳转到设置，让用户有时间看到权限弹窗或处理结果
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        // 跳转到应用的设置页面
-                        self?.openAppSettings()
+                    DispatchQueue.main.async {
+                        // 刷新卡片文案
+                        self?.updateCardVisibilityAndLayout()
+                        
+                        // 延迟一下再跳转到设置，让用户有时间看到权限弹窗或处理结果
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            // 跳转到应用的设置页面
+                            self?.openAppSettings()
+                        }
                     }
                 }
             }
@@ -476,28 +504,32 @@ final class OnboardingPage3ViewController: UIViewController {
     }
     
     @objc private func questionIconTapped() {
-        // 打开用户手册
-        print("Question icon tapped - Open help manual")
-        let helpManualVC = HelpManualPagesViewController()
-        helpManualVC.modalPresentationStyle = .fullScreen
-        helpManualVC.modalTransitionStyle = .crossDissolve
-        present(helpManualVC, animated: true)
+        self.questionIconView.animateButtonTap { [weak self] in
+            // 打开用户手册
+            print("Question icon tapped - Open help manual")
+            let helpManualVC = HelpManualPagesViewController()
+            helpManualVC.modalPresentationStyle = .fullScreen
+            helpManualVC.modalTransitionStyle = .crossDissolve
+            self?.present(helpManualVC, animated: true)
+        }
     }
     
     @objc private func connectAreaTapped() {
-        // 跳转到引导页4（扫描设备页面）
-        print("Connect Mindora tapped - Navigate to Page 4")
-        
-        let page4VC = OnboardingPage4ViewController()
-        
-        // 如果当前在导航控制器中，使用 push
-        if let navigationController = self.navigationController {
-            navigationController.pushViewController(page4VC, animated: true)
-        } else {
-            // 否则使用模态展示
-            page4VC.modalPresentationStyle = .fullScreen
-            page4VC.modalTransitionStyle = .crossDissolve
-            present(page4VC, animated: true)
+        self.bottomContainerView.animateButtonTap { [weak self] in
+            // 跳转到引导页4（扫描设备页面）
+            print("Connect Mindora tapped - Navigate to Page 4")
+            
+            let page4VC = OnboardingPage4ViewController()
+            
+            // 如果当前在导航控制器中，使用 push
+            if let navigationController = self?.navigationController {
+                navigationController.pushViewController(page4VC, animated: true)
+            } else {
+                // 否则使用模态展示
+                page4VC.modalPresentationStyle = .fullScreen
+                page4VC.modalTransitionStyle = .crossDissolve
+                self?.present(page4VC, animated: true)
+            }
         }
     }
     
@@ -598,7 +630,7 @@ private extension OnboardingPage3ViewController {
         view.layoutIfNeeded()
     }
     
-    /// 根据蓝牙权限状态更新卡片文案
+    /// 根据蓝牙权限状态更新卡片文案和背景颜色
     private func updateBluetoothCardText(isAuthorized: Bool) {
         let cardTextFontSize = scale(designCardTextFontSize, basedOn: view.bounds.height, designDimension: designHeight)
         let lineSpacing = scale(designCardTextLineSpacing, basedOn: view.bounds.height, designDimension: designHeight)
@@ -606,6 +638,17 @@ private extension OnboardingPage3ViewController {
         // 根据权限状态选择对应的文案
         let textKey = isAuthorized ? "onboarding.page3.bluetooth_card_text_authorized" : "onboarding.page3.bluetooth_card_text"
         let newText = L(textKey)
+        
+        // 根据权限状态更新背景颜色和边框：已授权时透明背景+白色边框，未授权时蓝色背景+无边框
+        if isAuthorized {
+            bluetoothCardView.backgroundColor = .clear
+            bluetoothCardView.layer.borderWidth = 0.5
+            bluetoothCardView.layer.borderColor = UIColor.white.cgColor
+        } else {
+            bluetoothCardView.backgroundColor = DesignConstants.cardBackgroundBlue
+            bluetoothCardView.layer.borderWidth = 0
+            bluetoothCardView.layer.borderColor = UIColor.clear.cgColor
+        }
         
         // 设置新的文案样式
         let bluetoothParagraphStyle = NSMutableParagraphStyle()

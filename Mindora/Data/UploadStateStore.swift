@@ -4,6 +4,10 @@ import Foundation
 /// 键采用与服务端一致的 wire key，例如：
 /// - "heart_rate"
 /// - "heart_rate_variability_sdnn"
+/// - "respiratory_rate"
+/// - "resting_heart_rate"
+/// - "sleeping_wrist_temperature"
+/// - "body_temperature"
 /// - "sleep_stage_deep" | "sleep_stage_rem" | "sleep_stage_light"
 final class UploadStateStore {
     static let shared = UploadStateStore()

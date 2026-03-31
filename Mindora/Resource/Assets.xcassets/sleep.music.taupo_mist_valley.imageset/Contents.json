@@ -1,0 +1,23 @@
+{
+  "images": [
+    {
+      "filename": "sleep.scene.taupo_mist_valley.png",
+      "idiom": "universal",
+      "scale": "1x"
+    },
+    {
+      "filename": "sleep.scene.taupo_mist_valley@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "filename": "sleep.scene.taupo_mist_valley@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

@@ -36,6 +36,11 @@
 
 // MARK: - Health Screen
 "health.title" = "건강";
+"health.page_title" = "모든 건강 데이터";
+"health.time.today" = "오늘";
+"health.time.past_7_days" = "지난 7일";
+"health.time.past_12_months" = "지난 12개월";
+"health.time.earlier" = "더 이전";
 // MARK: - Health Metrics
 "health.status.initial" = "Health 접근 요청 중";
 "health.status.loading" = "건강 데이터 불러오는 중";
@@ -65,11 +70,29 @@
 "health.sleep.stage.core" = "코어";
 "health.sleep.stage.deep" = "깊은 수면";
 "health.sleep.no_data" = "수면 데이터 없음";
+"health.sleep.bed_time" = "침대에 있던 시간";
+"health.sleep.sleep_time" = "수면 시간";
+"health.sleep.avg_bed_time" = "평균 침대 시간";
+"health.sleep.avg_sleep_time" = "평균 수면 시간";
 "health.period.day" = "일";
+"health.period.week" = "주";
 "health.period.month" = "월";
+"health.period.six_months" = "6개월";
 "health.period.year" = "년";
+"health.period.today" = "오늘";
 "health.period.daily_average" = "일평균";
+"health.period.hourly_average" = "시간평균";
+"health.period.weekly_average" = "주평균";
 "health.period.monthly_average" = "월평균";
+"health.period.range" = "범위";
+"health.period.hour" = "시";
+"health.weekday.sun" = "일";
+"health.weekday.mon" = "월";
+"health.weekday.tue" = "화";
+"health.weekday.wed" = "수";
+"health.weekday.thu" = "목";
+"health.weekday.fri" = "금";
+"health.weekday.sat" = "토";
 
 // MARK: - Settings Screen
 "settings.title" = "설정";
@@ -149,7 +172,7 @@
 "onboarding.start" = "시작";
 "onboarding.no_device" = "Mindora가 없으신가요?";
 "onboarding.connect_mindora" = "Mindora 연결";
-"onboarding.page3.health_card_text" = "'건강' 앱에서 Mindora의 데이터 접근 권한을 설정하세요\n탭하여 '건강' 앱 열기";
+"onboarding.page3.health_card_text" = "'건강' 앱에서 Mindora의 데이터 접근 권한을 설정하세요";
 "onboarding.page3.bluetooth_card_text" = "현재 기기의 블루투스가 켜져 있지 않습니다\n탭하여 블루투스 설정 열기";
 "onboarding.page3.bluetooth_card_text_authorized" = "블루투스 권한이 활성화되었습니다\n기기가 정상적으로 연결될 수 있습니다";
 "onboarding.page4.scanning_title" = "근처 기기 스캔";
@@ -226,7 +249,7 @@
 "permission.bluetooth.reminder_message" = "Mindora 기기에 연결하려면 앱에 블루투스 권한이 필요합니다.";
 "permission.request_authorization" = "액세스 승인";
 "permission.open_settings" = "설정 열기";
-"permission.open_health_app" = "건강 앱 열기";
+"permission.open_health_app" = "건강 열기";
 "permission.later" = "나중에";
 "permission.authorization_success" = "승인 성공";
 "permission.authorization_failed" = "승인 실패";
@@ -240,7 +263,14 @@
 "permission.health.settings_title" = "건강 개인 정보 보호 설정";
 "permission.health.settings_message" = "설정 > 개인 정보 보호 및 보안 > 건강으로 이동하여 Mindora를 찾아 필요한 데이터 유형을 켜세요.";
 "permission.health.guide_title" = "건강 데이터 권한 설정 방법";
-"permission.health.guide_message" = "1. 건강 앱을 열어요\n2. 하단의 '공유' 탭을 누르세요\n3. '앱'을 선택하세요\n4. Mindora를 찾으세요\n5. 필요한 데이터 유형을 켜세요";
+"permission.health.guide_message" = "건강 앱 열기\n하단의 '공유' 탭을 누르세요\n'앱'을 선택하세요\nMindora를 찾으세요\n필요한 데이터 유형을 켜세요";
 
 // Health Permission CTA (avoid misleading status)
-"permission.health.confirm" = "건강 앱에서 확인하기";
+"permission.health.confirm" = "설정";
+
+// Local Network Permission CTA
+"permission.local_network.confirm" = "설정에서 확인하세요";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "기기를 검색할 수 없습니다";
+"permission.local_network.denied_message" = "주변 Mindora 기기를 검색하려면 로컬 네트워크 접근 권한이 필요합니다. 설정에서 로컬 네트워크 접근을 활성화하세요.";

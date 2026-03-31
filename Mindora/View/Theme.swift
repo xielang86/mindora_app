@@ -80,7 +80,7 @@ class Theme {
     
     // 动态颜色属性
     static var background: UIColor {
-        return shared.isDarkMode ? UIColor.black : UIColor.systemBackground
+        return UIColor.black
     }
     
     static var surface: UIColor {

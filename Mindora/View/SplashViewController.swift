@@ -53,7 +53,6 @@ final class SplashViewController: UIViewController {
     }()
     
     // 主标语文本（三行合并）
-    // "Just for you.\nA better night's sleep,\nevery night."
     private let taglineLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
@@ -91,7 +90,7 @@ final class SplashViewController: UIViewController {
         let lineSpacing = scale(designLineSpacing, basedOn: view.bounds.height, designDimension: designHeight)
         let letterSpacing: CGFloat = 2.0  // 字符间距
         
-        let text = "Just for you.\nA better night's sleep,\nevery night."
+        let text = Constants.Strings.splashTagline
         let attributedString = NSMutableAttributedString(string: text)
         
         // 设置字体

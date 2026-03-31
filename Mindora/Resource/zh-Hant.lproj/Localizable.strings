@@ -36,6 +36,11 @@
 
 // MARK: - Health Screen
 "health.title" = "健康";
+"health.page_title" = "所有健康資料";
+"health.time.today" = "今天";
+"health.time.past_7_days" = "過去7天";
+"health.time.past_12_months" = "過去12個月";
+"health.time.earlier" = "更早";
 // MARK: - Health Metrics
 "health.status.initial" = "請求健康資料訪問";
 "health.status.loading" = "正在載入健康資料";
@@ -65,11 +70,29 @@
 "health.sleep.stage.core" = "核心睡眠";
 "health.sleep.stage.deep" = "深度睡眠";
 "health.sleep.no_data" = "暫無睡眠數據";
+"health.sleep.bed_time" = "臥床時間";
+"health.sleep.sleep_time" = "睡眠時間";
+"health.sleep.avg_bed_time" = "平均臥床時間";
+"health.sleep.avg_sleep_time" = "平均睡眠時間";
 "health.period.day" = "日";
+"health.period.week" = "週";
 "health.period.month" = "月";
+"health.period.six_months" = "6個月";
 "health.period.year" = "年";
+"health.period.today" = "今日";
 "health.period.daily_average" = "日均";
+"health.period.hourly_average" = "時均";
+"health.period.weekly_average" = "週均";
 "health.period.monthly_average" = "月均";
+"health.period.range" = "範圍";
+"health.period.hour" = "時";
+"health.weekday.sun" = "週日";
+"health.weekday.mon" = "週一";
+"health.weekday.tue" = "週二";
+"health.weekday.wed" = "週三";
+"health.weekday.thu" = "週四";
+"health.weekday.fri" = "週五";
+"health.weekday.sat" = "週六";
 
 // MARK: - Settings Screen
 "settings.title" = "設定";
@@ -149,7 +172,7 @@
 "onboarding.start" = "開始";
 "onboarding.no_device" = "沒有Mindora嗎？";
 "onboarding.connect_mindora" = "連接 Mindora";
-"onboarding.page3.health_card_text" = "請在'健康'App中設定 Mindora 的資料存取權限\n點擊前往'健康'App";
+"onboarding.page3.health_card_text" = "請在'健康'App中設定 Mindora 的資料存取權限";
 "onboarding.page3.bluetooth_card_text" = "檢測到當前設備藍牙未開啟\n點擊開啟藍牙設定";
 "onboarding.page3.bluetooth_card_text_authorized" = "藍牙權限已開啟\n設備可以正常連接";
 "onboarding.page4.scanning_title" = "掃描附近設備";
@@ -226,7 +249,7 @@
 "permission.bluetooth.reminder_message" = "為了連接您的 Mindora 設備，應用需要藍牙權限。";
 "permission.request_authorization" = "授權訪問";
 "permission.open_settings" = "打開設定";
-"permission.open_health_app" = "打開健康App";
+"permission.open_health_app" = "打開健康";
 "permission.later" = "稍後";
 "permission.authorization_success" = "授權成功";
 "permission.authorization_failed" = "授權失敗";
@@ -240,7 +263,20 @@
 "permission.health.settings_title" = "健康隱私設定";
 "permission.health.settings_message" = "請前往設定 > 隱私與安全性 > 健康，找到 Mindora 並開啟所需的數據類型。";
 "permission.health.guide_title" = "如何設定健康數據權限";
-"permission.health.guide_message" = "1. 打開健康App\n2. 點擊底部的共享\n3. 選擇App\n4. 找到 Mindora\n5. 開啟所需的數據類型";
+"permission.health.guide_message" = "打開「健康」APP
+點擊底部的共享
+選擇App
+找到 Mindora
+開啟所需的數據類型";
+
+// Health Permission CTA (avoid misleading status)
 
 // Health Permission CTA (避免誤導性狀態顯示)
-"permission.health.confirm" = "去健康App確認";
+"permission.health.confirm" = "設定";
+
+// Local Network Permission CTA
+"permission.local_network.confirm" = "請在設定中確認";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "無法搜尋設備";
+"permission.local_network.denied_message" = "需要本地網路權限才能搜尋附近的 Mindora 設備。請在設定中開啟本地網路存取權限。";

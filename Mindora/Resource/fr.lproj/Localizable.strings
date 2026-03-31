@@ -37,6 +37,11 @@
 
 // MARK: - Health Screen
 "health.title" = "Santé";
+"health.page_title" = "Toutes les données de santé";
+"health.time.today" = "Aujourd'hui";
+"health.time.past_7_days" = "7 derniers jours";
+"health.time.past_12_months" = "12 derniers mois";
+"health.time.earlier" = "Plus ancien";
 // MARK: - Health Metrics
 "health.status.initial" = "Demande d'accès Santé";
 "health.status.loading" = "Chargement des données de santé";
@@ -66,11 +71,29 @@
 "health.sleep.stage.core" = "Principal";
 "health.sleep.stage.deep" = "Profond";
 "health.sleep.no_data" = "Pas de données de sommeil";
+"health.sleep.bed_time" = "Au lit";
+"health.sleep.sleep_time" = "Temps de sommeil";
+"health.sleep.avg_bed_time" = "Temps moyen au lit";
+"health.sleep.avg_sleep_time" = "Temps moyen de sommeil";
 "health.period.day" = "Jour";
+"health.period.week" = "Semaine";
 "health.period.month" = "Mois";
+"health.period.six_months" = "6 mois";
 "health.period.year" = "Année";
+"health.period.today" = "Aujourd'hui";
 "health.period.daily_average" = "Moyenne quotidienne";
+"health.period.hourly_average" = "Moyenne horaire";
+"health.period.weekly_average" = "Moyenne hebdomadaire";
 "health.period.monthly_average" = "Moyenne mensuelle";
+"health.period.range" = "Plage";
+"health.period.hour" = "h";
+"health.weekday.sun" = "Dim";
+"health.weekday.mon" = "Lun";
+"health.weekday.tue" = "Mar";
+"health.weekday.wed" = "Mer";
+"health.weekday.thu" = "Jeu";
+"health.weekday.fri" = "Ven";
+"health.weekday.sat" = "Sam";
 
 // MARK: - Settings Screen
 "settings.title" = "Paramètres";
@@ -150,7 +173,7 @@
 "onboarding.start" = "Commencer";
 "onboarding.no_device" = "Pas de Mindora ?";
 "onboarding.connect_mindora" = "Connecter Mindora";
-"onboarding.page3.health_card_text" = "Configurez l'accès aux données de santé de Mindora dans l'app Santé\nAppuyez pour ouvrir l'app Santé";
+"onboarding.page3.health_card_text" = "Configurez l'accès aux données de santé de Mindora dans l'app Santé";
 "onboarding.page3.bluetooth_card_text" = "Le Bluetooth n'est actuellement pas activé\nAppuyez pour ouvrir les paramètres Bluetooth";
 "onboarding.page3.bluetooth_card_text_authorized" = "Autorisation Bluetooth activée\nL'appareil peut se connecter normalement";
 "onboarding.page4.scanning_title" = "Recherche d'appareils à proximité";
@@ -227,7 +250,7 @@
 "permission.bluetooth.reminder_message" = "Pour se connecter à votre appareil Mindora, l'application a besoin de l'autorisation Bluetooth.";
 "permission.request_authorization" = "Autoriser l'accès";
 "permission.open_settings" = "Ouvrir les réglages";
-"permission.open_health_app" = "Ouvrir l'app Santé";
+"permission.open_health_app" = "Ouvrir Santé";
 "permission.later" = "Plus tard";
 "permission.authorization_success" = "Autorisation réussie";
 "permission.authorization_failed" = "Autorisation échouée";
@@ -241,7 +264,14 @@
 "permission.health.settings_title" = "Confidentialité santé";
 "permission.health.settings_message" = "Ouvrez Réglages > Confidentialité et sécurité > Santé, sélectionnez Mindora et activez les types de données requis.";
 "permission.health.guide_title" = "Comment définir les autorisations de données de santé";
-"permission.health.guide_message" = "1. Ouvrez l'app Santé\n2. Touchez Partage en bas de l'écran\n3. Sélectionnez 'Apps'\n4. Choisissez Mindora\n5. Activez les types de données requis";
+"permission.health.guide_message" = "Ouvrez l'app Santé\nTouchez Partage en bas de l'écran\nSélectionnez 'Apps'\nChoisissez Mindora\nActivez les types de données requis";
 
 // Health Permission CTA (avoid misleading status)
-"permission.health.confirm" = "Confirmer dans l'app Santé";
+"permission.health.confirm" = "Paramètres";
+
+// Local Network Permission CTA
+"permission.local_network.confirm" = "Veuillez confirmer dans Réglages";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "Impossible de rechercher des appareils";
+"permission.local_network.denied_message" = "Laccès au réseau local est requis pour rechercher les appareils Mindora à proximité. Veuillez activer laccès au réseau local dans les Réglages.";

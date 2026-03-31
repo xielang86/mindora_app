@@ -1,7 +1,7 @@
 import UIKit
 
 final class Toast {
-    static func show(_ text: String, in view: UIView, duration: TimeInterval = 2.0) {
+    static func show(_ text: String, in view: UIView, duration: TimeInterval = 2.0, above targetView: UIView? = nil) {
         let padding: CGFloat = 12
         let label = UILabel()
         label.text = text
@@ -18,15 +18,25 @@ final class Toast {
         container.isUserInteractionEnabled = false
         container.addSubview(label)
         view.addSubview(container)
-        NSLayoutConstraint.activate([
-            container.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            container.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            container.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+        
+        var constraints = [
+            container.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            container.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 40),
+            container.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -40),
             label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: padding),
             label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -padding),
             label.topAnchor.constraint(equalTo: container.topAnchor, constant: padding),
             label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -padding)
-        ])
+        ]
+        
+        if let target = targetView {
+            constraints.append(container.bottomAnchor.constraint(equalTo: target.topAnchor, constant: -12)) // Slightly more padding above input
+        } else {
+            constraints.append(container.centerYAnchor.constraint(equalTo: view.centerYAnchor))
+        }
+        
+        NSLayoutConstraint.activate(constraints)
+        
         UIView.animate(withDuration: 0.2, animations: { container.alpha = 1 }) { _ in
             UIView.animate(withDuration: 0.25, delay: duration, options: .curveEaseInOut, animations: {
                 container.alpha = 0

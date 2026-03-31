@@ -269,11 +269,10 @@ final class HealthSyncSettingsViewController: UIViewController {
         let segmentFontSize = scale(designSegmentFontSize, basedOn: view.bounds.height, designDimension: designHeight)
         let segmentCornerRadius = scale(designSegmentCornerRadius, basedOn: view.bounds.height, designDimension: designHeight)
         
-        // 外层大圆角矩形：透明背景 + 白色描边
-        intervalControl.backgroundColor = .clear
+        // 外层大圆角矩形：无边框 + TabBar背景色
+        intervalControl.backgroundColor = DesignConstants.tabBarBackgroundColor
         intervalControl.layer.cornerRadius = segmentCornerRadius
-        intervalControl.layer.borderWidth = 0.5  // 白色描边宽度（根据设计稿0.5pt）
-        intervalControl.layer.borderColor = UIColor.white.cgColor
+        intervalControl.layer.borderWidth = 0
         intervalControl.clipsToBounds = true
         
         // 创建三个按钮
@@ -337,11 +336,10 @@ final class HealthSyncSettingsViewController: UIViewController {
     
     private func createMetricItems() {
         // 为每个指标创建UI项
-        let totalCount = HealthMetricKey.allCases.count
         for (index, key) in HealthMetricKey.allCases.enumerated() {
             let isFirst = (index == 0)
-            let isLast = (index == totalCount - 1)
-            let itemView = createMetricItem(key: key, showTopSeparator: !isFirst, showBottomSeparator: !isLast)
+            // 避免分割线重叠：只使用顶部分割线（除了第一个项），不使用底部分割线
+            let itemView = createMetricItem(key: key, showTopSeparator: !isFirst, showBottomSeparator: false)
             contentView.addSubview(itemView)
             metricItems.append(itemView)
         }
@@ -635,14 +633,47 @@ final class HealthSyncSettingsViewController: UIViewController {
         }
     }
     
-    private func updateIntervalButtonsAppearance() {
-        for (index, button) in intervalButtons.enumerated() {
-            if index == selectedIntervalIndex {
-                // 选中状态：显示背景色 RGB(59, 58, 58)
-                button.backgroundColor = UIColor(red: 59/255.0, green: 58/255.0, blue: 58/255.0, alpha: 1.0)
-            } else {
-                // 未选中状态：透明背景
-                button.backgroundColor = .clear
+    private func updateIntervalButtonsAppearance(animated: Bool = false) {
+        let selectedColor = DesignConstants.grayColor
+        
+        if animated {
+            // 使用弹性动画效果
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.8,
+                initialSpringVelocity: 0.5,
+                options: [.curveEaseInOut],
+                animations: {
+                    for (index, button) in self.intervalButtons.enumerated() {
+                        if index == self.selectedIntervalIndex {
+                            // 选中状态：显示背景色
+                            button.backgroundColor = selectedColor
+                            button.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+                        } else {
+                            // 未选中状态：透明背景
+                            button.backgroundColor = .clear
+                            button.transform = .identity
+                        }
+                    }
+                },
+                completion: { _ in
+                    // 动画完成后恢复正常大小
+                    UIView.animate(withDuration: 0.15) {
+                        for button in self.intervalButtons {
+                            button.transform = .identity
+                        }
+                    }
+                }
+            )
+        } else {
+            // 无动画直接设置
+            for (index, button) in intervalButtons.enumerated() {
+                if index == selectedIntervalIndex {
+                    button.backgroundColor = selectedColor
+                } else {
+                    button.backgroundColor = .clear
+                }
             }
         }
     }
@@ -674,7 +705,7 @@ final class HealthSyncSettingsViewController: UIViewController {
         guard newIndex != selectedIntervalIndex else { return }
         
         selectedIntervalIndex = newIndex
-        updateIntervalButtonsAppearance()
+        updateIntervalButtonsAppearance(animated: true)
         
         let intervals = HealthSyncInterval.allCases.sorted { $0.rawValue < $1.rawValue }
         guard intervals.indices.contains(newIndex) else { return }
@@ -786,7 +817,7 @@ final class CircleSelectionView: UIView {
 // MARK: - ExpandedTouchButton
 
 /// 自定义按钮，可扩展点击区域而不改变视觉大小
-final class ExpandedTouchButton: UIButton {
+class ExpandedTouchButton: UIButton {
     /// 扩展的点击区域（负值表示向外扩展）
     var touchAreaInsets: UIEdgeInsets = .zero
     

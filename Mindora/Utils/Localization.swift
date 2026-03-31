@@ -12,6 +12,7 @@ enum SupportedLanguage: String, CaseIterable {
     case japanese = "ja"
     case korean = "ko"
     case traditionalChinese = "zh-Hant"
+    case indonesian = "id"
     
     var displayName: String {
         switch self {
@@ -33,6 +34,8 @@ enum SupportedLanguage: String, CaseIterable {
             return "한국어"
         case .traditionalChinese:
             return "繁體中文"
+        case .indonesian:
+            return "Bahasa Indonesia"
         }
     }
     
@@ -56,6 +59,8 @@ enum SupportedLanguage: String, CaseIterable {
             return "한국어"
         case .traditionalChinese:
             return "繁體中文"
+        case .indonesian:
+            return "Bahasa Indonesia"
         }
     }
 }
@@ -117,7 +122,22 @@ final class LocalizationManager {
     
     /// 本地化字符串
     func localizedString(for key: String, comment: String = "") -> String {
-        return NSLocalizedString(key, bundle: currentBundle, comment: comment)
+        let missingValue = "___LOCALIZATION_MISSING___"
+        let localized = NSLocalizedString(key, bundle: currentBundle, value: missingValue, comment: comment)
+        
+        if localized != missingValue {
+            return localized
+        }
+        
+        // 如果当前语言没有找到key，且当前语言不是英文，尝试回退到英文
+        if currentLanguage != .english {
+            if let path = Bundle.main.path(forResource: SupportedLanguage.english.rawValue, ofType: "lproj"),
+               let englishBundle = Bundle(path: path) {
+                return NSLocalizedString(key, bundle: englishBundle, value: key, comment: comment)
+            }
+        }
+        
+        return key
     }
     
     // MARK: - 私有方法

@@ -32,37 +32,55 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         ) { [weak self] _ in
             self?.applyGlobalAppearance()
         }
+        
+        // 监听语言切换，重置根视图
+        NotificationCenter.default.addObserver(
+            forName: LocalizationManager.languageDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.reloadRootViewController()
+        }
 
-        // 检查是否是首次启动
+        // 检查是否已登录 (优先使用 AuthStorage 的判断逻辑，它会检查 Keychain)
+        // 如果 Keychain 中有有效会话，自动恢复登录状态
+        let isLoggedIn = AuthStorage.shared.isLoggedIn
+        if isLoggedIn {
+             UserDefaults.standard.set(true, forKey: "isLoggedIn")
+        }
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
         
-        if hasSeenOnboarding {
-            // 已经看过引导页，使用 Splash 过渡到主界面
-            let splash = SplashViewController()
-            window.rootViewController = splash
-            window.backgroundColor = Theme.background
-            window.makeKeyAndVisible()
-            self.window = window
+        // 统一使用 LaunchScreenViewController 作为启动页
+        let launchScreen = LaunchScreenViewController()
+        window.rootViewController = launchScreen
+        window.backgroundColor = Theme.background
+        window.makeKeyAndVisible()
+        self.window = window
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+        // 延迟 1.5秒后根据状态跳转
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            let targetVC: UIViewController
+            
+            if isLoggedIn && hasSeenOnboarding {
+                // 已经登录且完成引导页 -> 主界面
                 let tab = MainTabBarController()
-                splash.transition(to: tab, in: window)
+                targetVC = tab
                 
-                // 延迟检查权限，确保界面已完全加载
+                // 延迟检查权限
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                     self?.checkPermissionsOnLaunch(from: tab)
                 }
+            } else {
+                // 其他情况（未登录 或 已登录未引导）统一进入开始页
+                // StartViewController 内部的点击事件会处理具体跳转逻辑
+                let startVC = StartViewController()
+                let nav = UINavigationController(rootViewController: startVC)
+                nav.setNavigationBarHidden(true, animated: false)
+                targetVC = nav
             }
-        } else {
-            // 首次启动，显示开机引导页
-            let onboarding = OnboardingViewController()
-            window.rootViewController = onboarding
-            window.backgroundColor = UIColor(red: 0.18, green: 0.14, blue: 0.11, alpha: 1.0)
-            window.makeKeyAndVisible()
-            self.window = window
             
-            // 标记已看过引导页
-            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+            // 执行转场动画
+            launchScreen.transition(to: targetVC, in: window)
         }
     }
 
@@ -137,6 +155,32 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 root.view.layoutIfNeeded()
             }
         }
+    }
+    
+    // 重载根视图，用于语言切换
+    private func reloadRootViewController() {
+        guard let window = self.window else { return }
+        
+        let isLoggedIn = AuthStorage.shared.isLoggedIn
+        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+        
+        let targetVC: UIViewController
+        if isLoggedIn && hasSeenOnboarding {
+            // 重新创建 TabBar 及其子控制器，会重新加载本地化字符串
+            targetVC = MainTabBarController()
+        } else {
+            let startVC = StartViewController()
+            let nav = UINavigationController(rootViewController: startVC)
+            nav.setNavigationBarHidden(true, animated: false)
+            targetVC = nav
+        }
+        
+        print("Reloading root view controller due to language change...")
+        
+        // 使用过渡动画切换 rootViewController
+        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            window.rootViewController = targetVC
+        }, completion: nil)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

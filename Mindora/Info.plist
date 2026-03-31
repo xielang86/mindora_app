@@ -29,10 +29,7 @@
 		</dict>
 	</dict>
 	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIImageName</key>
-		<string>AppStart</string>
-	</dict>
+	<dict/>
 	<!-- HealthKit Read Permission Prompt -->
 	<key>NSHealthShareUsageDescription</key>
 	<string>This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.</string>
@@ -41,11 +38,29 @@
 	<string>This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.</string>
+	<!-- Local Network Permission Prompt -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Mindora uses the local network to discover and connect to your devices.</string>
 	<!-- BGTaskScheduler permitted identifiers -->
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.mindora.healthsync.refresh</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Mindora needs location access to help you quickly fill in your address.</string>
+	<!-- Photo Library Permissions -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Mindora needs permission to save screenshots to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Mindora needs permission to access your photo library to select a profile picture or save images.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Mindora needs access to your camera to take a profile picture.</string>
 	<!-- If in future you need to write data to HealthKit, also add NSHealthUpdateUsageDescription -->
 </dict>
 </plist>

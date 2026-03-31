@@ -56,11 +56,11 @@ final class OnboardingPage4ViewController: UIViewController {
     private let designButtonTextFontSize: CGFloat = DesignConstants.subtitleFontSize  // "连接 Mindora" 字体大小
     private let designButtonTextTrailing: CGFloat = 108    // 文字距离按钮右边
     
-    // 设计稿中的像素值 - 返回按钮（与 PermissionViewController 一致）
-    private let designCloseButtonTop: CGFloat = 186        // 返回按钮距离屏幕顶部
-    private let designCloseButtonLeading: CGFloat = 116    // 返回按钮距离屏幕左边
-    private let designCloseButtonWidth: CGFloat = 54       // 返回按钮图标宽度
-    private let designCloseButtonHeight: CGFloat = DesignConstants.subtitleFontSize  // 返回按钮图标高度
+    // 设计稿中的像素值 - 退出按钮
+    private let designExitButtonTop: CGFloat = 186         // 退出按钮距离屏幕顶部
+    private let designExitButtonTrailing: CGFloat = 80     // 退出按钮距离屏幕右边 (避免被圆角屏幕切掉)
+    private let designExitButtonWidth: CGFloat = 54        // 退出按钮图标宽度
+    private let designExitButtonHeight: CGFloat = DesignConstants.subtitleFontSize  // 退出按钮图标高度
     
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
@@ -146,17 +146,9 @@ final class OnboardingPage4ViewController: UIViewController {
         return label
     }()
     
-    // 返回按钮（超时后显示，样式与 PermissionViewController 的 BackButton 一致）
-    private let closeButton: UIButton = {
-        let button = ExpandedTouchButton(type: .custom)
-        button.setImage(UIImage(named: "back_icon"), for: .normal)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.contentHorizontalAlignment = .left
-        button.contentVerticalAlignment = .center
-        button.translatesAutoresizingMaskIntoConstraints = false
-        // 设置扩展的点击区域（不影响视觉大小）
-        button.touchAreaInsets = UIEdgeInsets(top: -10, left: 0, bottom: -10, right: -20)
-        button.alpha = 0  // 初始隐藏
+    // 退出按钮
+    private let exitButton: OnboardingExitButton = {
+        let button = OnboardingExitButton()
         return button
     }()
     
@@ -196,7 +188,7 @@ final class OnboardingPage4ViewController: UIViewController {
         view.addSubview(bottomContainerView)
         bottomContainerView.addSubview(questionIconView)
         bottomContainerView.addSubview(connectLabel)
-        view.addSubview(closeButton)
+        view.addSubview(exitButton)
         
         setupStyles()
         setupConstraints()
@@ -296,11 +288,11 @@ final class OnboardingPage4ViewController: UIViewController {
             connectLabel.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -buttonTextTrailing),
             connectLabel.centerYAnchor.constraint(equalTo: bottomContainerView.centerYAnchor),
             
-            // 返回按钮（左上角，与 PermissionViewController 的 BackButton 位置一致）
-            closeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: scale(designCloseButtonTop, basedOn: view.bounds.height, designDimension: designHeight)),
-            closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: scale(designCloseButtonLeading, basedOn: view.bounds.width, designDimension: designWidth)),
-            closeButton.widthAnchor.constraint(equalToConstant: scale(designCloseButtonWidth, basedOn: view.bounds.width, designDimension: designWidth)),
-            closeButton.heightAnchor.constraint(equalToConstant: scale(designCloseButtonHeight, basedOn: view.bounds.height, designDimension: designHeight))
+            // 退出按钮
+            exitButton.topAnchor.constraint(equalTo: view.topAnchor, constant: scale(designExitButtonTop, basedOn: view.bounds.height, designDimension: designHeight)),
+            exitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -scale(designExitButtonTrailing, basedOn: view.bounds.width, designDimension: designWidth)),
+            exitButton.widthAnchor.constraint(equalToConstant: scale(designExitButtonWidth, basedOn: view.bounds.width, designDimension: designWidth)),
+            exitButton.heightAnchor.constraint(equalToConstant: scale(designExitButtonHeight, basedOn: view.bounds.height, designDimension: designHeight))
         ])
     }
     
@@ -314,9 +306,6 @@ final class OnboardingPage4ViewController: UIViewController {
         let bottomTapGesture = UITapGestureRecognizer(target: self, action: #selector(bottomContainerTapped))
         bottomContainerView.addGestureRecognizer(bottomTapGesture)
         bottomContainerView.isUserInteractionEnabled = false  // 初始禁用交互
-        
-        // 退出按钮点击事件
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Scanning Management
@@ -331,11 +320,6 @@ final class OnboardingPage4ViewController: UIViewController {
         connectLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
         bottomContainerView.isUserInteractionEnabled = false
         mindoraTextLabel.textColor = UIColor(white: 1.0, alpha: 0.4)
-        
-        // 隐藏退出按钮
-        UIView.animate(withDuration: 0.3) {
-            self.closeButton.alpha = 0
-        }
         
         // 开始动画
         startSearchingAnimation()
@@ -413,11 +397,6 @@ final class OnboardingPage4ViewController: UIViewController {
         // 更新文案
         searchingLabel.text = L("onboarding.page4.no_device_found")
         
-        // 显示退出按钮
-        UIView.animate(withDuration: 0.3) {
-            self.closeButton.alpha = 1
-        }
-        
         // 启用连接按钮（文案保持"连接 Mindora"，点击后重新扫描）
         enableConnectButton()
     }
@@ -441,11 +420,6 @@ final class OnboardingPage4ViewController: UIViewController {
         // Mindora 文字去掉不透明度
         mindoraTextLabel.textColor = .white
         
-        // 隐藏退出按钮（如果已显示）
-        UIView.animate(withDuration: 0.3) {
-            self.closeButton.alpha = 0
-        }
-        
         // 启用连接按钮
         enableConnectButton()
         
@@ -462,40 +436,30 @@ final class OnboardingPage4ViewController: UIViewController {
         page5.modalTransitionStyle = .crossDissolve
         self.present(page5, animated: true)
     }
-    
-    // MARK: - Actions
+        // MARK: - Actions
     
     @objc private func questionIconTapped() {
-        // 打开用户手册
-        print("Question icon tapped - Open help manual")
-        let helpManualVC = HelpManualPagesViewController()
-        helpManualVC.modalPresentationStyle = .fullScreen
-        helpManualVC.modalTransitionStyle = .crossDissolve
-        present(helpManualVC, animated: true)
+        self.questionIconView.animateButtonTap { [weak self] in
+            // 打开用户手册
+            print("Question icon tapped - Open help manual")
+            let helpManualVC = HelpManualPagesViewController()
+            helpManualVC.modalPresentationStyle = .fullScreen
+            helpManualVC.modalTransitionStyle = .crossDissolve
+            self?.present(helpManualVC, animated: true)
+        }
     }
     
     @objc private func bottomContainerTapped() {
-        // 如果已找到设备，跳转到 Page5
-        if hasFoundDevice {
-            navigateToPage5()
-        }
-        // 如果未找到设备且不在搜索中（超时状态），重新开始扫描
-        else if !isSearching {
-            startScanning()
-        }
-    }
-    
-    @objc private func closeButtonTapped() {
-        // 退出引导流程，进入首页
-        // 使用 MainTabBarController 来确保导航结构正确
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            let tabBarController = MainTabBarController()
-            
-            window.rootViewController = tabBarController
-            
-            // 添加淡入淡出过渡动画
-            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: nil)
+        self.bottomContainerView.animateButtonTap { [weak self] in
+            guard let self = self else { return }
+            // 如果已找到设备，跳转到 Page5
+            if self.hasFoundDevice {
+                self.navigateToPage5()
+            }
+            // 如果未找到设备且不在搜索中（超时状态），重新开始扫描
+            else if !self.isSearching {
+                self.startScanning()
+            }
         }
     }
     
@@ -519,10 +483,42 @@ final class OnboardingPage4ViewController: UIViewController {
 extension OnboardingPage4ViewController: BonjourDiscoveryDelegate {
     func discoveryDidUpdate(_ discovery: BonjourDiscovery) {
         // 当扫描到设备时更新 UI
-        if !discovery.services.isEmpty && !hasFoundDevice {
+        if let service = discovery.services.first, !hasFoundDevice {
+            // 自动连接第一个发现的设备
+            let host = service.hostName ?? service.name
+            
+            // 保存连接会话
+            DeviceSession.shared.host = host
+            DeviceSession.shared.port = 9102
+            print("[OnboardingPage4] Device found and saved: \(host)")
+            
             DispatchQueue.main.async { [weak self] in
                 self?.onDeviceFound()
             }
         }
+    }
+    
+    func discoveryDidFail(_ discovery: BonjourDiscovery, errorCode: Int) {
+        Log.error("Onboarding", "discovery failed errorCode=\(errorCode)")
+        // 本地网络权限被拒绝或其他搜索错误，引导用户去设置
+        DispatchQueue.main.async { [weak self] in
+            self?.showLocalNetworkPermissionAlert()
+        }
+    }
+    
+    private func showLocalNetworkPermissionAlert() {
+        let customAlert = CustomAlertViewController(
+            title: L("permission.local_network.denied_title"),
+            description: L("permission.local_network.denied_message"),
+            confirmButtonTitle: L("permission.open_settings"),
+            cancelButtonTitle: L("common.cancel"),
+            onConfirm: {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            },
+            onCancel: nil
+        )
+        self.present(customAlert, animated: true)
     }
 }

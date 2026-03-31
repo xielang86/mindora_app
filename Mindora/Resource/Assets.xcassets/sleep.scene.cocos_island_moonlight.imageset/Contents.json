@@ -1,0 +1,23 @@
+{
+  "images": [
+    {
+      "filename": "sleep.scene.cocos_island_moonlight.png",
+      "idiom": "universal",
+      "scale": "1x"
+    },
+    {
+      "filename": "sleep.scene.cocos_island_moonlight@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "filename": "sleep.scene.cocos_island_moonlight@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

@@ -3,6 +3,14 @@ import UIKit
 
 protocol BonjourDiscoveryDelegate: AnyObject {
     func discoveryDidUpdate(_ discovery: BonjourDiscovery)
+    /// 搜索失败回调，errorCode 为 NetService 错误码
+    /// 常见错误：-72000 表示本地网络权限被拒绝
+    func discoveryDidFail(_ discovery: BonjourDiscovery, errorCode: Int)
+}
+
+// 提供默认空实现，避免强制所有遵循者实现
+extension BonjourDiscoveryDelegate {
+    func discoveryDidFail(_ discovery: BonjourDiscovery, errorCode: Int) {}
 }
 
 final class BonjourDiscovery: NSObject {
@@ -191,6 +199,8 @@ extension BonjourDiscovery: NetServiceBrowserDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.delegate?.discoveryDidUpdate(self)
+            // 通知代理搜索失败，让 UI 层处理（如权限被拒绝时引导用户去设置）
+            self.delegate?.discoveryDidFail(self, errorCode: code)
         }
     }
 

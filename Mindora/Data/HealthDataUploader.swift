@@ -7,30 +7,50 @@ struct HealthBehavior: Codable {
 
 // 内部用户画像载体（对应 Python 端 UserProfile dataclass）
 struct UpdateProfilePayload: Codable {
-    let uid: String
     let uid_emb: [Double]
-    let long_term_profile: [[AnyCodable]]
     let behaviors: [String: [[AnyCodable]]]
 
-    init(uid: String, uid_emb: [Double], long_term_profile: [[AnyCodable]], behaviors: [String: [[AnyCodable]]]) {
-        self.uid = uid
+    init(uid_emb: [Double], behaviors: [String: [[AnyCodable]]]) {
         self.uid_emb = uid_emb
-        self.long_term_profile = long_term_profile
         self.behaviors = behaviors
     }
 }
 
-// 新的顶层请求封装：与服务端 Python UpdateProfileRequest(action, user_profile) 对齐
-struct UpdateProfileRequestEnvelope: Codable {
-    let action: String
-    let user_profile: UpdateProfilePayload
-    init(action: String = "update_profile", user_profile: UpdateProfilePayload) {
-        self.action = action
-        self.user_profile = user_profile
+private struct UpdateProfileRequestData: Codable {
+    let uid: String
+    let jwtToken: String
+    let userProfile: UpdateProfilePayload
+
+    enum CodingKeys: String, CodingKey {
+        case uid
+        case jwtToken = "jwt_token"
+        case userProfile = "user_profile"
     }
 }
 
-// {"action":"update_profile","user_profile":{...画像字段...}}。
+// 新的顶层请求封装：与服务端 Python UpdateProfileRequest(request_type, timestamp, version, data) 对齐
+private struct UpdateProfileRequestEnvelope: Codable {
+    let requestType: String
+    let timestamp: Int
+    let version: String
+    let data: UpdateProfileRequestData
+
+    init(requestType: String = "update_profile", timestamp: Int = Int(Date().timeIntervalSince1970), version: String = "1.0", data: UpdateProfileRequestData) {
+        self.requestType = requestType
+        self.timestamp = timestamp
+        self.version = version
+        self.data = data
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case requestType = "request_type"
+        case timestamp
+        case version
+        case data
+    }
+}
+
+// {"request_type":"update_profile","timestamp":...,"version":"1.0","data":{"uid":...,"jwt_token":...,"user_profile":{...画像字段...}}}。
 // 轻量 AnyCodable，用于编码 [Tuple] 这类动态结构
 struct AnyCodable: Codable {
     let value: Any
@@ -61,7 +81,7 @@ struct AnyCodable: Codable {
     }
 }
 
-enum HealthDataUploaderError: Error { case invalidURL, requestFailed, badStatus(code: Int), serverRejected(message: String?) }
+enum HealthDataUploaderError: Error { case invalidURL, missingCredentials, requestFailed, badStatus(code: Int), serverRejected(message: String?) }
 
 final class HealthDataUploader {
     private static let maxLogChars = 4000
@@ -94,17 +114,15 @@ final class HealthDataUploader {
         let behaviors: [String: [[AnyCodable]]] = [
             "heart_rate": heart
         ]
-        let ltp: [[AnyCodable]] = [[AnyCodable("baseline_hr"), AnyCodable(78.0)]]
         Log.info("Uploader", "payload behaviors=\(behaviors.keys.joined(separator: ",")) heartCount=\(heart.count)")
-        return UpdateProfilePayload(uid: uid, uid_emb: [], long_term_profile: ltp, behaviors: behaviors)
+        return UpdateProfilePayload(uid_emb: [], behaviors: behaviors)
     }
 
     /// 使用真实 HealthKit 数据构建 payload
     /// - Parameters:
     ///   - uid: 用户唯一 ID
     ///   - series: HealthSeriesData （来自 HealthDataManager.fetchRecentSeries）
-    ///   - includeBaseline: 是否计算并写入 long_term_profile 基线数据（平均心率等）
-    static func buildPayload(uid: String, series: HealthDataManager.HealthSeriesData, includeBaseline: Bool = true) -> UpdateProfilePayload {
+    static func buildPayload(uid: String, series: HealthDataManager.HealthSeriesData) -> UpdateProfilePayload {
         var behaviors: [String: [[AnyCodable]]] = [:]
 
         func mapPoints(_ points: [HealthDataManager.HealthSeriesData.SamplePoint]) -> [[AnyCodable]] {
@@ -113,6 +131,10 @@ final class HealthDataUploader {
 
         if !series.heartRate.isEmpty { behaviors["heart_rate"] = mapPoints(series.heartRate) }
         if !series.hrv.isEmpty { behaviors["heart_rate_variability_sdnn"] = mapPoints(series.hrv) }
+        if !series.respiratoryRate.isEmpty { behaviors["respiratory_rate"] = mapPoints(series.respiratoryRate) }
+        if !series.restingHeartRate.isEmpty { behaviors["resting_heart_rate"] = mapPoints(series.restingHeartRate) }
+        if !series.sleepingWristTemperature.isEmpty { behaviors["sleeping_wrist_temperature"] = mapPoints(series.sleepingWristTemperature) }
+        if !series.bodyTemperature.isEmpty { behaviors["body_temperature"] = mapPoints(series.bodyTemperature) }
         // 睡眠阶段：编码为 [startTimestamp, durationSeconds]
         func mapSleep(_ arr: [HealthDataManager.HealthSeriesData.SleepStagePoint]) -> [[AnyCodable]] {
             arr.map { [AnyCodable($0.startTs), AnyCodable($0.duration)] }
@@ -121,48 +143,43 @@ final class HealthDataUploader {
         if !series.remSleep.isEmpty { behaviors["sleep_stage_rem"] = mapSleep(series.remSleep) }
         if !series.lightSleep.isEmpty { behaviors["sleep_stage_light"] = mapSleep(series.lightSleep) }
 
-        var ltp: [[AnyCodable]] = []
-        if includeBaseline {
-            if !series.heartRate.isEmpty {
-                let avg = series.heartRate.map { $0.value }.reduce(0, +) / Double(series.heartRate.count)
-                ltp.append([AnyCodable("avg_heart_rate"), AnyCodable(avg)])
-            }
-            if !series.hrv.isEmpty {
-                let avg = series.hrv.map { $0.value }.reduce(0, +) / Double(series.hrv.count)
-                ltp.append([AnyCodable("avg_hrv_sdnn"), AnyCodable(avg)])
-            }
-            // 睡眠总时长（近24h内区间合计）
-            let totalSleepSeconds = series.deepSleep.reduce(0){$0+$1.duration} + series.remSleep.reduce(0){$0+$1.duration} + series.lightSleep.reduce(0){$0+$1.duration}
-            if totalSleepSeconds > 0 {
-                ltp.append([AnyCodable("total_sleep_hours"), AnyCodable(totalSleepSeconds / 3600.0)])
-            }
-        }
-
         if behaviors.isEmpty {
             Log.info("Uploader", "buildPayload: no real data collected, fallback to empty behaviors")
         } else {
             Log.info("Uploader", "buildPayload: metrics=\(behaviors.keys.joined(separator: ",")) points=\(behaviors.values.reduce(0){ $0 + $1.count })")
         }
 
-        return UpdateProfilePayload(uid: uid, uid_emb: [], long_term_profile: ltp, behaviors: behaviors)
+        return UpdateProfilePayload(uid_emb: [], behaviors: behaviors)
     }
 
-    static func postUpdateProfile(host: String, port: Int = 9102, payload: UpdateProfilePayload, timeout: TimeInterval = 5.0) async throws -> Data {
-        guard let url = URL(string: "http://\(host):\(port)/update_profile") else {
-            Log.error("Uploader", "invalid URL host=\(host) port=\(port)")
+    static func postUpdateProfile(payload: UpdateProfilePayload, endpointURL: String = Constants.Network.healthSyncURL, timeout: TimeInterval = Constants.Network.timeoutInterval) async throws -> Data {
+        guard let url = URL(string: endpointURL) else {
+            Log.error("Uploader", "invalid URL endpoint=\(endpointURL)")
             throw HealthDataUploaderError.invalidURL
         }
+        guard let jwtToken = AuthStorage.shared.token, !jwtToken.isEmpty else {
+            Log.error("Uploader", "missing jwt token for health sync")
+            throw HealthDataUploaderError.missingCredentials
+        }
+
+        let encoder = JSONEncoder()
+        let envelope = UpdateProfileRequestEnvelope(
+            data: UpdateProfileRequestData(
+                uid: AuthStorage.shared.preferredUserIdentifier ?? "",
+                jwtToken: jwtToken,
+                userProfile: payload
+            )
+        )
+        let body = try encoder.encode(envelope)
+
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let encoder = JSONEncoder()
-    // 新格式：封装为 { action: "update_profile", user_profile: { uid, uid_emb, long_term_profile, behaviors } }
-    // 若需回退旧格式：直接 encoder.encode(payload) 并去除 envelope。
-        let envelope = UpdateProfileRequestEnvelope(user_profile: payload)
-        let body = try encoder.encode(envelope)
+        req.addValue("Bearer \(jwtToken)", forHTTPHeaderField: "Authorization")
+        req.httpBody = body
         Log.info("Uploader", "REQUEST JSON (envelope):\n\(prettyJSONString(from: body))")
         Log.info("Uploader", "POST \(url.absoluteString) body=\(body.count) bytes timeout=\(timeout)s")
-        req.httpBody = body
+
         let cfg = URLSessionConfiguration.ephemeral
         cfg.timeoutIntervalForRequest = timeout
         let (data, resp) = try await URLSession(configuration: cfg).data(for: req)
@@ -173,20 +190,31 @@ final class HealthDataUploader {
             Log.error("Uploader", "bad status=\(http.statusCode)")
             throw HealthDataUploaderError.badStatus(code: http.statusCode)
         }
-        // 解析服务端响应，只有 {"status":"success"} 才视为成功
+
         if let resp = try? JSONDecoder().decode(ServerAck.self, from: data) {
-            if resp.status.lowercased() == "success" {
+            if resp.code == 0 || resp.status?.lowercased() == "success" {
                 return data
             } else {
-                Log.error("Uploader", "server rejected: status=\(resp.status) message=\(resp.message ?? "-")")
-                throw HealthDataUploaderError.serverRejected(message: resp.message)
+                let serverMessage = resp.msg ?? resp.message
+                Log.error("Uploader", "server rejected: code=\(resp.code.map(String.init) ?? "-") status=\(resp.status ?? "-") message=\(serverMessage ?? "-")")
+                throw HealthDataUploaderError.serverRejected(message: serverMessage)
             }
         }
-        // 未能解析时，保守起见也认为失败，避免错误地标记为已上传
+
         Log.error("Uploader", "invalid ack json, refusing to mark success")
         throw HealthDataUploaderError.requestFailed
+    }
+
+    static func postUpdateProfile(host: String, port: Int = 9001, payload: UpdateProfilePayload, timeout: TimeInterval = Constants.Network.timeoutInterval) async throws -> Data {
+        let endpointURL = "http://\(host):\(port)/user_profile"
+        return try await postUpdateProfile(payload: payload, endpointURL: endpointURL, timeout: timeout)
     }
 }
 
 // 服务端通用响应
-struct ServerAck: Codable { let status: String; let message: String? }
+struct ServerAck: Codable {
+    let code: Int?
+    let msg: String?
+    let status: String?
+    let message: String?
+}

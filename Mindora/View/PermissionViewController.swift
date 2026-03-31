@@ -214,26 +214,9 @@ final class PermissionViewController: UIViewController {
     }
     
     private func updateFooterLabels() {
-        let footerFontSize = scale(designFooterFontSize, basedOn: view.bounds.height, designDimension: designHeight)
-        let line2Spacing = scale(designFooterLine2Spacing, basedOn: view.bounds.height, designDimension: designHeight)
-        
-        // 第一行文字
-        footerLabel1.text = L("permission.section.healthkit_footer_line1")
-        
-        // 第二行文字（带行间距）
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = line2Spacing
-        paragraphStyle.alignment = .left
-        
-        let attributedText = NSAttributedString(
-            string: L("permission.section.healthkit_footer_line2"),
-            attributes: [
-                .font: UIFont.systemFont(ofSize: footerFontSize, weight: .regular),
-                .foregroundColor: UIColor(white: 1.0, alpha: 0.3),
-                .paragraphStyle: paragraphStyle
-            ]
-        )
-        footerLabel2.attributedText = attributedText
+        // FooterLabels 中的文字不要了，去掉
+        footerLabel1.text = nil
+        footerLabel2.attributedText = nil
     }
     
     private func setupConstraints() {
@@ -275,9 +258,10 @@ final class PermissionViewController: UIViewController {
     }
     
     private func createPermissionItems() {
+        // 本地网络权限无法准确检测，且会在需要时自动触发系统弹窗，因此隐藏该选项
         let items: [(type: PermissionType, icon: String, title: String)] = [
             (.bluetooth, "bluetooth_icon", L("permission.bluetooth")),
-            (.localNetwork, "local_network", L("permission.local_network")),
+            // (.localNetwork, "local_network", L("permission.local_network")), // 隐藏：无法准确检测，在搜索设备时自动触发
             (.cellularData, "wireless_data", L("permission.cellular_data")),
             (.health, "boot-health", L("permission.health.status"))
         ]
@@ -293,7 +277,7 @@ final class PermissionViewController: UIViewController {
                 icon: item.icon,
                 title: item.title,
                 showTopSeparator: index != 0,
-                showBottomSeparator: index == items.count - 1
+                showBottomSeparator: false
             )
             contentView.addSubview(itemView)
             permissionItems.append(itemView)
@@ -490,6 +474,12 @@ final class PermissionViewController: UIViewController {
             label.text = L("permission.health.confirm")
             return
         }
+        
+        // 本地网络权限无法被准确检测（iOS 技术限制），统一显示"请在设置中确认"
+        if type == .localNetwork {
+            label.text = L("permission.local_network.confirm")
+            return
+        }
 
         let status: PermissionStatus
         switch type {
@@ -587,16 +577,29 @@ final class PermissionViewController: UIViewController {
             return
         }
 
-        // 不再尝试通过 API 判断读取授权状态；直接请求（若首次会弹窗，否则快速返回），然后引导用户去健康 App 确认。
-        Task {
-            do {
-                try await HealthDataManager.shared.requestAuthorization()
-                await MainActor.run { PermissionManager.shared.openHealthApp() }
-            } catch {
-                // 无论成功与否，都引导用户去健康 App 确认
-                await MainActor.run { PermissionManager.shared.openHealthApp() }
-            }
-        }
+        // 显示引导提示，告诉用户如何在健康 App 中设置权限
+        let alertVC = HealthGuideAlertViewController(
+            title: L("permission.health.guide_title"),
+            message: L("permission.health.guide_message"),
+            confirmButtonTitle: L("permission.open_health_app"),
+            cancelButtonTitle: L("permission.later"),
+            onConfirm: {
+                // 先请求授权（若首次会弹窗），然后打开健康 App
+                Task {
+                    do {
+                        try await HealthDataManager.shared.requestAuthorization()
+                    } catch {
+                        // 忽略错误，继续打开健康 App
+                    }
+                    await MainActor.run {
+                        PermissionManager.shared.openHealthApp()
+                    }
+                }
+            },
+            onCancel: nil
+        )
+        
+        present(alertVC, animated: true)
     }
     
     // MARK: - Helper Methods
@@ -617,11 +620,8 @@ final class PermissionViewController: UIViewController {
             self.updateHealthStatusUI()
         }
         
-        PermissionManager.shared.getLocalNetworkStatus(forceRefresh: force) { [weak self] status in
-            print("[PermissionViewController] 本地网络状态: \(status)")
-            self?.networkStatuses[.localNetwork] = status
-            self?.updateNetworkStatusUI(for: .localNetwork)
-        }
+        // 本地网络权限：不在此处检查，会在搜索设备时自动触发系统弹窗
+        // PermissionManager.shared.getLocalNetworkStatus(forceRefresh: force) { ... }
         
         PermissionManager.shared.getCellularDataStatus(forceRefresh: force) { [weak self] status in
             print("[PermissionViewController] 蜂窝数据状态: \(status)")

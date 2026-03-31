@@ -9,12 +9,31 @@
 // MARK: - Tab Bar Titles
 "tab.home" = "首页";
 "tab.health" = "健康";
+"tab.sleep" = "睡眠";
+"tab.explore" = "探索";
+"tab.store" = "商店";
 "tab.settings" = "设置";
 
 // MARK: - Theme Modes
 "theme.system" = "跟随系统";
 "theme.light" = "浅色模式";
 "theme.dark" = "深色模式";
+
+// MARK: - Register P3
+"register.p3.title" = "创建账户";
+"register.p3.subtitle" = "欢迎回来！请输入您的详细信息。";
+"register.p3.marketing" = "我同意接收营销信息";
+"register.p3.button.save" = "继续";
+"register.p3.agree_prefix" = "我同意 ";
+"register.p3.terms" = "服务条款";
+"register.p3.and" = " 和 ";
+"register.p3.privacy" = "隐私政策";
+
+// MARK: - Register P4
+"register.p4.title" = "连接您的 Mindora";
+"register.p4.subtitle" = "将您的 Mindora 连接到充电器并继续下一步。请确保您的手机已启用蓝牙。";
+"register.p4.button.set_mindor" = "设置 Mindora";
+"register.p4.no_mindora" = "还没有 Mindora？";
 
 // MARK: - Home Screen
 "home.title" = "首页";
@@ -34,8 +53,26 @@
 "home.search_finished_one" = "找到 1 台设备";
 "home.search_finished_many" = "找到 %d 台设备";
 
+// MARK: - Home Dashboard
+"home.metric.sleep_onset" = "入睡用时";
+"home.metric.deep_sleep" = "深度睡眠";
+"home.tab.sleep" = "睡眠";
+"home.tab.overall_score" = "综合评分";
+"home.tab.activity" = "活动";
+"home.insights.title" = "睡眠洞察";
+"home.insights.subtitle" = "基于您的睡眠数据分析";
+"home.best.title" = "本周最佳";
+"home.best.subtitle" = "旨在为您带来最佳睡眠";
+"home.best.used_times" = "使用次数";
+"home.best.score" = "评分";
+
 // MARK: - Health Screen
 "health.title" = "健康";
+"health.page_title" = "所有健康数据";
+"health.time.today" = "今天";
+"health.time.past_7_days" = "过去7天";
+"health.time.past_12_months" = "过去12个月";
+"health.time.earlier" = "更早";
 
 // MARK: - Health Metrics
 "health.status.initial" = "请求健康数据访问";
@@ -66,22 +103,78 @@
 "health.sleep.stage.core" = "核心睡眠";
 "health.sleep.stage.deep" = "深度睡眠";
 "health.sleep.no_data" = "暂无睡眠数据";
+"health.sleep.bed_time" = "卧床时间";
+"health.sleep.sleep_time" = "睡眠时间";
+"health.sleep.avg_bed_time" = "平均卧床时间";
+"health.sleep.avg_sleep_time" = "平均睡眠时间";
 "health.period.day" = "日";
+"health.period.week" = "周";
 "health.period.month" = "月";
+"health.period.six_months" = "6个月";
 "health.period.year" = "年";
+"health.period.today" = "今日";
 "health.period.daily_average" = "日均";
+"health.period.hourly_average" = "时均";
+"health.period.weekly_average" = "周均";
 "health.period.monthly_average" = "月均";
+"health.period.range" = "范围";
+"health.period.hour" = "时";
+"health.weekday.sun" = "周日";
+"health.weekday.mon" = "周一";
+"health.weekday.tue" = "周二";
+"health.weekday.wed" = "周三";
+"health.weekday.thu" = "周四";
+"health.weekday.fri" = "周五";
+"health.weekday.sat" = "周六";
+
+// MARK: - Health Week View
+"health.week.avg_score" = "平均睡眠评分";
+"health.week.good" = "良好";
+"health.week.insights" = "睡眠洞察";
+"health.week.insights_sub" = "基于您的睡眠数据分析";
+"health.week.insights_title" = "睡眠趋势";
+"health.week.insights.body" = "卓越的深度\n睡眠表现";
+"health.week.insights.desc" = "您的深度睡眠占总睡眠的 29.8%，高于标准水平。\n请继续保持规律的作息。";
+
+"health.week.best" = "本周最佳";
+"health.week.best_title" = "入睡效率";
+"health.week.best_sub" = "旨在为您带来最佳睡眠";
+"health.week.best.used_times" = "使用次数";
+"health.week.best.score" = "评分";
+"health.week.sedona" = "塞多纳沙漠的宁静";
+"health.week.respiratory_rate" = "呼吸频率";
+"health.week.avg_heart_rate" = "平均心率";
+"health.week.avg_skin_temp" = "平均手腕温度";
+"health.week.avg_awake" = "平均清醒时间";
+"health.week.avg_rem" = "平均快速眼动时间";
+"health.week.avg_core" = "平均核心睡眠时间";
+"health.week.avg_deep" = "平均深度睡眠时间";
+"health.week.days_tracked" = "监测天数";
+"health.week.avg_total" = "平均总睡眠时间";
+"health.week.avg_onset" = "平均入睡时间";
+
+// MARK: - Health Week Expanded Headers
+"health.week.header.heart_rate" = "平均心率";
+"health.week.header.total_sleep" = "总睡眠时长";
+"health.week.header.time_in_bed" = "平均卧床时间";
+"health.week.metric.from_baseline" = "(相较基准)";
+
+// MARK: - Health Month View
+"health.month.optimal" = "优秀";
+
 
 // MARK: - Settings Screen
 "settings.title" = "设置";
 "settings.subtitle" = "个性化你的 Mindora";
-"settings.profile_subtitle" = "设备昵称与头像的修改";
+"settings.profile_subtitle" = "查看并编辑个人资料";
 "settings.sync_subtitle" = "同步您在手机上的健康数据";
 "settings.reset_subtitle" = "恢复出厂设置，会重置所有设置与记录";
 "settings.version_subtitle" = "软件升级会带来新功能与BUG修复";
 "settings.language" = "语言";
 "settings.theme" = "主题模式";
-"settings.profile" = "个人资料修改";
+"settings.profile" = "个人资料";
+"settings.profile_email_format" = "邮箱：%@";
+"settings.profile_email_placeholder" = "未登录";
 "settings.sync" = "健康信息同步";
 "settings.permission" = "权限管理";
 "settings.version" = "软件版本";
@@ -90,6 +183,7 @@
 "settings.show_onboarding" = "重新查看引导页";
 
 // Language and Theme Selection
+"settings.language_title" = "设置语言";
 "settings.select_language" = "选择语言";
 "settings.select_theme" = "选择主题模式";
 
@@ -117,11 +211,52 @@
 "settings.sync_success_message" = "已发送一批示例健康数据。";
 "settings.sync_error_title" = "同步失败";
 
+// MARK: - Device Management
+"device_manage.status.connected" = "已连接";
+"device_manage.button.connect_other" = "连接其他设备";
+"device_manage.default_name" = "Mindora Black Two";
+
+
 // MARK: - Settings Sections
 "settings.section.personalization" = "个性化";
 "settings.section.data_account" = "数据与账户";
 "settings.section.other" = "其他";
 "settings.section.about" = "关于";
+
+// MARK: - Side Menu
+"sidemenu.title" = "我的账号";
+"sidemenu.user.name" = "用户名称";
+"sidemenu.subscription" = "会员订阅";
+"sidemenu.upgrade" = "升级到 Pro 版本";
+"sidemenu.device" = "设备";
+"sidemenu.notifications" = "消息通知";
+"sidemenu.privacy_data" = "隐私 & 数据";
+"sidemenu.health_link" = "健康数据关联";
+"sidemenu.language" = "语言";
+"sidemenu.help" = "帮助";
+"sidemenu.logout" = "退出登陆";
+"sidemenu.terms" = "《服务条款》";
+"sidemenu.privacy_policy" = "《隐私政策》";
+"sidemenu.not_logged_in" = "未登录";
+
+// MARK: - User Profile
+"user_profile.title" = "个人资料";
+"user_profile.user_id" = "用户ID";
+"user_profile.nickname" = "昵称";
+"user_profile.gender" = "性别";
+"user_profile.gender.male" = "男";
+"user_profile.gender.female" = "女";
+"user_profile.gender.other" = "其他";
+"user_profile.age" = "年龄";
+"user_profile.birthday" = "生日";
+"user_profile.email" = "邮箱";
+"user_profile.phone" = "电话";
+"user_profile.address" = "地址";
+"user_profile.update" = "更新资料";
+"user_profile.username_default" = "用户名";
+"user_profile.take_photo" = "拍照";
+"user_profile.choose_from_album" = "从手机相册选择";
+"user_profile.cancel" = "取消";
 
 // MARK: - Device Selection
 "device_selection.title" = "请选择您想要连接的Mindora设备";
@@ -145,12 +280,16 @@
 "common.cancel" = "取消";
 "common.confirm" = "确认";
 "common.retry" = "重试";
+"common.saved_to_photos" = "已保存到相册";
+"common.save_success" = "保存成功";
+"common.share_success" = "分享成功";
+"common.copy_success" = "已复制";
 
 // MARK: - Onboarding
 "onboarding.start" = "开始";
 "onboarding.no_device" = "没有Mindora吗？";
 "onboarding.connect_mindora" = "连接 Mindora";
-"onboarding.page3.health_card_text" = "请在'健康'App中设置 Mindora 的数据访问权限\n点击前往'健康'App";
+"onboarding.page3.health_card_text" = "请在“健康”App中设置 Mindora 的数据访问权限";
 "onboarding.page3.bluetooth_card_text" = "检测到当前设备蓝牙未开启\n点击开启蓝牙设置";
 "onboarding.page3.bluetooth_card_text_authorized" = "蓝牙权限已开启\n设备可以正常连接";
 "onboarding.page4.scanning_title" = "扫描附近设备";
@@ -230,7 +369,7 @@
 "permission.bluetooth.reminder_message" = "为了连接您的 Mindora 设备，应用需要蓝牙权限。";
 "permission.request_authorization" = "授权访问";
 "permission.open_settings" = "打开设置";
-"permission.open_health_app" = "打开健康App";
+"permission.open_health_app" = "打开健康";
 "permission.later" = "稍后";
 "permission.authorization_success" = "授权成功";
 "permission.authorization_failed" = "授权失败";
@@ -244,8 +383,421 @@
 "permission.health.settings_title" = "健康隐私设置";
 "permission.health.settings_message" = "请前往设置 > 隐私与安全性 > 健康，找到 Mindora 并开启所需的数据类型。";
 "permission.health.guide_title" = "如何设置健康数据权限";
-"permission.health.guide_message" = "1. 打开健康App\n2. 点击底部的共享\n3. 选择App\n4. 找到 Mindora\n5. 开启所需的数据类型";
+"permission.health.guide_message" = "打开“健康”APP\n点击底部的共享\n选择App\n找到 Mindora\n开启所需的数据类型";
 
 // Health Permission CTA (避免误导性状态显示)
-"permission.health.confirm" = "去健康App确认";
+"permission.health.confirm" = "设置";
 
+// Local Network Permission CTA (无法准确检测，提示用户在设置中确认)
+"permission.local_network.confirm" = "请在设置中确认";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "无法搜索设备";
+"permission.local_network.denied_message" = "需要本地网络权限才能搜索附近的 Mindora 设备。请在设置中开启本地网络访问权限。";
+
+
+// MARK: - Login
+"login.email_placeholder" = "请输入邮箱";
+"login.get_code" = "验证邮箱";
+"login.toast.enter_email" = "请输入您的邮箱";
+"login.toast.invalid_email" = "邮箱格式不正确";
+"login.toast.network_error_prefix" = "网络错误：";
+"login.toast.no_data" = "未收到数据";
+"login.toast.send_code_failed" = "发送验证码失败";
+"login.toast.invalid_response" = "无效的响应";
+"login.toast.login_failed" = "登录失败";
+"login.verify_alert.title" = "验证邮箱";
+"login.verify_alert.message_format" = "请输入发送至 %@ 的验证码";
+"login.verify_alert.code_placeholder" = "验证码";
+"login.verify_alert.login_action" = "登录";
+
+// Login Success
+"login.success.title" = "登录成功";
+"login.success.message" = "邮箱 %@ 验证通过";
+
+// MARK: - User Profile
+"user_profile.title" = "个人资料";
+"user_profile.change_avatar" = "更换头像";
+"user_profile.email_title" = "邮箱";
+"user_profile.logout" = "退出登录";
+"user_profile.logout_confirm_title" = "确认退出登录？";
+"user_profile.logout_confirm_message" = "退出会清空本地数据。";
+"user_profile.logout_success" = "已退出登录";
+"user_profile.delete" = "删除账号";
+"user_profile.delete_confirm_title" = "确认删除账号？";
+"user_profile.delete_confirm_message" = "将发送删除请求并清空本地数据。";
+"user_profile.delete_success" = "账号已删除";
+"user_profile.delete_failed" = "删除账号失败";
+"user_profile.token_missing" = "请先登录";
+"user_profile.photo_unavailable" = "无法访问相册";
+"user_profile.update_success" = "个人资料已更新";
+"user_profile.update_failed" = "个人资料更新失败";
+"login.code_sent_title" = "验证码已发送";
+"login.code_sent_message" = "验证码已经发送到您的邮箱：%@，请登录邮箱查看验证码。";
+
+// MARK: - Login Start
+// "login_start.tagline" = "个人洞察\n赋能您的\n每一天";
+"login_start.button.start" = "开始";
+"login_start.button.no_device" = "还没有 Mindora?";
+
+
+// MARK: - Register P1
+"register.welcome" = "欢迎！";
+"register.email_label" = "电子邮箱";
+"register.email_placeholder" = "电子邮箱";
+"register.info.create" = "请输入您的电子邮箱地址以创建帐户。";
+"register.info.signin" = "如果您已经是会员，请输入您的 Mindora 帐户邮箱以登录。";
+"register.button.continue" = "继续";
+
+// MARK: - Register P2
+"register.p2.title" = "请输入验证码";
+"register.p2.subtitle" = "4位验证码已发送至";
+"register.p2.resend" = "重新发送";
+
+// MARK: - Register P3
+"register.p3.title" = "使用条款和隐私政策";
+"register.p3.subtitle" = "请查阅以下内容以继续：";
+"register.p3.agree_prefix" = "我已阅读并同意 ";
+"register.p3.terms" = "《使用条款》";
+"register.p3.and" = " 和 ";
+"register.p3.privacy" = "《Mindora隐私政策》。";
+"register.p3.marketing" = "接收独家健康教育、提示和特别优惠，以获得最佳的 Mindora 体验。";
+"register.p3.button.save" = "保存并继续";
+
+// MARK: - Common Alerts
+"common.error" = "错误";
+"common.notice" = "提示";
+"register.verification_code_sent" = "验证码已发送";
+
+// MARK: - Auth Errors
+"auth.error.invalid_url" = "无效的 URL";
+"auth.error.serialization_error" = "数据处理错误";
+"auth.error.no_data" = "未收到数据";
+"auth.error.api_error_default" = "API 错误：%d";
+"auth.error.invalid_response" = "无效的响应";
+"auth.error.missing_data" = "响应数据缺失";
+
+// MARK: - Subscription
+"subscription.nav.title" = "会员订阅";
+"subscription.my_midora" = "我的MIDORA";
+"subscription.not_member" = "您还不是会员";
+"subscription.not_member_desc" = "订阅您需要的会员类型，享受专属权益";
+"subscription.section.title" = "会员订阅";
+"subscription.my.title" = "我的订阅";
+"subscription.monthly" = "月度会员";
+"subscription.yearly" = "年度会员";
+"subscription.price.monthly" = "/月";
+"subscription.price.yearly" = "/年";
+"subscription.action.subscribe" = "开通订阅";
+"subscription.action.cancel" = "取消订阅";
+"subscription.desc.monthly.prefix" = "订阅到期前一天将以";
+"subscription.desc.monthly.suffix" = "/月续期，可在费用扣除前随时取消订阅。";
+"subscription.desc.yearly" = "自开通日期起可享受一整年的会员服务，可在下次续费前随时取消订阅。";
+"subscription.auto_renew" = "自动续费时间：";
+"subscription.expires_prefix" = "订阅到期时间：";
+"subscription.desc.cancelled" = "您的会员权益将保留至订阅到期，到期后将无法享受会员服务，请及时续费。";
+"subscription.exclusive" = "会员专属";
+"subscription.feature.1" = "360°全方位睡眠分析，你的私人睡眠数据库";
+"subscription.feature.2" = "智能睡眠洞察，从数据到解决方案";
+"subscription.feature.3" = "专属助眠方案，个性化睡眠提升";
+"subscription.help.faq" = "常见问题";
+"subscription.help.message" = "消息中心";
+"subscription.help.renewal" = "续费管理";
+"subscription.help.restore" = "恢复购买";
+"subscription.help.community" = "加入社群";
+"subscription.help.contact" = "联系我们";
+
+// Subscription Email
+"subscription.email.subject" = "Mindora 反馈";
+"subscription.email.app_version" = "应用版本";
+"subscription.email.ios_version" = "iOS 版本";
+"subscription.email.device" = "设备型号";
+"subscription.email.error.title" = "无法发送邮件";
+"subscription.email.error.message" = "您的设备未配置邮件账户。";
+
+// Subscription Status
+"subscription.tide_days" = "累计天数";
+"subscription.active.plan_prefix" = "生效中 · ";
+"subscription.active.plan_suffix" = "订阅";
+"subscription.plan_name.monthly" = "月度";
+"subscription.plan_name.yearly" = "年度";
+"subscription.expires_prefix" = "有效期至 ";
+
+// MARK: - Notifications
+"notifications.title" = "消息通知";
+"notifications.permission.title" = "允许通知";
+"notifications.permission.desc" = "打开系统通知，及时接收消息";
+"notifications.permission.status" = "你已在系统中关闭Mindora通知权限";
+"notifications.permission.keep" = "保持现状";
+"notifications.permission.open" = "去开启";
+"notifications.mock.system" = "系统消息";
+"notifications.mock.title" = "会员提醒";
+"notifications.mock.body" = "您订阅的会员还有7天到期，为避免影响后续使用，请及时续费。";
+"notifications.mock.action" = "进入会员页面查看";
+
+// MARK: - Terms & Privacy
+"legal.terms.title" = "Mindora 服务条款";
+"legal.terms.content" = "欢迎使用Mindora！感谢您对我们的关注。\n\n本《服务条款》(“本协议”)阐述了您使用 mindora316.com(“网站”)、智能助眠硬件、充电器及/或其他相关产品，包括Mindora移动应用程序(“Mindora应用”)(统称为“服务”)所适用的条款和条件。本网站和Mindora应用由 Mindora Technologies Inc. 及其关联公司和子公司(统称为“Mindora”、“我们”或“我们的”)拥有并运营。\n\n在本协议中，我们称自己为“Mindora”、“我们”；我们称您为“您”或“用户”。Mindora和用户在本协议中单独称为“一方”，合称为“双方”。\n\n通过访问或使用服务（包括访问网站），即表示您有意并明确同意受本协议所有条款和条件以及《Mindora隐私政策》（详见 mindora316.com/privacy-policy，通过引用并入本协议，下称“隐私政策”）的约束。如果您不同意这些条款和条件，则不得使用服务。";
+
+"legal.privacy.title" = "Mindora 隐私政策";
+"legal.privacy.content" = "更新日期：2026年1月29日\n生效日期：2026年1月29日\n\nMindora及其全球的关联公司（以下简称“Mindora”、“我们”、“我方”）深知隐私对您的重要性，并会尊重您的隐私。《Mindora隐私政策》（以下简称“本政策”）适用于我方提供的Mindora及内置系统服务（以下简称“Mindora服务”）。Mindora是我们开发的一款智能助眠硬件，致力于为您带来更科学、更智慧的睡眠改善方案。Mindora App 是控制Mindora的客户端，用于帮助用户通过手机更加全面地使用Mindora设备，同时向用户提供更多实用功能，如在用户对话中标记音频重点、识别用户状态、获得用户习惯等。本政策尚未涵盖的部分，则以《Mindora通用隐私政策》为准。除另有约定，本政策所用术语与《Mindora用户协议》中的术语具有相同含义。\n\n如您根据您所居住的司法辖区法律为未成年人或不具有完全民事行为能力的主体（以下简称“未成年人”），请您在法定监护人陪同下仔细阅读并充分理解本协议，并征得法定监护人的同意后使用Mindora及服务。\n\n请仔细阅读本政策（尤其是粗体内容）并确定了解我们对您个人信息的处理规则。我们高度重视对您个人信息的保护，并将遵循现行法律法规，基于合法、正当的方式并遵循诚信原则妥善处理您的个人信息。如您对本政策有任何疑问，您可以通过我方平台公布的联系方式与我们联系。";
+
+// MARK: - Help Page
+"help.page.title" = "帮助";
+"help.page.description" = "如您对产品有任何疑问，\n您可以通过扫描上方官方二维码或邮箱与我们联系。";
+"help.page.email" = "support@mindora316.com";
+
+// MARK: - Logout Alert
+"logout.alert.title" = "退出登录";
+"logout.alert.message" = "您确定要退出登录吗？您需要重新登录才能使用该应用。";
+"logout.alert.cancel" = "取消";
+"logout.alert.confirm" = "退出登录";
+
+// MARK: - Health Link Alert
+"health_link.alert.title" = "即将跳转至苹果健康数据关联";
+"health_link.alert.cancel" = "取消";
+"health_link.alert.confirm" = "确定";
+"common.save" = "保存";
+"user_profile.label_date" = "日期";
+
+// MARK: - Address
+"address.title" = "我的地址";
+"address.empty" = "还未添加地址";
+"address.add_new" = "添加新地址";
+"address.paste_tip" = "粘贴文本，可智能识别地址";
+"address.paste" = "粘贴";
+"address.name" = "姓名";
+"address.name_placeholder" = "请输入姓名";
+"address.phone" = "手机号";
+"address.phone_placeholder" = "请输入手机号码";
+"address.region" = "所在地区";
+"address.region_placeholder" = "选择省市区";
+"address.locate" = "定位";
+"address.detail" = "详细地址";
+"address.detail_placeholder" = "小区、门牌号等";
+"address.set_default" = "设为默认地址";
+"address.confirm" = "确认";
+"address.default_tag" = "默认";
+"address.delete" = "删除";
+"permission.location_needed" = "Mindora 需要定位权限来帮助您填写地址。请在设置中开启。";
+"common.tips" = "提示";
+"common.settings" = "去设置";
+"common.cancel" = "取消";
+"address.select_title" = "选择地址";
+"address.search_placeholder" = "搜索地点";
+"address.current_location" = "[位置]";
+
+// Subscription Restore
+"subscription.restore.loading" = "恢复中...";
+"subscription.restore.success" = "恢复成功";
+
+// MARK: - Explore
+"explore.greeting.hi" = "Hi,";
+"explore.intro.data" = "嗨，昨晚你的身体进入了一个稳定、放松且高度可恢复的睡眠状态。从入睡节律到整夜结构，你的多项关键指标都优于你近期的平均水平。这不是“偶然睡得好”，而是一次神经系统与睡眠结构协同良好的夜晚。";
+"explore.intro.default" = "在你入睡、醒来、再次进入深眠的每一个阶段，Mindora都在持续观察你的睡眠节律，并根据你的状态调整陪伴方式。这些洞察并不只是数据的变化，它们来自你正在使用的睡眠场景、声音节奏，以及你身体给出的真实反馈。";
+"explore.intro.default_detail" = "向下看看，我们会为你解释：\n昨晚发生了什么，哪些方式对你最有帮助，以及Mindora为你做了哪些调整。";
+
+"explore.section.efficiency" = "入睡效率";
+"explore.section.structure" = "睡眠结构";
+"explore.section.fluctuation" = "夜间波动";
+"explore.section.preference" = "场景偏好";
+"explore.section.advice" = "睡眠建议";
+
+"explore.metric.onset_time" = "入睡用时：%@分钟";
+"explore.metric.continuous_sleep" = "连续睡眠时长：%@分钟";
+"explore.metric.smart_intervention" = "智能干预：%@";
+
+"explore.efficiency.first_sleep" = "首次入睡时间";
+"explore.efficiency.pre_hr" = "入睡前心率";
+"explore.efficiency.pre_resp" = "入睡前呼吸频率";
+
+"explore.structure.rem" = "快速动眼睡眠";
+"explore.structure.deep" = "深度睡眠";
+"explore.structure.light" = "核心睡眠";
+
+"explore.fluctuation.awake_count" = "夜间觉醒";
+"explore.fluctuation.awake_duration" = "觉醒时长";
+"explore.fluctuation.awake_type" = "觉醒类型";
+"explore.fluctuation.hr_range" = "心率波动";
+"explore.fluctuation.resp_range" = "呼吸波动";
+
+"explore.status.health_range" = "健康区间";
+"explore.status.average" = "平均水平";
+"explore.status.fluctuation_high" = "波动偏多";
+
+"explore.mock.efficiency_desc" = "心率与呼吸趋势均为「平稳」，这通常意味着：副交感神经已开始占主导，身体处于可自然放松的状态，大脑不需要额外“降速”即可入睡。\n\n在睡前30分钟内，心率与呼吸维持在相对稳定或缓慢下降区间，通常与更短的入睡潜伏期相关，这也是睡眠医学中判断“入睡准备完成度”的常用生理信号之一。";
+"explore.mock.structure_desc" = "这组数据并不指向“结构异常”，昨晚的睡眠阶段顺序没有缺失，只是每一段关键睡眠被切得较碎，是典型的：夜间被多次打断「深睡与REM被压缩」。\n\n这是压力夜晚中最常见、也最可修复的一种模式。";
+"explore.mock.fluctuation_desc" = "这些信号共同指向：夜间神经系统处于高反应状态，对外界刺激与内在焦虑都较为敏感。在夜间03:25，Mindora监测到心率/呼吸的波动，且觉醒持续超过生理调整阈值，届时mindora为您启动了一次15分钟的干预行为，通过「阿玛菲海岸微风」低频、节律连续的海浪声场，帮助神经系统重新切换回副交感主导状态，使得你在夜醒后的15分钟，再次安定入睡。";
+"explore.mock.preference_desc" = "昨晚，你在「可可岛月光漂浮」的环境中进入睡眠。这是一个以海洋包裹型环境 + 粉噪 / 棕噪为主导的声场结构。\n\n可可岛月光漂浮的声音结构以低频连续的海浪声为主，整体节律稳定，没有明显的突变或尖锐声，这是一个不会主动吸引注意力、但能持续存在的环境。\n\n研究表明，低频、连续的自然声场可以降低大脑对环境变化的警觉度，减少入睡前对“是否安全”的反复判断。海浪声的缓慢节律，也更容易与呼吸节奏产生同步，帮助神经系统自然切换到休息模式。\n\n昨晚的身体反应，正好印证了这一点。在这个环境中，你的入睡用时为15分钟，入睡前心率约68 bpm，呼吸频率15次/分钟，均处在一个放松且可持续的区间。夜间出现的觉醒主要为翻身，未伴随明显的生理波动，更像是睡眠阶段转换中的自然调整。\n\n你对这种低频连续 + 自然水体节律的环境适应度较高。它更适合你在入睡阶段逐步“放下意识控制”，而不是通过强引导快速入睡。";
+"explore.mock.advice_desc" = "通过连续几晚的数据观察，你的整体睡眠状态较为稳定。如果希望进一步减少夜间波动，可尝试在睡前1小时降低外界刺激强度，或在未来几晚提前结束声音播放。\n\n睡眠不是一条直线，而是一种会被打扰、也会自我修复的系统。记录这些变化，不是为了评判你睡得好不好，而是为了帮你找到最省力、最稳定的睡眠方式。\n\n昨晚，你的身体完成了这件事。";
+"explore.mock.intervention" = "场景介入";
+"explore.mock.awake_type" = "焦虑型";
+
+"explore.preference.recent" = "最近使用";
+"explore.preference.cocos_island.title" = "可可岛月光漂浮";
+"explore.preference.cocos_island.subtitle" = "音场类型：海洋/粉噪/棕噪";
+
+"explore.quote.text" = "Mindora 不只是记录你的睡眠\n而是在理解你的状态后\n选择更合适的方式陪你继续睡下去";
+"explore.quote.open" = "“";
+"explore.quote.close" = "”";
+
+"explore.article.1.title" = "文章标题";
+"explore.article.1.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
+"explore.article.2.title" = "文章标题";
+"explore.article.2.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
+"explore.article.3.title" = "文章标题";
+"explore.article.3.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
+"explore.article.4.title" = "文章标题";
+"explore.article.4.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
+
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.label" = "状态区间";
+"explore.placeholder.number" = "- -";
+"explore.placeholder.time" = "- -:- -";
+"explore.placeholder.hr" = "- -次/分钟";
+"explore.placeholder.resp" = "- -次/分钟";
+"explore.placeholder.duration" = "- -分钟";
+"explore.placeholder.count" = "- -次";
+"explore.placeholder.text" = "- -";
+"explore.placeholder.hr_fluctuation" = "- -次/分钟";
+"explore.placeholder.percent" = "- -%";
+
+"explore.value.count_format" = "%@ 次";
+"explore.value.duration_format" = "%@ 分钟";
+"explore.value.resp_rate_format" = "%@ 次/分";
+"explore.value.hr_format" = "%@ bpm";
+"explore.value.hr_range_format" = "%@ bpm";
+
+"explore.default.efficiency_desc" = "这里会展示你的入睡过程。Mindora会基于你的入睡时间、入睡时长、入睡前的心率和呼吸变化分析出你的入睡习惯，让你更了解你自己的睡眠如何更自然地开始。";
+"explore.default.structure_desc" = "这里会呈现你的睡眠阶段分布。你可以看到浅睡、深睡与快速眼动睡眠的比例与连续性，了解自己的睡眠结构有助于你调整作息和睡眠习惯，而无需评判好坏。";
+"explore.default.fluctuation_desc" = "这里会记录在夜间Mindora的每一次陪伴干预和你睡眠中的反应。在夜间，如果你在睡眠过程中出现波动，Mindora会基于生理指标精准判断你的波动情况，在合理范围内陪伴，在必要时干预，守护你的睡眠节律。";
+"explore.default.preference_desc" = "这里会总结你偏好的声音类型与场景。通过这些分析你可以更了解哪些因素更有效地帮助了你的睡眠。Mindora会学习你的睡眠习惯和对声音场景的偏好，并为你推荐更有效、更个性化的睡眠陪伴方案。";
+
+"explore.empty.score" = "0";
+"explore.empty.title" = "睡眠评分";
+"explore.empty.message" = "完成首次监测后，\n你将在这里获得睡眠质量的深度分析。\n让我们开始你的第一次睡眠监测吧。";
+"explore.bottom.description" = "通过感知你的整夜睡眠状态，关注你的各项生理指标变化并在需要时主动通过AI调节提供介入，帮助你获得更连贯、更优质的好睡眠。当你开始使用后，这里会显示你的深度睡眠洞察。包括入睡过程、睡眠结构、夜间波动以及我们为你推荐的声场。";
+"subscription.restore.no_purchases" = "未发现有效订阅";
+
+// Renewal Management
+"renewal.title" = "续费管理";
+"renewal.your_subscription" = "你的订阅";
+"renewal.product_name" = "我的MIDORA";
+"renewal.plan" = "订阅方案";
+"renewal.plan.monthly" = "连续包月";
+"renewal.renewal_date" = "续期时间";
+"renewal.amount" = "扣费金额";
+"renewal.manage" = "管理";
+"renewal.plan.yearly" = "连续包年";
+"renewal.plan.none" = "你没有任何订阅项目";
+
+
+// MARK: - FAQ
+"subscription.renewal_management" = "续费管理";
+"faq.title" = "Mindora 常见问题解答";
+"faq.subtitle" = "Mindora是一款智能助眠设备，旨在通过多感官协同和AI帮助您改善睡眠质量。它并非医疗设备。以下是一些常见问题的解答。";
+"faq.section.getting_started" = "入门指南";
+"faq.section.core_ai" = "核心功能与AI";
+"faq.q.packaging" = "我的Mindora产品包装内包含什么？";
+"faq.a.packaging" = "每套Mindora产品包含一个Mindora助眠主机、一个电源适配器和一根USB充电线。部分套餐可能包含额外的配件（如天然香薰补充装）。";
+"faq.q.accuracy" = "Mindora的睡眠环境监测数据准确吗？";
+"faq.a.accuracy" = "Mindora采用经过验证的传感器（如温湿度、光敏、声压传感器）和算法来评估您的睡眠环境，提供睡眠阶段（浅睡、深睡、REM）、心率和睡眠环境等数据评估，其数据适用于追踪您卧室环境的长期趋势和模式，并据此提供改善建议。请注意，它并非医疗级诊断设备。请注意，单个数据的绝对值可能受设备具体摆放位置影响。";
+"faq.q.ai" = "什么是“AI智能干预”功能？它是如何工作的？";
+"faq.a.ai" = "Mindora利用AI技术实时监测您的睡眠状态，并自动调节声光环境以帮助您维持深度睡眠或平稳唤醒。";
+
+
+// MARK: - Health Refactor
+"health.segment.day" = "日";
+"health.segment.week" = "周";
+"health.segment.month" = "月";
+"health.sleep.efficiency" = "睡眠效率";
+"health.sleep.performance" = "睡眠表现";
+"health.sleep.time_in_bed" = "卧床时间";
+"health.sleep.resting_heart_rate" = "静息心率";
+"health.sleep.overnight_vitals" = "夜间生命体征";
+"health.sleep.respiratory_rate" = "呼吸频率";
+"health.sleep.body_temperature" = "体温";
+"health.sleep.scenarios" = "睡眠场景";
+"health.sleep.onset" = "入睡";
+"health.sleep.awake_time" = "清醒时间";
+
+// MARK: - Health Month View
+"health.month.trends_title" = "睡眠趋势";
+"health.month.trends_subtitle" = "基于您的睡眠数据分析";
+"health.month.trends_body" = "本月，您保持了稳定的睡眠量，夜间觉醒次数极少。";
+"health.month.trends_desc" = "在过去30天里，深度睡眠占总睡眠的29.8%，高于标准水平。\n您的就寝时间平均提前了32分钟。\n请继续保持规律的作息。";
+"health.month.best_title" = "入睡效率";
+"health.month.best_subtitle" = "旨在为您带来最佳睡眠";
+"health.month.best_desc" = "本月，“塞多纳红岩宁静”是您使用最频繁的睡眠场景，并且表现出最佳的入睡效果。“可可岛月光漂流”在维持稳定睡眠方面表现出色……";
+"health.month.avg_heart_rate" = "平均心率";
+"health.month.total_sleep" = "总睡眠时长";
+"health.month.days_tracked" = "监测天数";
+
+"subscription.view_content_hint" = "订阅后可以查看";
+"subscription.go_to_subscribe" = "前往订阅";
+
+// MARK: - Explore
+"explore.title" = "探索";
+"explore.greeting" = "嗨，%@";
+"explore.intro.default" = "在你入睡、醒来、再次进入深眠的每一个阶段，Mindora 都在持续观察你的睡眠节律，并根据你的状态调整陪伴方式。这些洞察并不只是数据的变化，它们来自你正在使用的睡眠场景、声音节奏，以及你身体给出的真实反馈。";
+"explore.intro.default_detail" = "向下看看，我们会为你解释：\n昨晚发生了什么，哪些方式对你最有帮助，以及 Mindora 为你做了哪些调整。";
+"explore.intro.data" = "嗨，昨晚你的身体进入了一个稳定、放松且高度可恢复的睡眠状态。从入睡节律到整夜结构，你的多项关键指标都优于你近期的平均水平。这不是“偶然睡得好”，而是一次神经系统与睡眠结构协同良好的夜晚。";
+"explore.section.efficiency" = "入睡效率";
+"explore.section.structure" = "睡眠结构";
+"explore.section.fluctuation" = "夜间波动";
+"explore.section.preference" = "场景偏好";
+"explore.section.advice" = "睡眠建议";
+"explore.metric.onset_time" = "入睡用时：%@分钟";
+"explore.metric.continuous_sleep" = "连续睡眠时长：%@分钟";
+"explore.metric.smart_intervention" = "智能干预：%@";
+"explore.efficiency.first_sleep" = "首次入睡时间";
+"explore.efficiency.pre_hr" = "入睡前心率";
+"explore.efficiency.pre_resp" = "入睡前呼吸频率";
+"explore.structure.rem" = "快速动眼睡眠";
+"explore.structure.deep" = "深度睡眠";
+"explore.structure.light" = "核心睡眠";
+"explore.fluctuation.awake_count" = "夜间觉醒";
+"explore.fluctuation.awake_duration" = "觉醒时长";
+"explore.fluctuation.awake_type" = "觉醒类型";
+"explore.fluctuation.hr_range" = "心率波动";
+"explore.status.health_range" = "健康区间";
+"explore.status.average" = "平均水平";
+"explore.status.fluctuation_high" = "波动偏多";
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.label" = "状态区间";
+"explore.preference.recent" = "最近使用";
+"explore.preference.cocos_island.title" = "可可岛月光漂浮";
+"explore.preference.cocos_island.subtitle" = "音场类型：海洋/粉噪/棕噪";
+"explore.quote.text" = "Mindora 不只是记录你的睡眠，而是在理解你的状态后选择更合适的方式陪你继续睡下去";
+"explore.article.1.title" = "文章标题标题";
+"explore.article.1.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
+"explore.article.2.title" = "文章标题标题";
+"explore.article.2.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
+"explore.article.3.title" = "文章标题标题";
+"explore.article.3.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介……";
+"explore.article.4.title" = "文章标题标题";
+"explore.article.4.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
+"explore.empty.score" = "0";
+"explore.empty.title" = "睡眠评分";
+"explore.empty.message" = "完成首次监测后，\n你将在这里获得睡眠质量的深度分析。\n让我们开始你的第一次睡眠监测吧。";
+
+
+// MARK: - Store
+"store.coming_soon" = "商店即将上线";
+"store.banner.title" = "选择你喜欢的\n混合精油和组合";
+"store.banner.discount_prefix" = "三件 ";
+"store.banner.discount_value" = "9.5";
+"store.banner.discount_suffix" = "折";
+"store.banner.learn_more" = "了解更多";
+"store.section.member_exclusive" = "会员专属";
+"store.section.new_arrivals" = "商城上新";
+"store.badge.hot" = "热卖";
+"store.badge.new" = "新品";
+"store.product.combo_oil" = "香薰精油组合";
+"store.product.frankincense_oil" = "乳香沉木精油";
+"store.product.calming_oil" = "植物安神精油";
+"store.product.silk_pajama" = "丝绸睡衣套装";
+"store.product.gift_set" = "丝滑睡眠礼品…";
+"store.search.placeholder" = "输入搜索内容";
+"store.search.cancel" = "取消";
+"store.search.history" = "历史记录";

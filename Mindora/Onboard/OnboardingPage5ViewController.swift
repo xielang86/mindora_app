@@ -34,6 +34,12 @@ final class OnboardingPage5ViewController: UIViewController {
     private let designCompleteButtonHeight: CGFloat = 164  // 完成按钮高度
     private let designCompleteButtonCornerRadius: CGFloat = 82  // 完成按钮圆角
     
+    // 设计稿中的像素值 - 退出按钮
+    private let designExitButtonTop: CGFloat = 186         // 退出按钮距离屏幕顶部
+    private let designExitButtonTrailing: CGFloat = 80     // 退出按钮距离屏幕右边 (避免被圆角屏幕切掉)
+    private let designExitButtonWidth: CGFloat = 54        // 退出按钮图标宽度
+    private let designExitButtonHeight: CGFloat = DesignConstants.subtitleFontSize  // 退出按钮图标高度
+    
     // 设计稿中的像素值 - Tab Bar（参考 MainTabBarController）
     private let designTabBarHeight: CGFloat = 176
     private let designTabBarFontSize: CGFloat = DesignConstants.subtitleFontSize
@@ -101,6 +107,12 @@ final class OnboardingPage5ViewController: UIViewController {
         return label
     }()
     
+    // 退出按钮
+    private let exitButton: OnboardingExitButton = {
+        let button = OnboardingExitButton()
+        return button
+    }()
+    
     // 自定义 Tab Bar 容器
     private let customTabBarContainer = UIView()
     private var tabButtons: [UIButton] = []
@@ -124,6 +136,7 @@ final class OnboardingPage5ViewController: UIViewController {
         view.addSubview(checkmarkImageView)
         view.addSubview(completeButtonView)
         completeButtonView.addSubview(completeLabel)
+        view.addSubview(exitButton)
         
         setupStyles()
         setupConstraints()
@@ -160,6 +173,12 @@ final class OnboardingPage5ViewController: UIViewController {
         let completeButtonWidth = scale(designCompleteButtonWidth, basedOn: view.bounds.width, designDimension: designWidth)
         let completeButtonHeight = scale(designCompleteButtonHeight, basedOn: view.bounds.height, designDimension: designHeight)
         
+        // 退出按钮尺寸 - 按设计稿比例计算
+        let exitButtonTop = scale(designExitButtonTop, basedOn: view.bounds.height, designDimension: designHeight)
+        let exitButtonTrailing = scale(designExitButtonTrailing, basedOn: view.bounds.width, designDimension: designWidth)
+        let exitButtonWidth = scale(designExitButtonWidth, basedOn: view.bounds.width, designDimension: designWidth)
+        let exitButtonHeight = scale(designExitButtonHeight, basedOn: view.bounds.height, designDimension: designHeight)
+        
         NSLayoutConstraint.activate([
             // 背景图片 - 完全填充整个屏幕
             backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -185,7 +204,13 @@ final class OnboardingPage5ViewController: UIViewController {
             
             // 完成文字
             completeLabel.centerXAnchor.constraint(equalTo: completeButtonView.centerXAnchor),
-            completeLabel.centerYAnchor.constraint(equalTo: completeButtonView.centerYAnchor)
+            completeLabel.centerYAnchor.constraint(equalTo: completeButtonView.centerYAnchor),
+            
+            // 退出按钮
+            exitButton.topAnchor.constraint(equalTo: view.topAnchor, constant: exitButtonTop),
+            exitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -exitButtonTrailing),
+            exitButton.widthAnchor.constraint(equalToConstant: exitButtonWidth),
+            exitButton.heightAnchor.constraint(equalToConstant: exitButtonHeight)
         ])
     }
     
@@ -272,22 +297,38 @@ final class OnboardingPage5ViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func completeButtonTapped() {
-        // 点击完成后，进入主应用界面
-        enterMainApp()
-    }
-    
-    /// 进入主应用界面（切换到 MainTabBarController，默认显示 Home 页面）
-    private func enterMainApp() {
-        // 标记引导页已完成
-        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
-        
-        // 获取 SceneDelegate 并切换到 MainTabBarController
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let sceneDelegate = windowScene.delegate as? SceneDelegate {
-            let mainTabBarController = MainTabBarController()
-            mainTabBarController.selectedIndex = 0  // 默认选中第一个 tab（Home）
-            sceneDelegate.window?.rootViewController = mainTabBarController
-            sceneDelegate.window?.makeKeyAndVisible()
+        self.completeButtonView.animateButtonTap {
+            // Check if we are running inside the app (Root is MainTabBarController)
+            let keyWindow = UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .flatMap { $0.windows }
+                .first(where: { $0.isKeyWindow })
+            
+            if let window = self.view.window ?? keyWindow,
+               let tabBarController = window.rootViewController as? MainTabBarController {
+                
+                // Logic for "Add Device" flow from Side Menu
+                print("[OnboardingPage5] Completing Add Device flow")
+                
+                // 1. Mark onboarding as seen (just in case)
+                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+                
+                // 2. Dismiss all modals (SideMenu + Onboarding Stack)
+                window.rootViewController?.dismiss(animated: true) {
+                    // 3. After dismissal, present DeviceManagementViewController
+                    // We need to present it from the currently visible view controller to be safe, or just the root default
+                    let deviceVC = DeviceManagementViewController()
+                    let nav = UINavigationController(rootViewController: deviceVC)
+                    nav.setNavigationBarHidden(true, animated: false)
+                    nav.modalPresentationStyle = .fullScreen
+                    
+                    // Present from the tabBarController
+                    tabBarController.present(nav, animated: true)
+                }
+            } else {
+                // First Launch Flow
+                OnboardingExitButton.completeOnboarding()
+            }
         }
     }
 }

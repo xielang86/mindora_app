@@ -37,6 +37,11 @@
 
 // MARK: - Health Screen
 "health.title" = "Salud";
+"health.page_title" = "Todos los datos de salud";
+"health.time.today" = "Hoy";
+"health.time.past_7_days" = "Últimos 7 días";
+"health.time.past_12_months" = "Últimos 12 meses";
+"health.time.earlier" = "Anterior";
 // MARK: - Health Metrics
 "health.status.initial" = "Solicitando acceso a Salud";
 "health.status.loading" = "Cargando datos de salud";
@@ -66,11 +71,29 @@
 "health.sleep.stage.core" = "Principal";
 "health.sleep.stage.deep" = "Profundo";
 "health.sleep.no_data" = "Sin datos de sueño";
+"health.sleep.bed_time" = "En cama";
+"health.sleep.sleep_time" = "Tiempo dormido";
+"health.sleep.avg_bed_time" = "Tiempo promedio en cama";
+"health.sleep.avg_sleep_time" = "Tiempo promedio dormido";
 "health.period.day" = "Día";
+"health.period.week" = "Semana";
 "health.period.month" = "Mes";
+"health.period.six_months" = "6 meses";
 "health.period.year" = "Año";
+"health.period.today" = "Hoy";
 "health.period.daily_average" = "Promedio diario";
+"health.period.hourly_average" = "Promedio por hora";
+"health.period.weekly_average" = "Promedio semanal";
 "health.period.monthly_average" = "Promedio mensual";
+"health.period.range" = "Rango";
+"health.period.hour" = "h";
+"health.weekday.sun" = "Dom";
+"health.weekday.mon" = "Lun";
+"health.weekday.tue" = "Mar";
+"health.weekday.wed" = "Mié";
+"health.weekday.thu" = "Jue";
+"health.weekday.fri" = "Vie";
+"health.weekday.sat" = "Sáb";
 
 // MARK: - Settings Screen
 "settings.title" = "Configuración";
@@ -150,7 +173,7 @@
 "onboarding.start" = "Comenzar";
 "onboarding.no_device" = "¿No tienes Mindora?";
 "onboarding.connect_mindora" = "Conectar Mindora";
-"onboarding.page3.health_card_text" = "Configure el acceso a datos de salud de Mindora en la app Salud\nToque para abrir la app Salud";
+"onboarding.page3.health_card_text" = "Configure el acceso a datos de salud de Mindora en la app Salud";
 "onboarding.page3.bluetooth_card_text" = "Bluetooth no está habilitado actualmente\nToque para abrir la configuración de Bluetooth";
 "onboarding.page3.bluetooth_card_text_authorized" = "Permiso de Bluetooth activado\nEl dispositivo puede conectarse normalmente";
 "onboarding.page4.scanning_title" = "Escaneando dispositivos cercanos";
@@ -227,7 +250,7 @@
 "permission.bluetooth.reminder_message" = "Para conectarse a su dispositivo Mindora, la aplicación necesita permiso de Bluetooth.";
 "permission.request_authorization" = "Autorizar acceso";
 "permission.open_settings" = "Abrir ajustes";
-"permission.open_health_app" = "Abrir app Salud";
+"permission.open_health_app" = "Abrir Salud";
 "permission.later" = "Más tarde";
 "permission.authorization_success" = "Autorización exitosa";
 "permission.authorization_failed" = "Autorización fallida";
@@ -241,7 +264,14 @@
 "permission.health.settings_title" = "Privacidad de salud";
 "permission.health.settings_message" = "Ve a Ajustes > Privacidad y seguridad > Salud, busca Mindora y activa los tipos de datos necesarios.";
 "permission.health.guide_title" = "Cómo configurar los permisos de datos de salud";
-"permission.health.guide_message" = "1. Abre la app Salud\n2. Toca Compartir en la parte inferior\n3. Elige 'Apps'\n4. Selecciona Mindora\n5. Activa los tipos de datos necesarios";
+"permission.health.guide_message" = "Abre la app Salud\nToca Compartir en la parte inferior\nElige 'Apps'\nSelecciona Mindora\nActiva los tipos de datos necesarios";
 
 // Health Permission CTA (avoid misleading status)
-"permission.health.confirm" = "Confirmar en app Salud";
+"permission.health.confirm" = "Configuración";
+
+// Local Network Permission CTA
+"permission.local_network.confirm" = "Por favor confirme en Ajustes";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "No se pueden buscar dispositivos";
+"permission.local_network.denied_message" = "Se requiere acceso a la red local para buscar dispositivos Mindora cercanos. Por favor, habilite el acceso a la red local en Ajustes.";

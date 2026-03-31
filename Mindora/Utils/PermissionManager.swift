@@ -11,6 +11,8 @@ import UIKit
 import CoreTelephony
 import Network
 import CoreBluetooth
+import Photos
+import UserNotifications
 
 final class PermissionManager {
     static let shared = PermissionManager()
@@ -208,6 +210,13 @@ final class PermissionManager {
         }
 
         if #available(iOS 14.0, *) {
+            // 强制刷新时，取消现有探测并重新开始
+            if forceRefresh {
+                localNetworkProbe?.cancel()
+                localNetworkProbe = nil
+                cachedLocalNetworkStatus = nil
+            }
+            
             localNetworkCallbacks.append(completion)
             guard localNetworkProbe == nil else { return }
             let probe = LocalNetworkAuthorizationProbe()
@@ -223,8 +232,14 @@ final class PermissionManager {
                 }
             }
         } else {
-            DispatchQueue.main.async { completion(.unavailable) }
+            // iOS 14 以下不需要本地网络权限，视为已授权
+            DispatchQueue.main.async { completion(.authorized) }
         }
+    }
+    
+    /// 清除本地网络权限缓存
+    func clearLocalNetworkStatusCache() {
+        cachedLocalNetworkStatus = nil
     }
 
     /// 获取蜂窝数据权限状态
@@ -272,6 +287,43 @@ final class PermissionManager {
         
         print("[PermissionManager] 蓝牙授权状态: rawValue=\(authorization.rawValue), status=\(statusDescription)")
         return result
+    }
+    
+    // MARK: - Notification Permission
+    
+    /// 检查通知权限状态
+    func checkNotificationPermissionStatus(completion: @escaping (PermissionStatus) -> Void) {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let status: PermissionStatus
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                status = .authorized
+            case .denied:
+                // 用户明确拒绝，映射为 notDetermined (未授权) 以符合当前 App 逻辑
+                status = .notDetermined
+            case .notDetermined:
+                status = .notDetermined
+            @unknown default:
+                status = .notDetermined
+            }
+            
+            DispatchQueue.main.async {
+                completion(status)
+            }
+        }
+    }
+    
+    /// 请求通知权限
+    func requestNotificationPermission(completion: @escaping (PermissionStatus) -> Void) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            DispatchQueue.main.async {
+                if granted {
+                    completion(.authorized)
+                } else {
+                    completion(.notDetermined)
+                }
+            }
+        }
     }
     
     // MARK: - Reminder Logic
@@ -532,40 +584,52 @@ final class PermissionManager {
     
     /// 显示如何在健康 App 中设置权限的指引
     private func showHealthAppGuide(from viewController: UIViewController) {
-        let alert = UIAlertController(
+        let guideAlert = HealthGuideAlertViewController(
             title: L("permission.health.guide_title"),
             message: L("permission.health.guide_message"),
-            preferredStyle: .alert
+            confirmButtonTitle: L("permission.open_health_app"),
+            cancelButtonTitle: L("common.ok"),
+            onConfirm: { [weak self] in
+                self?.openHealthApp()
+            },
+            onCancel: nil
         )
         
-        alert.addAction(UIAlertAction(title: L("permission.open_health_app"), style: .default) { _ in
-            self.openHealthApp()
-        })
-        
-        alert.addAction(UIAlertAction(title: L("common.ok"), style: .cancel))
-        
-        viewController.present(alert, animated: true)
+        viewController.present(guideAlert, animated: true)
     }
     
-    /// 打开健康 App
+    /// 打开健康 App 的共享页面（如果可能）
+    /// 注意：iOS 健康 App 的 URL Scheme 功能有限，无法直接跳转到特定应用的权限页面
+    /// 我们尝试使用 sharing URL，如果不支持则打开健康 App 主界面
     func openHealthApp(completion: ((Bool) -> Void)? = nil) {
-        guard let url = URL(string: "x-apple-health://") else {
-            completion?(false)
-            openAppSettings()
-            return
-        }
-
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url) { success in
-                if !success {
-                    self.openAppSettings()
+        // 尝试的 URL 列表，按优先级排序
+        // 1. 尝试直接打开共享页面（某些 iOS 版本可能支持）
+        // 2. 尝试打开健康 App 主界面
+        let urlStrings = [
+            "x-apple-health://sharingOverview", // 优先：共享总览页
+            "x-apple-health://sharing",         // 兼容：共享 TAB
+            "x-apple-health://"                 // 备选：打开健康 App 主界面
+        ]
+        
+        for urlString in urlStrings {
+            if let url = URL(string: urlString),
+               UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url) { success in
+                    if success {
+                        completion?(true)
+                    } else {
+                        // 如果当前 URL 失败，继续尝试下一个（但在 open 回调中无法继续循环）
+                        // 所以这里只记录失败
+                        completion?(false)
+                    }
                 }
-                completion?(success)
+                return
             }
-        } else {
-            openAppSettings()
-            completion?(false)
         }
+        
+        // 所有 URL 都不可用，打开应用设置
+        openAppSettings()
+        completion?(false)
     }
     
     /// 打开应用设置页面
@@ -619,52 +683,230 @@ private extension PermissionManager {
     func unauthorizedAll(authorized: Int, denied: Int, pending: Int) -> Bool {
         return authorized == 0 && denied > 0 && pending == 0
     }
+    
+    // MARK: - Photo Library Permission
+    
+    func checkPhotoLibraryPermission() -> PermissionStatus {
+        let status: PHAuthorizationStatus
+        if #available(iOS 14, *) {
+            status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        } else {
+            status = PHPhotoLibrary.authorizationStatus()
+        }
+        
+        switch status {
+        case .authorized:
+            return .authorized
+        case .denied, .restricted:
+            return .unavailable
+        case .notDetermined:
+            return .notDetermined
+        case .limited:
+            return .partiallyAuthorized
+        @unknown default:
+            return .unavailable
+        }
+    }
+    
+    func requestPhotoLibraryPermission(completion: @escaping (PermissionStatus) -> Void) {
+        let handler: (PHAuthorizationStatus) -> Void = { status in
+            DispatchQueue.main.async {
+                switch status {
+                case .authorized:
+                    completion(.authorized)
+                case .denied, .restricted:
+                    completion(.unavailable)
+                case .notDetermined:
+                    completion(.notDetermined)
+                case .limited:
+                    completion(.partiallyAuthorized)
+                @unknown default:
+                    completion(.unavailable)
+                }
+            }
+        }
+        
+        if #available(iOS 14, *) {
+            PHPhotoLibrary.requestAuthorization(for: .addOnly, handler: handler)
+        } else {
+            PHPhotoLibrary.requestAuthorization(handler)
+        }
+    }
 }
 
 // MARK: - Local Network Probe
 
+/// 本地网络权限检测探针
+/// 
+/// iOS 14+ 引入了本地网络权限，但 Apple 没有提供直接查询权限状态的 API。
+/// 
+/// 重要说明：iOS 本地网络权限检测是一个已知的技术难题：
+/// - Apple 故意不提供直接查询权限的 API
+/// - NWBrowser 即使在权限关闭的情况下也可能返回 ready 状态
+/// - 权限状态可能有延迟，设置更改后不会立即生效
+/// 
+/// 由于技术限制，我们采用保守策略：
+/// - 如果能检测到明确的拒绝信号，返回未授权
+/// - 否则假设已授权（因为实际使用时系统会再次提示）
 @available(iOS 14.0, *)
 private final class LocalNetworkAuthorizationProbe {
     private var browser: NWBrowser?
+    private var listener: NWListener?
     private let queue = DispatchQueue(label: "com.mindora.permission.localnetwork.probe")
     private var completion: ((PermissionStatus) -> Void)?
+    private var hasFinished = false
+    private var timeoutWorkItem: DispatchWorkItem?
 
     func start(completion: @escaping (PermissionStatus) -> Void) {
         self.completion = completion
+        self.hasFinished = false
 
+        // 尝试创建一个本地网络监听器来检测权限
+        // 当权限被拒绝时，监听器会失败
+        do {
+            let parameters = NWParameters.udp
+            parameters.includePeerToPeer = true
+            
+            listener = try NWListener(using: parameters)
+            listener?.stateUpdateHandler = { [weak self] state in
+                guard let self, !self.hasFinished else { return }
+                print("[LocalNetworkProbe] Listener state: \(state)")
+                
+                switch state {
+                case .ready:
+                    // 监听器就绪，权限已授权
+                    self.finish(with: .authorized)
+                    
+                case .waiting(let error):
+                    print("[LocalNetworkProbe] Listener waiting with error: \(error)")
+                    // 检查是否是权限错误
+                    if case .posix(let posixError) = error {
+                        print("[LocalNetworkProbe] POSIX error: \(posixError.rawValue)")
+                        // 某些 POSIX 错误表示权限被拒绝
+                        if posixError == .EACCES || posixError == .EPERM {
+                            self.finish(with: .notDetermined)
+                        }
+                    }
+                    // 继续等待
+                    
+                case .failed(let error):
+                    print("[LocalNetworkProbe] Listener failed with error: \(error)")
+                    // 失败可能表示权限问题
+                    if case .posix(let posixError) = error {
+                        if posixError == .EACCES || posixError == .EPERM {
+                            self.finish(with: .notDetermined)
+                            return
+                        }
+                    }
+                    // 其他失败，尝试使用 browser 方法
+                    self.tryBrowserMethod()
+                    
+                case .cancelled:
+                    break
+                    
+                case .setup:
+                    break
+                    
+                @unknown default:
+                    break
+                }
+            }
+            
+            listener?.start(queue: queue)
+            
+        } catch {
+            print("[LocalNetworkProbe] Failed to create listener: \(error)")
+            // 创建监听器失败，尝试使用 browser 方法
+            tryBrowserMethod()
+        }
+
+        // 设置超时
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self, !self.hasFinished else { return }
+            print("[LocalNetworkProbe] Timeout reached")
+            // 超时情况下，假设已授权（因为没有明确的拒绝信号）
+            self.finish(with: .authorized)
+        }
+        timeoutWorkItem = workItem
+        queue.asyncAfter(deadline: .now() + 2.0, execute: workItem)
+    }
+    
+    private func tryBrowserMethod() {
+        guard !hasFinished else { return }
+        
         let parameters = NWParameters()
         parameters.includePeerToPeer = true
 
-        browser = NWBrowser(for: .bonjour(type: "_mindora._tcp", domain: nil), using: parameters)
+        browser = NWBrowser(for: .bonjour(type: "_mindora._tcp", domain: "local."), using: parameters)
+        
         browser?.stateUpdateHandler = { [weak self] state in
-            guard let self else { return }
+            guard let self, !self.hasFinished else { return }
+            print("[LocalNetworkProbe] Browser state: \(state)")
+            
             switch state {
             case .ready:
                 self.finish(with: .authorized)
-            case .failed(let error):
-                if case .posix = error {
-                    self.finish(with: .notDetermined)
-                } else {
-                    self.finish(with: .unavailable)
+                
+            case .waiting(let error):
+                print("[LocalNetworkProbe] Browser waiting with error: \(error)")
+                if case .posix(let posixError) = error {
+                    if posixError == .EACCES || posixError == .EPERM {
+                        self.finish(with: .notDetermined)
+                    }
                 }
-            default:
+                
+            case .failed(let error):
+                print("[LocalNetworkProbe] Browser failed with error: \(error)")
+                // DNS NoAuth 错误仍然视为已授权
+                if case .dns(_) = error {
+                    self.finish(with: .authorized)
+                } else if case .posix(let posixError) = error {
+                    if posixError == .EACCES || posixError == .EPERM {
+                        self.finish(with: .notDetermined)
+                    } else {
+                        self.finish(with: .authorized)
+                    }
+                } else {
+                    self.finish(with: .authorized)
+                }
+                
+            case .cancelled, .setup:
+                break
+                
+            @unknown default:
                 break
             }
         }
 
         browser?.start(queue: queue)
-
-        queue.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-            guard let self, self.browser != nil else { return }
-            self.finish(with: .notDetermined)
+    }
+    
+    func cancel() {
+        queue.async { [weak self] in
+            guard let self else { return }
+            self.timeoutWorkItem?.cancel()
+            self.timeoutWorkItem = nil
+            self.browser?.cancel()
+            self.browser = nil
+            self.listener?.cancel()
+            self.listener = nil
+            self.hasFinished = true
+            self.completion = nil
         }
     }
 
     private func finish(with status: PermissionStatus) {
+        guard !hasFinished else { return }
+        hasFinished = true
+        timeoutWorkItem?.cancel()
+        timeoutWorkItem = nil
         browser?.cancel()
         browser = nil
+        listener?.cancel()
+        listener = nil
         let completion = self.completion
         self.completion = nil
+        print("[LocalNetworkProbe] Finished with status: \(status)")
         completion?(status)
     }
 }

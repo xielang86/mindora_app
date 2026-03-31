@@ -1,0 +1,23 @@
+{
+  "images": [
+    {
+      "filename": "sleep.music.snowy_peak_brahma_sound.png",
+      "idiom": "universal",
+      "scale": "1x"
+    },
+    {
+      "filename": "sleep.music.snowy_peak_brahma_sound@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "filename": "sleep.music.snowy_peak_brahma_sound@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

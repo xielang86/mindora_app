@@ -20,4 +20,24 @@ enum Log {
         print("[ERROR] [\(ts())] [\(tag)] \(message())")
         #endif
     }
+
+    static func prettyJSON(_ data: Data, maxChars: Int = 4000) -> String {
+        let raw: String
+        if let obj = try? JSONSerialization.jsonObject(with: data, options: []),
+           let pretty = try? JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted]),
+           let str = String(data: pretty, encoding: .utf8) {
+            raw = str
+        } else if let str = String(data: data, encoding: .utf8) {
+            raw = str
+        } else {
+            raw = "<non-utf8 body: \(data.count) bytes>"
+        }
+
+        if raw.count <= maxChars {
+            return raw
+        }
+
+        let endIndex = raw.index(raw.startIndex, offsetBy: maxChars)
+        return String(raw[..<endIndex]) + "…(truncated)"
+    }
 }

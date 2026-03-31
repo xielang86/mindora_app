@@ -59,6 +59,7 @@ final class SettingsViewController: UIViewController {
     
     // 选项容器
     private var settingItems: [UIView] = []
+    private weak var profileSubtitleLabel: UILabel?
     
     // MARK: - Lifecycle
     
@@ -73,6 +74,7 @@ final class SettingsViewController: UIViewController {
         super.viewWillAppear(animated)
         // 确保导航栏设置在每次显示时都正确
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        updateProfileSubtitle()
     }
     
     // MARK: - Setup
@@ -110,7 +112,7 @@ final class SettingsViewController: UIViewController {
     
     private func createSettingItems() {
         let items: [(title: String, subtitle: String, action: Selector)] = [
-            (L("settings.profile"), L("settings.profile_subtitle"), #selector(profileTapped)),
+            (L("settings.profile"), profileSubtitle(), #selector(profileTapped)),
             (L("settings.sync"), L("settings.sync_subtitle"), #selector(syncTapped)),
             (L("permission.title"), "", #selector(permissionTapped)),
             (String(format: L("settings.version_with_number"), versionChecker.getCurrentVersion()), L("settings.version_subtitle"), #selector(versionTapped)),
@@ -128,7 +130,8 @@ final class SettingsViewController: UIViewController {
                 title: item.title,
                 subtitle: item.subtitle,
                 action: item.action,
-                showTopSeparator: index != 0  // 第一个选项不显示上边分隔线
+                showTopSeparator: index != 0,  // 第一个选项不显示上边分隔线
+                isProfileItem: index == 0
             )
             contentView.addSubview(itemView)
             settingItems.append(itemView)
@@ -154,7 +157,7 @@ final class SettingsViewController: UIViewController {
         }
     }
     
-    private func createSettingItem(title: String, subtitle: String, action: Selector, showTopSeparator: Bool = true) -> UIView {
+    private func createSettingItem(title: String, subtitle: String, action: Selector, showTopSeparator: Bool = true, isProfileItem: Bool = false) -> UIView {
         let containerView = UIView()
         containerView.backgroundColor = .black
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -186,6 +189,10 @@ final class SettingsViewController: UIViewController {
             label.translatesAutoresizingMaskIntoConstraints = false
             containerView.addSubview(label)
             subtitleLabel = label
+
+            if isProfileItem {
+                profileSubtitleLabel = label
+            }
         }
         
         // 箭头图标
@@ -209,7 +216,6 @@ final class SettingsViewController: UIViewController {
         let arrowWidth = scale(designArrowWidth, basedOn: view.bounds.width, designDimension: designWidth)
         let arrowHeight = scale(designArrowHeight, basedOn: view.bounds.height, designDimension: designHeight)
         let arrowTrailing = scale(designArrowTrailing, basedOn: view.bounds.width, designDimension: designWidth)
-        let titleTop = scale(designItemTitleTop, basedOn: view.bounds.height, designDimension: designHeight)
         let subtitleTop = scale(designItemSubtitleTop, basedOn: view.bounds.height, designDimension: designHeight)
         
         var constraints: [NSLayoutConstraint] = []
@@ -236,15 +242,21 @@ final class SettingsViewController: UIViewController {
         
         // 标题位置
         if let subtitleLabel = subtitleLabel {
-            let topAnchor = separatorLine?.bottomAnchor ?? containerView.topAnchor
+            // 使用 StackView 实现垂直居中
+            titleLabel.removeFromSuperview()
+            subtitleLabel.removeFromSuperview()
+            
+            let stackView = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+            stackView.axis = .vertical
+            stackView.alignment = .leading
+            stackView.spacing = subtitleTop
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            containerView.addSubview(stackView)
+            
             NSLayoutConstraint.activate([
-                titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: titleTop),
-                titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: itemLeading),
-                titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: arrowImageView.leadingAnchor, constant: -20),
-                
-                subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: subtitleTop),
-                subtitleLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-                subtitleLabel.trailingAnchor.constraint(equalTo: arrowImageView.leadingAnchor, constant: -20)
+                stackView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+                stackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: itemLeading),
+                stackView.trailingAnchor.constraint(lessThanOrEqualTo: arrowImageView.leadingAnchor, constant: -20)
             ])
         } else {
             NSLayoutConstraint.activate([
@@ -265,8 +277,8 @@ final class SettingsViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func profileTapped() {
-        print("个人资料修改 tapped")
-        Toast.show(L("settings.profile"), in: self.view)
+        let profileVC = UserProfileViewController()
+        navigationController?.pushViewController(profileVC, animated: true)
     }
     
     @objc private func syncTapped() {
@@ -310,9 +322,23 @@ final class SettingsViewController: UIViewController {
     }
     
     private func showOnboarding() {
-        let onboarding = OnboardingViewController()
-        onboarding.modalPresentationStyle = .fullScreen
-        present(onboarding, animated: true)
+        let onboarding = StartViewController()
+        onboarding.isReplaying = true
+        let nav = UINavigationController(rootViewController: onboarding)
+        nav.modalPresentationStyle = .fullScreen
+        nav.setNavigationBarHidden(true, animated: false)
+        present(nav, animated: true)
+    }
+
+    private func profileSubtitle() -> String {
+        if let email = AuthStorage.shared.email, !email.isEmpty {
+            return String(format: L("settings.profile_email_format"), email)
+        }
+        return L("settings.profile_email_placeholder")
+    }
+
+    private func updateProfileSubtitle() {
+        profileSubtitleLabel?.text = profileSubtitle()
     }
     
     // MARK: - Version Check

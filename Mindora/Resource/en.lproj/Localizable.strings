@@ -9,12 +9,31 @@
 // MARK: - Tab Bar Titles
 "tab.home" = "Home";
 "tab.health" = "Health";
+"tab.sleep" = "Sleep";
+"tab.explore" = "Explore";
+"tab.store" = "Stores";
 "tab.settings" = "Settings";
 
 // MARK: - Theme Modes
 "theme.system" = "Follow System";
 "theme.light" = "Light Mode";
 "theme.dark" = "Dark Mode";
+
+// MARK: - Register P3
+"register.p3.title" = "Create Account";
+"register.p3.subtitle" = "Welcome back! Please enter your details.";
+"register.p3.marketing" = "I agree to receive marketing communications";
+"register.p3.button.save" = "Continue";
+"register.p3.agree_prefix" = "I agree to the ";
+"register.p3.terms" = "Terms of Service";
+"register.p3.and" = " and ";
+"register.p3.privacy" = "Privacy Policy";
+
+// MARK: - Register P4
+"register.p4.title" = "Connect your Mindora";
+"register.p4.subtitle" = "Connect your Mindora to the charger and continue to the next step.  Please make sure that Bluetooth is enabled on your phone.";
+"register.p4.button.set_mindor" = "Set up Mindora";
+"register.p4.no_mindora" = "No Mindora yet?";
 
 // MARK: - Home Screen
 "home.title" = "Home";
@@ -34,8 +53,26 @@
 "home.search_finished_one" = "1 device found";
 "home.search_finished_many" = "%d devices found";
 
+// MARK: - Home Dashboard
+"home.metric.sleep_onset" = "Sleep Onset";
+"home.metric.deep_sleep" = "Deep Sleep";
+"home.tab.sleep" = "Sleep";
+"home.tab.overall_score" = "Overall Score";
+"home.tab.activity" = "Activity";
+"home.insights.title" = "Sleep Insights";
+"home.insights.subtitle" = "Based on your sleep data analysis";
+"home.best.title" = "Weekly Best";
+"home.best.subtitle" = "Designed to bring you the best sleep";
+"home.best.used_times" = "Used times";
+"home.best.score" = "score";
+
 // MARK: - Health Screen
 "health.title" = "Health";
+"health.page_title" = "All Health Data";
+"health.time.today" = "Today";
+"health.time.past_7_days" = "Past 7 Days";
+"health.time.past_12_months" = "Past 12 Months";
+"health.time.earlier" = "Earlier";
 
 // MARK: - Health Metrics
 "health.status.initial" = "Requesting Health access";
@@ -66,22 +103,78 @@
 "health.sleep.stage.core" = "Core";
 "health.sleep.stage.deep" = "Deep";
 "health.sleep.no_data" = "No sleep data";
+"health.sleep.bed_time" = "Time in Bed";
+"health.sleep.sleep_time" = "Time Asleep";
+"health.sleep.avg_bed_time" = "Avg. Time in Bed";
+"health.sleep.avg_sleep_time" = "Avg. Time Asleep";
 "health.period.day" = "Day";
+"health.period.week" = "Week";
 "health.period.month" = "Month";
+"health.period.six_months" = "6 Months";
 "health.period.year" = "Year";
+"health.period.today" = "Today";
 "health.period.daily_average" = "Daily Avg";
+"health.period.hourly_average" = "Hourly Avg";
+"health.period.weekly_average" = "Weekly Avg";
 "health.period.monthly_average" = "Monthly Avg";
+"health.period.range" = "Range";
+"health.period.hour" = "h";
+"health.weekday.sun" = "Sun";
+"health.weekday.mon" = "Mon";
+"health.weekday.tue" = "Tue";
+"health.weekday.wed" = "Wed";
+"health.weekday.thu" = "Thu";
+"health.weekday.fri" = "Fri";
+"health.weekday.sat" = "Sat";
+
+// MARK: - Health Week View
+"health.week.avg_score" = "Avg. sleep score";
+"health.week.good" = "Good";
+"health.week.insights" = "Sleep Insights";
+"health.week.insights_sub" = "Based on your sleep data analysis";
+"health.week.insights_title" = "Sleep Trends";
+"health.week.insights.body" = "Excellent Deep \nSleep Performance";
+"health.week.insights.desc" = "Your deep sleep accounts for 29.8% of your \ntotal sleep, above the standard level. \nKeep maintaining a regular sleep schedule.";
+
+"health.week.best" = "Weekly Best";
+"health.week.best_title" = "Onset Efficiency";
+"health.week.best_sub" = "Designed to bring you the best sleep";
+"health.week.best.used_times" = "Used times";
+"health.week.best.score" = "score";
+"health.week.sedona" = "Sedona Desert Calm";
+"health.week.respiratory_rate" = "Respiratory Rate";
+"health.week.avg_heart_rate" = "Avg. Heart Rate";
+"health.week.avg_skin_temp" = "Avg. Wrist Temperature";
+"health.week.avg_awake" = "Avg. Awake";
+"health.week.avg_rem" = "Avg. REM";
+"health.week.avg_core" = "Avg. Core Sleep";
+"health.week.avg_deep" = "Avg. Deep Sleep";
+"health.week.days_tracked" = "Days Tracked";
+"health.week.avg_total" = "Avg. Total Sleep";
+"health.week.avg_onset" = "Avg. Sleep Onset";
+
+// MARK: - Health Week Expanded Headers
+"health.week.header.heart_rate" = "Avg. heart rate";
+"health.week.header.total_sleep" = "Total sleep";
+"health.week.header.time_in_bed" = "Avg. time in bed";
+"health.week.metric.from_baseline" = "(from Baseline)";
+
+// MARK: - Health Month View
+"health.month.optimal" = "Optimal";
+
 
 // MARK: - Settings Screen
 "settings.title" = "Settings";
 "settings.subtitle" = "Make Mindora yours";
-"settings.profile_subtitle" = "Modify device nickname and avatar";
+"settings.profile_subtitle" = "View and edit your profile";
 "settings.sync_subtitle" = "Sync health data on your phone";
 "settings.reset_subtitle" = "Factory reset will restore all settings and records";
 "settings.version_subtitle" = "Software upgrades bring new features and bug fixes";
 "settings.language" = "Language";
 "settings.theme" = "Theme Mode";
-"settings.profile" = "Edit Profile";
+"settings.profile" = "Profile";
+"settings.profile_email_format" = "Email: %@";
+"settings.profile_email_placeholder" = "Not logged in";
 "settings.sync" = "Health Data Sync";
 "settings.permission" = "Permission Management";
 "settings.version" = "App Version";
@@ -90,6 +183,7 @@
 "settings.show_onboarding" = "Show Onboarding Again";
 
 // Language and Theme Selection
+"settings.language_title" = "Language";
 "settings.select_language" = "Select Language";
 "settings.select_theme" = "Select Theme Mode";
 
@@ -115,6 +209,12 @@
 "settings.syncing" = "Syncing...";
 "settings.sync_success_title" = "Sync Successful";
 "settings.sync_success_message" = "A batch of sample health data has been sent.";
+
+// MARK: - Device Management
+"device_manage.status.connected" = "Connected";
+"device_manage.button.connect_other" = "Connect Other Device";
+"device_manage.default_name" = "Mindora Black Two";
+
 "settings.sync_error_title" = "Sync Failed";
 
 // MARK: - Settings Sections
@@ -122,6 +222,41 @@
 "settings.section.data_account" = "Data & Account";
 "settings.section.other" = "Other";
 "settings.section.about" = "About";
+
+// MARK: - Side Menu
+"sidemenu.title" = "My Account";
+"sidemenu.user.name" = "Username";
+"sidemenu.subscription" = "Subscription";
+"sidemenu.upgrade" = "Upgrade to Pro";
+"sidemenu.device" = "Devices";
+"sidemenu.notifications" = "Notifications";
+"sidemenu.privacy_data" = "Privacy & Data";
+"sidemenu.health_link" = "Health Data Link";
+"sidemenu.language" = "Language";
+"sidemenu.help" = "Help";
+"sidemenu.logout" = "Log Out";
+"sidemenu.terms" = "Terms of Service";
+"sidemenu.privacy_policy" = "Privacy Policy";
+"sidemenu.not_logged_in" = "Not logged in";
+
+// MARK: - User Profile
+"user_profile.title" = "Profile";
+"user_profile.user_id" = "User ID";
+"user_profile.nickname" = "Nickname";
+"user_profile.gender" = "Gender";
+"user_profile.gender.male" = "Male";
+"user_profile.gender.female" = "Female";
+"user_profile.gender.other" = "Other";
+"user_profile.age" = "Age";
+"user_profile.birthday" = "Birthday";
+"user_profile.email" = "Email";
+"user_profile.phone" = "Phone";
+"user_profile.address" = "Address";
+"user_profile.update" = "Update Profile";
+"user_profile.username_default" = "Username";
+"user_profile.take_photo" = "Take Photo";
+"user_profile.choose_from_album" = "Choose from Album";
+"user_profile.cancel" = "Cancel";
 
 // MARK: - Device Selection
 "device_selection.title" = "Please select the Mindora device you want to connect to";
@@ -145,12 +280,16 @@
 "common.cancel" = "Cancel";
 "common.confirm" = "Confirm";
 "common.retry" = "Retry";
+"common.saved_to_photos" = "Saved to Photos";
+"common.save_success" = "Saved Successfully";
+"common.share_success" = "Shared Successfully";
+"common.copy_success" = "Copied";
 
 // MARK: - Onboarding
 "onboarding.start" = "Start";
 "onboarding.no_device" = "Don't have Mindora?";
 "onboarding.connect_mindora" = "Connect Mindora";
-"onboarding.page3.health_card_text" = "Configure Mindora's health data access in the Health app\nTap to open Health app";
+"onboarding.page3.health_card_text" = "Configure Mindora's health data access in the Health app";
 "onboarding.page3.bluetooth_card_text" = "Bluetooth is not enabled\nTap to enable Bluetooth settings";
 "onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth permission is enabled\nDevice can connect normally";
 "onboarding.page4.scanning_title" = "Scanning Nearby Devices";
@@ -230,7 +369,7 @@
 "permission.bluetooth.reminder_message" = "To connect to your Mindora device, the app needs Bluetooth permission.";
 "permission.request_authorization" = "Authorize Access";
 "permission.open_settings" = "Open Settings";
-"permission.open_health_app" = "Open Health app";
+"permission.open_health_app" = "Open Health";
 "permission.later" = "Later";
 "permission.authorization_success" = "Authorization Successful";
 "permission.authorization_failed" = "Authorization Failed";
@@ -243,8 +382,455 @@
 // Health Settings Guide
 "permission.health.settings_title" = "Health Privacy Settings";
 "permission.health.settings_message" = "Go to Settings > Privacy & Security > Health, find Mindora, and turn on the data types you need.";
-"permission.health.guide_title" = "How to manage Health permissions";
-"permission.health.guide_message" = "1. Open the Health app\n2. Tap Sharing at the bottom\n3. Choose 'Apps'\n4. Select Mindora\n5. Enable the data types you need";
+"permission.health.guide_title" = "How to Set Health Data Permissions";
+"permission.health.guide_message" = "Open Health App\nTap Sharing at the bottom\nChoose 'Apps'\nSelect Mindora\nEnable the data types you need";
 
 // Health Permission CTA (avoid misleading status)
-"permission.health.confirm" = "Go confirm in Health app";
+"permission.health.confirm" = "Settings";
+
+// Local Network Permission CTA (cannot be accurately detected, prompt user to confirm in settings)
+"permission.local_network.confirm" = "Please confirm in Settings";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "Cannot Search for Devices";
+"permission.local_network.denied_message" = "Local network access is required to search for nearby Mindora devices. Please enable local network access in Settings.";
+
+// MARK: - Login
+"login.email_placeholder" = "Enter your email";
+"login.get_code" = "Verify Email";
+"login.toast.enter_email" = "Please enter your email";
+"login.toast.invalid_email" = "Invalid email format";
+"login.toast.network_error_prefix" = "Network error: ";
+"login.toast.no_data" = "No data received";
+"login.toast.send_code_failed" = "Failed to send code";
+"login.toast.invalid_response" = "Invalid response";
+"login.toast.login_failed" = "Login failed";
+"login.verify_alert.title" = "Verify Email";
+
+// Login Success
+"login.success.title" = "Login Successful";
+"login.success.message" = "Email %@ verified successfully";
+"login.verify_alert.message_format" = "Enter the code sent to %@";
+"login.verify_alert.code_placeholder" = "Verification Code";
+"login.verify_alert.login_action" = "Login";
+"login.code_sent_title" = "Verification Code Sent";
+"login.code_sent_message" = "Verification code has been sent to your email: %@. Please check your inbox.";
+
+// MARK: - User Profile
+"user_profile.title" = "User Profile";
+"user_profile.change_avatar" = "Change Avatar";
+"user_profile.email_title" = "Email";
+"user_profile.logout" = "Log Out";
+"user_profile.logout_confirm_title" = "Log out?";
+"user_profile.logout_confirm_message" = "Logging out clears local data.";
+"user_profile.logout_success" = "Logged out";
+"user_profile.delete" = "Delete Account";
+"user_profile.delete_confirm_title" = "Delete account?";
+"user_profile.delete_confirm_message" = "We will request account deletion and clear local data.";
+"user_profile.delete_success" = "Account deleted";
+"user_profile.delete_failed" = "Failed to delete account";
+"user_profile.token_missing" = "Please login first";
+"user_profile.photo_unavailable" = "Photos access is unavailable";
+"user_profile.update_success" = "Profile updated";
+"user_profile.update_failed" = "Failed to update profile";
+
+// MARK: - Login Start
+"login_start.tagline" = "Personal insights\nto empower your\neveryday.";
+"login_start.button.start" = "Start";
+"login_start.button.no_device" = "No Mindora yet?";
+
+
+// MARK: - Register P1
+"register.welcome" = "Welcome!";
+"register.email_label" = "Email address";
+"register.email_placeholder" = "Email address";
+"register.info.create" = "Please enter your email address to create an account.";
+"register.info.signin" = "If you’re already a member, enter your Mindora account email to sign in.";
+"register.button.continue" = "Continue";
+
+// MARK: - Register P3
+"register.p3.title" = "Terms of Use and Privacy Policy";
+"register.p3.subtitle" = "Please review the following to continue:";
+"register.p3.agree_prefix" = "I have read and agree to the ";
+"register.p3.terms" = "Terms of Use";
+"register.p3.and" = " and ";
+"register.p3.privacy" = "Mindora Privacy Policy.";
+"register.p3.marketing" = "Receive exclusive health education, tips, and special offers to get the most out of your mindora experience.";
+"register.p3.button.save" = "Save and continue";
+
+// MARK: - Register P2
+"register.p2.title" = "Enter confirmation code";
+"register.p2.subtitle" = "A 4-digit code was sent to";
+"register.p2.resend" = "Resend code";
+
+// MARK: - Common Alerts
+"common.error" = "Error";
+"common.notice" = "Notice";
+"register.verification_code_sent" = "Verification code sent";
+
+// MARK: - Auth Errors
+"auth.error.invalid_url" = "Invalid URL";
+"auth.error.serialization_error" = "Serialization Error";
+"auth.error.no_data" = "No Data Received";
+"auth.error.api_error_default" = "API Error: %d";
+"auth.error.invalid_response" = "Invalid Response";
+"auth.error.missing_data" = "Missing Data in Response";
+
+// MARK: - Subscription
+"subscription.nav.title" = "Membership";
+"subscription.my_midora" = "My MIDORA";
+
+// MARK: - Explore
+"explore.greeting.hi" = "Hi,";
+"explore.intro.data" = "Hi, last night your body entered a stable, relaxed, and highly restorative sleep state. From sleep onset rhythm to overnight structure, multiple key indicators were better than your recent average. This wasn’t just “a lucky good night,” but a night where your nervous system and sleep architecture worked in sync.";
+"explore.intro.default" = "In every phase—falling asleep, waking up, and returning to deep sleep—Mindora keeps observing your sleep rhythm and adjusts how it stays with you. These insights aren’t just numbers; they come from the sleep scenes you use, the sound patterns, and the real feedback from your body.";
+"explore.intro.default_detail" = "Scroll down and we’ll explain:\nwhat happened last night, what helped you most, and how Mindora adjusted for you.";
+
+"explore.section.efficiency" = "Sleep Onset Efficiency";
+"explore.section.structure" = "Sleep Structure";
+"explore.section.fluctuation" = "Night Fluctuation";
+"explore.section.preference" = "Scene Preference";
+"explore.section.advice" = "Sleep Advice";
+
+"explore.metric.onset_time" = "Sleep onset: %@ min";
+"explore.metric.continuous_sleep" = "Continuous sleep: %@ min";
+"explore.metric.smart_intervention" = "Smart intervention: %@";
+
+"explore.efficiency.first_sleep" = "First sleep time";
+"explore.efficiency.pre_hr" = "Pre-sleep heart rate";
+"explore.efficiency.pre_resp" = "Pre-sleep respiratory rate";
+
+"explore.structure.rem" = "REM sleep";
+"explore.structure.deep" = "Deep sleep";
+"explore.structure.light" = "Core sleep";
+
+"explore.fluctuation.awake_count" = "Night awakenings";
+"explore.fluctuation.awake_duration" = "Awake duration";
+"explore.fluctuation.awake_type" = "Awakening type";
+"explore.fluctuation.hr_range" = "Heart rate fluctuation";
+"explore.fluctuation.resp_range" = "Respiratory fluctuation";
+
+"explore.status.health_range" = "Healthy range";
+"explore.status.average" = "Average";
+"explore.status.fluctuation_high" = "Higher fluctuation";
+
+"explore.mock.efficiency_desc" = "Heart rate and breathing trends were both steady, which usually means the parasympathetic system is dominant and the body can relax naturally without extra “slow down” effort.\n\nWithin the 30 minutes before sleep, heart rate and breathing stayed relatively stable or gently declined. This often correlates with shorter sleep latency and is a common physiological signal used to judge readiness for sleep.";
+"explore.mock.structure_desc" = "These data don’t suggest a structural abnormality. Last night’s sleep stages were intact, but each key stage was more fragmented—typical of nights with multiple interruptions, where deep sleep and REM are compressed.\n\nThis is one of the most common, and most repairable, patterns on stressed nights.";
+"explore.mock.fluctuation_desc" = "Together, these signals indicate a highly reactive nervous system at night—more sensitive to external stimuli and internal anxiety. At 03:25, Mindora detected heart-rate and breathing fluctuations, and the awakening exceeded the physiological adjustment threshold. Mindora initiated a 15-minute intervention using the low-frequency, continuous waves of “Amalfi Coast Breeze,” helping the nervous system shift back to parasympathetic dominance so you could settle and fall asleep again within 15 minutes.";
+"explore.mock.preference_desc" = "Last night, you fell asleep in the “Cocos Island Moonlight Drift” environment—an ocean-embracing soundscape with pink and brown noise.\n\nIts structure centers on low-frequency, continuous ocean waves with a steady rhythm and no sharp spikes—an environment that doesn’t demand attention but stays present.\n\nResearch shows that low-frequency, continuous natural soundscapes reduce alertness to environmental changes and lessen pre-sleep safety checking. The slow ocean rhythm also syncs more easily with breathing, helping the nervous system shift into rest.\n\nYour body’s response confirmed this: sleep onset took 15 minutes, pre-sleep heart rate was about 68 bpm, and breathing rate was 15 breaths/min—relaxed and steady. Night awakenings were mostly turns, without clear physiological spikes, more like natural transitions between stages.\n\nYou adapt well to low-frequency, continuous natural-water rhythms. This environment suits a gradual “letting go” at sleep onset rather than a strong guided drop-off.";
+"explore.mock.advice_desc" = "Across several nights, your overall sleep has been stable. To further reduce night fluctuations, try lowering external stimulation in the hour before bed or ending audio playback slightly earlier over the next few nights.\n\nSleep isn’t a straight line—it’s a system that can be disturbed and self-repair. Tracking these changes isn’t to judge, but to find the easiest, most stable sleep pattern for you.\n\nLast night, your body did that.";
+"explore.mock.intervention" = "Scene intervention";
+"explore.mock.awake_type" = "Anxiety-related";
+
+"explore.preference.recent" = "Recent";
+"explore.preference.cocos_island.title" = "Cocos Island Moonlight Drift";
+"explore.preference.cocos_island.subtitle" = "Soundscape: ocean / pink noise / brown noise";
+
+"explore.quote.text" = "Mindora doesn’t just record your sleep\nIt understands your state\nAnd chooses the best way to stay with you";
+"explore.quote.open" = "“";
+"explore.quote.close" = "”";
+
+"explore.article.1.title" = "Article Title";
+"explore.article.1.subtitle" = "Article summary article summary article summary article summary";
+"explore.article.2.title" = "Article Title";
+"explore.article.2.subtitle" = "Article summary article summary article summary article summary";
+"explore.article.3.title" = "Article Title";
+"explore.article.3.subtitle" = "Article summary article summary article summary article summary";
+"explore.article.4.title" = "Article Title";
+"explore.article.4.subtitle" = "Article summary article summary article summary article summary";
+
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.label" = "Status range";
+"explore.placeholder.number" = "- -";
+"explore.placeholder.time" = "- -:- -";
+"explore.placeholder.hr" = "- - bpm";
+"explore.placeholder.resp" = "- - breaths/min";
+"explore.placeholder.duration" = "- - min";
+"explore.placeholder.count" = "- - times";
+"explore.placeholder.text" = "- -";
+"explore.placeholder.hr_fluctuation" = "- - bpm";
+"explore.placeholder.percent" = "- -%";
+
+"explore.value.count_format" = "%@ times";
+"explore.value.duration_format" = "%@ min";
+"explore.value.resp_rate_format" = "%@ breaths/min";
+"explore.value.hr_format" = "%@ bpm";
+"explore.value.hr_range_format" = "%@ bpm";
+
+"explore.default.efficiency_desc" = "This area will show your sleep onset process. Mindora analyzes your sleep time, sleep latency, and pre-sleep heart rate and breathing patterns so you can better understand how your sleep naturally begins.";
+"explore.default.structure_desc" = "This section presents your sleep stage distribution. You’ll see the proportions and continuity of light, deep, and REM sleep. Understanding your structure helps you adjust habits without judging good or bad.";
+"explore.default.fluctuation_desc" = "This section records each nighttime intervention from Mindora and your responses. If fluctuations occur, Mindora uses physiological signals to assess them, stays with you within a reasonable range, and intervenes when needed to protect your sleep rhythm.";
+"explore.default.preference_desc" = "This section summarizes your preferred sound types and scenes. These insights help you understand what most effectively supports your sleep. Mindora learns your habits and preferences to recommend more effective, personalized sleep companionship.";
+
+"explore.empty.score" = "0";
+"explore.empty.title" = "Sleep Score";
+"explore.empty.message" = "After your first monitoring session,\nyou'll receive a deeper analysis of your sleep quality here.\nLet's start your first sleep monitoring.";
+"explore.bottom.description" = "By sensing your entire night's sleep state and tracking changes in your physiological indicators, Mindora actively provides AI-assisted interventions when needed, helping you achieve more continuous and better-quality sleep. Once you start using it, you'll see your deep sleep insights here, including sleep onset process, sleep structure, nighttime fluctuations, and our recommended soundscapes.";
+
+// MARK: - Subscription
+"subscription.nav.title" = "Membership";
+"subscription.my_midora" = "My MIDORA";
+"subscription.not_member" = "You are not a member yet";
+"subscription.not_member_desc" = "Subscribe to the plan you need and enjoy exclusive benefits";
+"subscription.section.title" = "Membership Subscription";
+"subscription.my.title" = "My Subscription";
+"subscription.monthly" = "Monthly";
+"subscription.yearly" = "Yearly";
+"subscription.price.monthly" = "/month";
+"subscription.price.yearly" = "/year";
+"subscription.action.subscribe" = "Subscribe";
+"subscription.action.cancel" = "Cancel";
+"subscription.desc.monthly.prefix" = "Renew at ";
+"subscription.desc.monthly.suffix" = "/month one day before expiry. Cancel anytime before deduction.";
+"subscription.desc.yearly" = "Enjoy a full year of service. Cancel anytime before next renewal.";
+"subscription.auto_renew" = "Auto-renew time: ";
+"subscription.expires_prefix" = "Expires on: ";
+"subscription.desc.cancelled" = "Your benefits will remain active until the subscription expires. Please renew in time.";
+"subscription.exclusive" = "Member Exclusive";
+"subscription.feature.1" = "360° all-round sleep analysis, your private sleep database";
+"subscription.feature.2" = "Smart sleep insight, from data to solutions";
+"subscription.feature.3" = "Exclusive sleep aid plan, personalized sleep improvement";
+"subscription.help.faq" = "FAQ";
+"subscription.help.message" = "Message Center";
+"subscription.help.renewal" = "Renewal Management";
+"subscription.help.restore" = "Restore Purchase";
+"subscription.help.community" = "Join Community";
+"subscription.help.contact" = "Contact Us";
+
+// Subscription Email
+"subscription.email.subject" = "Mindora Support";
+"subscription.email.app_version" = "App Version";
+"subscription.email.ios_version" = "iOS Version";
+"subscription.email.device" = "Device";
+"subscription.email.error.title" = "Email Error";
+"subscription.email.error.message" = "Email is not configured on this device.";
+
+// Subscription Status
+"subscription.tide_days" = "TIDE Days";
+"subscription.active.plan_prefix" = "Active · ";
+"subscription.active.plan_suffix" = " Subscription";
+"subscription.plan_name.monthly" = "Monthly";
+"subscription.plan_name.yearly" = "Yearly";
+"subscription.expires_prefix" = "Expires on ";
+
+// MARK: - Notifications
+"notifications.title" = "Notifications";
+"notifications.permission.title" = "Allow Notifications";
+"notifications.permission.desc" = "Turn on system notifications to receive messages in time";
+"notifications.permission.status" = "You have disabled Mindora notifications in system settings";
+"notifications.permission.keep" = "Keep";
+"notifications.permission.open" = "Go to Settings";
+"notifications.mock.system" = "System Message";
+"notifications.mock.title" = "Membership Reminder";
+"notifications.mock.body" = "Your subscription expires in 7 days. Please renew in time to avoid interruption.";
+"notifications.mock.action" = "View Membership Page";
+
+
+// MARK: - Terms & Privacy
+"legal.terms.title" = "Mindora Terms of Service";
+"legal.terms.content" = "Welcome to Mindora! Thank you for your interest.\n\nThese Terms of Service (\"Agreement\") set forth the terms and conditions applicable to your use of mindora316.com (the \"Site\"), smart sleep aid hardware, chargers, and/or other related products, including the Mindora mobile application (the \"Mindora App\") (collectively referred to as the \"Services\"). The Site and the Mindora App are owned and operated by Mindora Technologies Inc. and its affiliates and subsidiaries (collectively, \"Mindora,\" \"we,\" or \"us\").\n\nBy accessing or using the Services, you agree to be bound by these Terms and the Mindora Privacy Policy (available at mindora316.com/privacy-policy). If you do not agree, do not use the Services.";
+
+"legal.privacy.title" = "Mindora Privacy Policy";
+"legal.privacy.content" = "Update Date: January 29, 2026\nEffective Date: January 29, 2026\n\nMindora and its global affiliates (hereinafter referred to as \"Mindora\", \"we\", \"us\") understand the importance of privacy to you and will respect your privacy. The \"Mindora Privacy Policy\" (hereinafter referred to as \"this Policy\") applies to the Mindora and built-in system services provided by us (hereinafter referred to as \"Mindora Services\"). Mindora is a smart sleep aid hardware developed by us, dedicated to bringing you a more scientific and intelligent sleep improvement solution. The Mindora App is a client for controlling Mindora, helping users use Mindora devices more comprehensively through mobile phones, while providing users with more practical functions, such as marking audio highlights in user conversations, identifying user status, and obtaining user habits. For parts not covered by this Policy, the \"Mindora General Privacy Policy\" shall prevail. Unless otherwise agreed, the terms used in this Policy have the same meaning as those in the \"Mindora User Agreement\".\n\nIf you are a minor or a subject without full civil conduct capacity according to the laws of your jurisdiction of residence (hereinafter referred to as \"Minor\"), please read and fully understand this agreement carefully accompanied by your legal guardian, and use Mindora and services after obtaining the consent of your legal guardian.\n\nPlease carefully read this Policy (especially the bold content) and ensure that you understand our rules for processing your personal information. We attach great importance to the protection of your personal information and will handle your personal information properly based on legal and legitimate methods and following the principle of good faith in accordance with current laws and regulations. If you have any questions about this Policy, you can contact us through the contact information published on our platform.";
+
+// MARK: - Help Page
+"help.page.title" = "Help";
+"help.page.description" = "If you have any questions about the product,\nyou can contact us by scanning the official QR code above or via email.";
+"help.page.email" = "support@mindora316.com";
+
+// MARK: - Logout Alert
+"logout.alert.title" = "Log out";
+"logout.alert.message" = "Are you sure you want to log out? You'll need to login again to use the app.";
+"logout.alert.cancel" = "Cancel";
+"logout.alert.confirm" = "Log out";
+
+// MARK: - Health Link Alert
+"health_link.alert.title" = "About to jump to Apple Health data association";
+"health_link.alert.cancel" = "Cancel";
+"health_link.alert.confirm" = "Confirm";
+"common.save" = "Save";
+"user_profile.label_date" = "Date";
+
+// MARK: - Address
+"address.title" = "My Addresses";
+"address.empty" = "No address added yet";
+"address.add_new" = "Add New Address";
+"address.paste_tip" = "Paste text for smart recognition";
+"address.paste" = "Paste";
+"address.name" = "Name";
+"address.name_placeholder" = "Please enter name";
+"address.phone" = "Phone";
+"address.phone_placeholder" = "Please enter phone number";
+"address.region" = "Region";
+"address.region_placeholder" = "Select Region";
+"address.locate" = "Locate";
+"address.detail" = "Detailed Address";
+"address.detail_placeholder" = "Street, House No., etc.";
+"address.set_default" = "Set as Default Address";
+"address.confirm" = "Confirm";
+"address.default_tag" = "Default";
+
+// MARK: - Address
+"address.title" = "My Addresses";
+"address.empty" = "No address added yet";
+"address.add_new" = "Add New Address";
+"address.paste_tip" = "Paste text for smart recognition";
+"address.paste" = "Paste";
+"address.name" = "Name";
+"address.name_placeholder" = "Please enter name";
+"address.phone" = "Phone";
+"address.phone_placeholder" = "Please enter phone number";
+"address.region" = "Region";
+"address.region_placeholder" = "Select Region";
+"address.locate" = "Locate";
+"address.detail" = "Detailed Address";
+"address.detail_placeholder" = "Street, House No., etc.";
+"address.set_default" = "Set as Default Address";
+"address.confirm" = "Confirm";
+"address.default_tag" = "Default";
+"address.delete" = "Delete";
+"address.delete" = "Delete";
+"permission.location_needed" = "Mindora needs location access to help fill your address. Please enable in Settings.";
+"common.tips" = "Tips";
+"common.settings" = "Settings";
+"common.cancel" = "Cancel";
+"address.select_title" = "Select Address";
+"address.search_placeholder" = "Search Place";
+"address.select_title" = "Select Address";
+"address.search_placeholder" = "Search Place";
+"address.current_location" = "[Current Location]";
+"address.current_location" = "[Current Location]";
+
+// Subscription Restore
+"subscription.restore.loading" = "Restoring...";
+"subscription.restore.success" = "Restore Successful";
+"subscription.restore.no_purchases" = "No active subscription found.";
+
+// Renewal Management
+"renewal.title" = "Renewal Management";
+"renewal.your_subscription" = "Your Subscription";
+"renewal.product_name" = "My MIDORA";
+"renewal.plan" = "Plan";
+"renewal.plan.monthly" = "Monthly Subscription";
+"renewal.renewal_date" = "Renewal Date";
+"renewal.amount" = "Amount";
+"renewal.manage" = "Manage";
+"renewal.plan.yearly" = "Yearly Subscription";
+"renewal.plan.none" = "You have no subscriptions";
+
+
+// MARK: - FAQ
+"subscription.renewal_management" = "Subscription Management";
+"faq.title" = "Mindora FAQ";
+"faq.subtitle" = "Mindora is a smart sleep aid device designed to improve sleep quality through multi-sensory synergy and AI. It is not a medical device. Here are some answers to common questions.";
+"faq.section.getting_started" = "Getting Started";
+"faq.section.core_ai" = "Core Features & AI";
+"faq.q.packaging" = "What is included in my Mindora packaging?";
+"faq.a.packaging" = "Each Mindora set includes a Mindora host unit, a power adapter, and a USB charging cable. Some packages may contain additional accessories (such as natural aromatherapy refills).";
+"faq.q.accuracy" = "Is Mindora's sleep environment monitoring data accurate?";
+"faq.a.accuracy" = "Mindora uses verified sensors (such as temperature/humidity, light, and sound pressure sensors) and algorithms to assess your sleep environment, providing data on sleep stages (Light, Deep, REM), heart rate, and sleep environment. This data is suitable for tracking long-term trends and patterns in your bedroom environment and offering improvement suggestions. Please note that it is not a medical-grade diagnostic device. The absolute value of individual data points may be affected by the specific placement of the device.";
+"faq.q.ai" = "What is the 'AI Smart Intervention' feature and how does it work?";
+"faq.a.ai" = "Mindora uses AI technology to monitor your sleep state in real-time and automatically adjusts the sound and light environment to help you maintain deep sleep or wake up gently.";
+
+
+// MARK: - Health Refactor
+"health.segment.day" = "Day";
+"health.segment.week" = "Week";
+"health.segment.month" = "Month";
+"health.sleep.efficiency" = "Sleep Efficiency";
+"health.sleep.performance" = "Sleep Performance";
+"health.sleep.time_in_bed" = "Time in Bed";
+"health.sleep.resting_heart_rate" = "Resting Heart Rate";
+"health.sleep.overnight_vitals" = "Overnight Vitals";
+"health.sleep.respiratory_rate" = "Respiratory Rate";
+"health.sleep.body_temperature" = "Body Temperature";
+"health.sleep.scenarios" = "Sleep Scenarios";
+"health.sleep.onset" = "Sleep Onset";
+"health.sleep.awake_time" = "Awake Time";
+
+
+// MARK: - Health Month View
+"health.month.trends_title" = "Sleep Trends";
+"health.month.trends_subtitle" = "Based on your sleep data analysis";
+"health.month.trends_body" = "This month, you maintained a consistent amount of sleep with very few nighttime awakenings.";
+"health.month.trends_desc" = "Over the past 30 days, deep sleep accounted for 29.8% of your total sleep, above the standard level. \nYour bedtime shifted earlier by an average of 32 minutes. \nKeep maintaining a regular sleep schedule.";
+"health.month.best_title" = "Onset Efficiency";
+"health.month.best_subtitle" = "Designed to bring you the best sleep";
+"health.month.best_desc" = "This month, \"Sedona Red Rock Serenity\" was your most frequently used sleep scenario and showed the best sleep onset performance. \"Cocoa Island Moonlight Drift\" stood out in maintaining stable sleep……";
+"health.month.avg_heart_rate" = "Avg. heart rate";
+"health.month.total_sleep" = "Total sleep";
+"health.month.days_tracked" = "Days Tracked";
+
+"subscription.view_content_hint" = "Subscribe to view";
+"subscription.go_to_subscribe" = "Subscribe";
+
+// MARK: - Explore
+"explore.title" = "Explore";
+"explore.greeting" = "Hi, %@";
+"explore.intro.default" = "In every stage of falling asleep, waking up, and entering deep sleep again, Mindora is continuously observing your sleep rhythm and adjusting the companionship method based on your status. These insights are not just changes in data; they come from the sleep scenes you are using, the sound rhythm, and the real feedback your body gives.";
+"explore.intro.default_detail" = "Scroll down and we’ll explain:\nWhat happened last night, which approaches helped you most, and what adjustments Mindora made for you.";
+"explore.intro.data" = "Hi, last night your body entered a stable, relaxed, and highly recoverable sleep state. From onset rhythm to all-night structure, many key indicators are better than your recent average. This wasn’t a lucky night—it was a well-coordinated night between your nervous system and sleep architecture.";
+"explore.section.efficiency" = "Sleep Onset Efficiency";
+"explore.status.health_range" = "Health Range";
+"explore.metric.onset_time" = "Onset Time: %@ min";
+"explore.section.structure" = "Sleep Structure";
+"explore.status.average" = "Average Level";
+"explore.metric.continuous_sleep" = "Continuous Sleep: %@ min";
+"explore.section.fluctuation" = "Night Fluctuation";
+"explore.status.fluctuation_high" = "High Fluctuation";
+"explore.metric.smart_intervention" = "Smart Intervention: %@";
+"explore.section.preference" = "Scenario Preference";
+"explore.section.advice" = "Sleep Advice";
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.time" = "- - min";
+"explore.placeholder.label" = "Status Range";
+"explore.efficiency.first_sleep" = "Onset Time";
+"explore.efficiency.pre_hr" = "Pre-Sleep HR";
+"explore.efficiency.pre_resp" = "Pre-Sleep Resp";
+"explore.structure.rem" = "REM Sleep";
+"explore.structure.deep" = "Deep Sleep";
+"explore.structure.light" = "Light Sleep";
+"explore.fluctuation.awake_count" = "Awakenings";
+"explore.fluctuation.awake_duration" = "Duration";
+"explore.fluctuation.awake_type" = "Type";
+"explore.fluctuation.hr_range" = "HR Range";
+"explore.preference.recent" = "Recently Used";
+"explore.preference.cocos_island.title" = "Cocoa Island Moonlight Drift";
+"explore.preference.cocos_island.subtitle" = "Sound profile: ocean / pink noise / brown noise";
+"explore.quote.text" = "Mindora doesn’t just record your sleep. After understanding your state, it chooses a more suitable way to help you keep sleeping.";
+"explore.article.1.title" = "Article Title";
+"explore.article.1.subtitle" = "Article summary article summary article summary article summary";
+"explore.article.2.title" = "Article Title";
+"explore.article.2.subtitle" = "Article summary article summary article summary article summary";
+"explore.article.3.title" = "Article Title";
+"explore.article.3.subtitle" = "Article summary article summary article summary article summary…";
+"explore.article.4.title" = "Article Title";
+"explore.article.4.subtitle" = "Article summary article summary article summary article summary";
+
+"explore.mock.efficiency_desc" = "Heart rate and breathing trends are both 'stable', suggesting that the parasympathetic nervous system has taken the lead. The body is in a state of natural relaxation, and the brain doesn't need extra 'deceleration' to fall asleep.\n\nMaintaining a relatively stable or slowly declining heart rate and breathing within 30 minutes before bed correlates with shorter sleep latency. This is also one of the common physiological signals in sleep medicine to judge 'readiness for sleep'.";
+"explore.mock.structure_desc" = "This data does not indicate 'structural abnormality'. There were no missing sleep stages last night, but key sleep segments were fragmented. This is typical of: frequent nighttime interruptions where 'Deep Sleep and REM are compressed'.\n\nThis is one of the most common and recoverable patterns seen during stressful nights.";
+"explore.mock.fluctuation_desc" = "These signals suggest the nocturnal nervous system was in a high-response state, sensitive to both external stimuli and internal anxiety. At 03:25 AM, Mindora detected fluctuations in heart rate/breathing, and the awakening lasted beyond the physiological adjustment threshold. Mindora then initiated a 15-minute intervention using the 'Amalfi Coast Breeze'—a low-frequency, rhythmic, continuous ocean soundscape—helping the nervous system switch back to parasympathetic dominance, allowing you to settle back to sleep 15 minutes after waking.";
+"explore.mock.preference_desc" = "Last night, you fell asleep in the “Cocoa Island Moonlight Drift” environment. This sound field is dominated by an ocean‑enveloped ambience with pink/brown noise.\n\nThe structure is led by low‑frequency, continuous ocean waves. The overall rhythm is stable, without sharp spikes—an environment that doesn’t actively attract attention yet remains present.\n\nResearch suggests low‑frequency continuous natural soundscapes reduce vigilance to environmental changes and lessen pre‑sleep safety checks. The slow rhythm of waves can also sync with breathing, helping the nervous system shift into rest mode.";
+"explore.mock.advice_desc" = "Observing several nights of data, your overall sleep state is fairly stable. If you want to further reduce nighttime fluctuations, try lowering external stimulation 1 hour before bed or ending sound playback earlier on upcoming nights.\n\nSleep isn’t a straight line—it’s a system that can be interrupted and self‑repair. Recording these changes isn’t about judging how well you slept; it’s about finding the least‑effort, most stable way for you to sleep.\n\nLast night, your body did exactly that.";
+"explore.mock.intervention" = "Scene Intervention";
+"explore.mock.awake_type" = "Anxiety Type";
+
+// MARK: - Store
+"store.coming_soon" = "Store Coming Soon";
+"store.banner.title" = "Choose Your Favorite\nBlends & Combos";
+"store.banner.discount_prefix" = "3 Items ";
+"store.banner.discount_value" = "9.5";
+"store.banner.discount_suffix" = " OFF";
+"store.banner.learn_more" = "Learn More";
+"store.section.member_exclusive" = "Members Exclusive";
+"store.section.new_arrivals" = "New Arrivals";
+"store.badge.hot" = "Hot";
+"store.badge.new" = "New";
+"store.product.combo_oil" = "Essential Oil Combo";
+"store.product.frankincense_oil" = "Frankincense Oil";
+"store.product.calming_oil" = "Plant Calming Oil";
+"store.product.silk_pajama" = "Silk Pajama Set";
+"store.product.gift_set" = "Silk Sleep Gift...";
+"store.search.placeholder" = "Search products";
+"store.search.cancel" = "Cancel";
+"store.search.history" = "Search History";

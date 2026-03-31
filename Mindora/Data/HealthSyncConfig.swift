@@ -4,12 +4,20 @@ import Foundation
 enum HealthMetricKey: String, CaseIterable, Codable, Hashable {
     case heartRate              // heart_rate
     case hrv                    // heart_rate_variability_sdnn
+    case respiratoryRate        // respiratory_rate
+    case restingHeartRate       // resting_heart_rate
+    case sleepingWristTemperature // sleeping_wrist_temperature
+    case bodyTemperature        // body_temperature
     case sleepStages            // sleep_stage_*
 
     var localizedName: String {
         switch self {
         case .heartRate: return L("health.metric.heart_rate")
         case .hrv: return L("health.metric.hrv")
+        case .respiratoryRate: return "Respiratory Rate"
+        case .restingHeartRate: return "Resting Heart Rate"
+        case .sleepingWristTemperature: return "Sleeping Wrist Temperature"
+        case .bodyTemperature: return "Body Temperature"
         case .sleepStages: return L("health.metric.sleep")
         }
     }
@@ -17,15 +25,15 @@ enum HealthMetricKey: String, CaseIterable, Codable, Hashable {
 
 /// 同步周期枚举（秒）
 enum HealthSyncInterval: Int, CaseIterable, Codable {
-    case six = 6
-    case twelve = 12
-    case thirty = 30
+    case fifteenMinutes = 900
+    case thirtyMinutes = 1800
+    case oneHour = 3600
 
     var localizedName: String {
         switch self {
-        case .six: return L("health.sync.interval.6s")
-        case .twelve: return L("health.sync.interval.12s")
-        case .thirty: return L("health.sync.interval.30s")
+        case .fifteenMinutes: return "15 Min"
+        case .thirtyMinutes: return "30 Min"
+        case .oneHour: return "1 Hour"
         }
     }
 }
@@ -36,7 +44,7 @@ struct HealthSyncConfig: Codable, Equatable {
     var interval: HealthSyncInterval
     var metrics: Set<HealthMetricKey>
 
-    static func `default`() -> HealthSyncConfig { .init(enabled: true, interval: .twelve, metrics: Set(HealthMetricKey.allCases)) }
+    static func `default`() -> HealthSyncConfig { .init(enabled: true, interval: Constants.Network.healthSyncInterval, metrics: Set(HealthMetricKey.allCases)) }
 }
 
 /// 管理配置的存储与通知

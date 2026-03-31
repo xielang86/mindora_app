@@ -37,6 +37,11 @@
 
 // MARK: - Health Screen
 "health.title" = "Gesundheit";
+"health.page_title" = "Alle Gesundheitsdaten";
+"health.time.today" = "Heute";
+"health.time.past_7_days" = "Letzte 7 Tage";
+"health.time.past_12_months" = "Letzte 12 Monate";
+"health.time.earlier" = "Früher";
 // MARK: - Health Metrics
 "health.status.initial" = "Health-Zugriff wird angefordert";
 "health.status.loading" = "Gesundheitsdaten werden geladen";
@@ -66,11 +71,29 @@
 "health.sleep.stage.core" = "Kern";
 "health.sleep.stage.deep" = "Tief";
 "health.sleep.no_data" = "Keine Schlafdaten";
+"health.sleep.bed_time" = "Im Bett";
+"health.sleep.sleep_time" = "Schlafzeit";
+"health.sleep.avg_bed_time" = "Durchschn. Bettzeit";
+"health.sleep.avg_sleep_time" = "Durchschn. Schlafzeit";
 "health.period.day" = "Tag";
+"health.period.week" = "Woche";
 "health.period.month" = "Monat";
+"health.period.six_months" = "6 Monate";
 "health.period.year" = "Jahr";
+"health.period.today" = "Heute";
 "health.period.daily_average" = "Tagesdurchschnitt";
+"health.period.hourly_average" = "Stündlicher Durchschnitt";
+"health.period.weekly_average" = "Wochendurchschnitt";
 "health.period.monthly_average" = "Monatsdurchschnitt";
+"health.period.range" = "Bereich";
+"health.period.hour" = "Uhr";
+"health.weekday.sun" = "So";
+"health.weekday.mon" = "Mo";
+"health.weekday.tue" = "Di";
+"health.weekday.wed" = "Mi";
+"health.weekday.thu" = "Do";
+"health.weekday.fri" = "Fr";
+"health.weekday.sat" = "Sa";
 
 // MARK: - Settings Screen
 "settings.title" = "Einstellungen";
@@ -150,7 +173,7 @@
 "onboarding.start" = "Starten";
 "onboarding.no_device" = "Kein Mindora?";
 "onboarding.connect_mindora" = "Mindora verbinden";
-"onboarding.page3.health_card_text" = "Konfigurieren Sie die Gesundheitsdatenzugriffe von Mindora in der Health-App\nTippen Sie, um die Health-App zu öffnen";
+"onboarding.page3.health_card_text" = "Konfigurieren Sie die Gesundheitsdatenzugriffe von Mindora in der Health-App";
 "onboarding.page3.bluetooth_card_text" = "Bluetooth ist derzeit nicht aktiviert\nTippen Sie, um die Bluetooth-Einstellungen zu öffnen";
 "onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth-Berechtigung ist aktiviert\nGerät kann normal verbunden werden";
 "onboarding.page4.scanning_title" = "Geräte in der Nähe scannen";
@@ -227,7 +250,7 @@
 "permission.bluetooth.reminder_message" = "Um eine Verbindung zu Ihrem Mindora-Gerät herzustellen, benötigt die App Bluetooth-Berechtigung.";
 "permission.request_authorization" = "Zugriff autorisieren";
 "permission.open_settings" = "Einstellungen öffnen";
-"permission.open_health_app" = "Health-App öffnen";
+"permission.open_health_app" = "Health öffnen";
 "permission.later" = "Später";
 "permission.authorization_success" = "Autorisierung erfolgreich";
 "permission.authorization_failed" = "Autorisierung fehlgeschlagen";
@@ -241,7 +264,14 @@
 "permission.health.settings_title" = "Datenschutz für Gesundheit";
 "permission.health.settings_message" = "Öffnen Sie Einstellungen > Datenschutz & Sicherheit > Gesundheit, wählen Sie Mindora und aktivieren Sie die benötigten Datentypen.";
 "permission.health.guide_title" = "So legen Sie Gesundheitsdatenberechtigungen fest";
-"permission.health.guide_message" = "1. Öffnen Sie die Health-App\n2. Tippen Sie unten auf 'Teilen'\n3. Wählen Sie 'Apps'\n4. Tippen Sie auf Mindora\n5. Aktivieren Sie die benötigten Datentypen";
+"permission.health.guide_message" = "Öffnen Sie die Health-App\nTippen Sie unten auf 'Teilen'\nWählen Sie 'Apps'\nTippen Sie auf Mindora\nAktivieren Sie die benötigten Datentypen";
 
 // Health Permission CTA (avoid misleading status)
-"permission.health.confirm" = "In Health-App bestätigen";
+"permission.health.confirm" = "Einstellungen";
+
+// Local Network Permission CTA
+"permission.local_network.confirm" = "Bitte in Einstellungen bestätigen";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "Geräte können nicht gesucht werden";
+"permission.local_network.denied_message" = "Für die Suche nach Mindora-Geräten in der Nähe ist der Zugriff auf das lokale Netzwerk erforderlich. Bitte aktivieren Sie den lokalen Netzwerkzugriff in den Einstellungen.";

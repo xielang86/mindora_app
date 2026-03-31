@@ -1,30 +1,9 @@
 import Foundation
 import HealthKit
 
-// MARK: - Internal wrappers to avoid declaring global Sendable conformances on imported Foundation classes
-#if swift(>=5.7)
-private struct _SendablePredicate: @unchecked Sendable { let value: NSPredicate }
-private struct _SendableSortDescriptor: @unchecked Sendable { let value: NSSortDescriptor }
-#endif
-
-/// Struct holding fetched health metrics (latest values or summaries)
-struct HealthMetrics {
-    var heartRate: Double?            // bpm
-    var heartRateVariability: Double? // ms (SDNN)
-    var sleepSummary: SleepSummary?
-
-    struct SleepSummary {
-        let totalSleepHours: Double      // 实际睡眠时间（睡着的时间）
-        let deepSleepHours: Double?
-        let remSleepHours: Double?
-        let lightSleepHours: Double?
-        let timeInBed: Double?           // 在床上的总时间（包括睡眠和清醒时间）
-    }
-}
-
 final class HealthDataManager {
     static let shared = HealthDataManager()
-    private let healthStore = HKHealthStore()
+    let healthStore = HKHealthStore()
 
     private init() {}
 
@@ -37,11 +16,18 @@ final class HealthDataManager {
     func requestAuthorization() async throws {
         guard HKHealthStore.isHealthDataAvailable() else { throw HealthError.notAvailable }
 
-        let readTypes: Set<HKObjectType> = [
+        var readTypes: Set<HKObjectType> = [
             HKObjectType.quantityType(forIdentifier: .heartRate)!,
             HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
+            HKObjectType.quantityType(forIdentifier: .respiratoryRate)!,
+            HKObjectType.quantityType(forIdentifier: .restingHeartRate)!,
+            HKObjectType.quantityType(forIdentifier: .bodyTemperature)!,
             HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         ]
+
+        if #available(iOS 16.0, *), let sleepingWristTemperature = HKObjectType.quantityType(forIdentifier: .appleSleepingWristTemperature) {
+            readTypes.insert(sleepingWristTemperature)
+        }
 
         try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
             healthStore.requestAuthorization(toShare: nil, read: readTypes) { success, error in
@@ -52,253 +38,133 @@ final class HealthDataManager {
     }
 
     // MARK: - Public fetch
-    func fetchLatestMetrics() async throws -> HealthMetrics {
+    /// - Parameter forceLive: 当为 true 时跳过 debug mock 数据，直接从 HealthKit 获取真实数据
+    func fetchLatestMetrics(forceLive: Bool = false) async throws -> HealthMetrics {
         // Debug 模式：返回虚假数据用于测试
-        if DesignConstants.isDebugMode {
-            let debugSleepSummary = HealthMetrics.SleepSummary(
+        if !forceLive && DesignConstants.isDebugMode {
+            let now = Date()
+            let debugSleepSummary = HealthMetrics.SleepValue(
                 totalSleepHours: DesignConstants.DebugHealthData.totalSleepHours,
                 deepSleepHours: nil,
                 remSleepHours: nil,
                 lightSleepHours: nil,
-                timeInBed: DesignConstants.DebugHealthData.timeInBed
+                timeInBed: DesignConstants.DebugHealthData.timeInBed,
+                date: now
+            )
+            
+            let debugHR = HealthMetrics.MetricValue(
+                value: DesignConstants.DebugHealthData.heartRate,
+                date: now
+            )
+            
+            let debugHRV = HealthMetrics.MetricValue(
+                value: DesignConstants.DebugHealthData.heartRateVariability,
+                date: now
             )
             
             return HealthMetrics(
-                heartRate: DesignConstants.DebugHealthData.heartRate,
-                heartRateVariability: DesignConstants.DebugHealthData.heartRateVariability,
-                sleepSummary: debugSleepSummary
+                heartRate: debugHR,
+                heartRateVariability: debugHRV,
+                respiratoryRate: nil,
+                restingHeartRate: nil,
+                sleepingWristTemperature: nil,
+                bodyTemperature: nil,
+                sleepSummary: debugSleepSummary,
+                lastUpdated: now
             )
         }
         
         // 正常模式：从 HealthKit 获取真实数据
         async let hr = fetchLatestQuantity(.heartRate, unit: HKUnit.count().unitDivided(by: .minute()))
         async let hrv = fetchLatestQuantity(.heartRateVariabilitySDNN, unit: HKUnit.secondUnit(with: .milli))
+        async let respiratory = fetchLatestQuantity(.respiratoryRate, unit: HKUnit.count().unitDivided(by: .minute()))
+        async let restingHeartRate = fetchLatestQuantity(.restingHeartRate, unit: HKUnit.count().unitDivided(by: .minute()))
+        async let bodyTemperature = fetchLatestQuantity(.bodyTemperature, unit: .degreeCelsius())
         async let sleep = fetchSleepSummary()
 
+        let hrResult = try await hr
+        let hrvResult = try await hrv
+        let respiratoryResult = try await respiratory
+        let restingHeartRateResult = try await restingHeartRate
+        let bodyTemperatureResult = try await bodyTemperature
+        let sleepResult = try await sleep
+
+        let sleepingWristTemperatureResult: (value: Double?, date: Date?)
+        if #available(iOS 16.0, *) {
+            sleepingWristTemperatureResult = try await fetchLatestQuantity(.appleSleepingWristTemperature, unit: .degreeCelsius())
+        } else {
+            sleepingWristTemperatureResult = (nil, nil)
+        }
+        
+        // 转换为 MetricValue 结构
+        let hrMetric: HealthMetrics.MetricValue?
+        if let value = hrResult.value, let date = hrResult.date {
+            hrMetric = HealthMetrics.MetricValue(value: value, date: date)
+        } else {
+            hrMetric = nil
+        }
+        
+        let hrvMetric: HealthMetrics.MetricValue?
+        if let value = hrvResult.value, let date = hrvResult.date {
+            hrvMetric = HealthMetrics.MetricValue(value: value, date: date)
+        } else {
+            hrvMetric = nil
+        }
+
+        let respiratoryMetric: HealthMetrics.MetricValue?
+        if let value = respiratoryResult.value, let date = respiratoryResult.date {
+            respiratoryMetric = HealthMetrics.MetricValue(value: value, date: date)
+        } else {
+            respiratoryMetric = nil
+        }
+
+        let restingHeartRateMetric: HealthMetrics.MetricValue?
+        if let value = restingHeartRateResult.value, let date = restingHeartRateResult.date {
+            restingHeartRateMetric = HealthMetrics.MetricValue(value: value, date: date)
+        } else {
+            restingHeartRateMetric = nil
+        }
+
+        let sleepingWristTemperatureMetric: HealthMetrics.MetricValue?
+        if let value = sleepingWristTemperatureResult.value, let date = sleepingWristTemperatureResult.date {
+            sleepingWristTemperatureMetric = HealthMetrics.MetricValue(value: value, date: date)
+        } else {
+            sleepingWristTemperatureMetric = nil
+        }
+
+        let bodyTemperatureMetric: HealthMetrics.MetricValue?
+        if let value = bodyTemperatureResult.value, let date = bodyTemperatureResult.date {
+            bodyTemperatureMetric = HealthMetrics.MetricValue(value: value, date: date)
+        } else {
+            bodyTemperatureMetric = nil
+        }
+        
+        // 计算最后更新时间：取所有数据中最新的时间
+        let dates = [
+            hrResult.date,
+            hrvResult.date,
+            respiratoryResult.date,
+            restingHeartRateResult.date,
+            sleepingWristTemperatureResult.date,
+            bodyTemperatureResult.date,
+            sleepResult?.date
+        ].compactMap { $0 }
+        let latestDate = dates.max()
+        
         let metrics = HealthMetrics(
-            heartRate: try await hr,
-            heartRateVariability: try await hrv,
-            sleepSummary: try await sleep
+            heartRate: hrMetric,
+            heartRateVariability: hrvMetric,
+            respiratoryRate: respiratoryMetric,
+            restingHeartRate: restingHeartRateMetric,
+            sleepingWristTemperature: sleepingWristTemperatureMetric,
+            bodyTemperature: bodyTemperatureMetric,
+            sleepSummary: sleepResult,
+            lastUpdated: latestDate
         )
         return metrics
     }
-    
-    // MARK: - Sleep Stage Data (for Sleep Graph)
-    /// 睡眠阶段详细数据（用于睡眠图表展示）
-    struct SleepStageDetail {
-        enum Stage {
-            case awake, rem, core, deep
-        }
-        let stage: Stage
-        let startTime: Date
-        let endTime: Date
-    }
-    
-    /// 获取最近一次睡眠的详细阶段数据
-    func fetchLatestSleepStages() async throws -> [SleepStageDetail] {
-        // Debug 模式：返回模拟数据
-        if DesignConstants.isDebugMode {
-            return generateDebugSleepStages()
-        }
-        
-        // 正常模式：从 HealthKit 获取真实数据
-        guard let type = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return [] }
-        
-        let calendar = Calendar.current
-        let now = Date()
-        let roughWindowStart = now.addingTimeInterval(-48 * 3600)
-        
-        return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<[SleepStageDetail], Error>) in
-            #if swift(>=5.7)
-            let roughPredicateSendable = _SendablePredicate(value: HKQuery.predicateForSamples(withStart: roughWindowStart, end: now, options: []))
-            #else
-            let roughPredicateSendable = HKQuery.predicateForSamples(withStart: roughWindowStart, end: now, options: [])
-            #endif
-            let localPredicate = roughPredicateSendable.value
-            
-            let query = HKSampleQuery(sampleType: type, predicate: localPredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
-                if let error = error { cont.resume(throwing: error); return }
-                guard let rawSamples = samples as? [HKCategorySample], !rawSamples.isEmpty else { cont.resume(returning: []); return }
-                
-                // 筛选出最近一次主睡眠的阶段数据
-                let sleepStageValues: Set<Int>
-                if #available(iOS 16.0, *) {
-                    sleepStageValues = [
-                        HKCategoryValueSleepAnalysis.asleepCore.rawValue,
-                        HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
-                        HKCategoryValueSleepAnalysis.asleepREM.rawValue,
-                        HKCategoryValueSleepAnalysis.awake.rawValue,
-                        HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue
-                    ]
-                } else {
-                    sleepStageValues = [
-                        HKCategoryValueSleepAnalysis.asleep.rawValue,
-                        HKCategoryValueSleepAnalysis.awake.rawValue
-                    ]
-                }
-                
-                // 找到最近一次睡眠的结束时间
-                guard let latestSample = rawSamples.filter({ sleepStageValues.contains($0.value) }).max(by: { $0.endDate < $1.endDate }) else {
-                    cont.resume(returning: [])
-                    return
-                }
-                
-                // 计算该睡眠的窗口（18:00 -> 次日 18:00）
-                func dayWindow(for endDate: Date) -> (start: Date, end: Date) {
-                    let dayStartCandidate = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: calendar.startOfDay(for: endDate))!
-                    if endDate >= dayStartCandidate {
-                        return (dayStartCandidate, dayStartCandidate.addingTimeInterval(24 * 3600))
-                    } else {
-                        let start = dayStartCandidate.addingTimeInterval(-24 * 3600)
-                        return (start, start.addingTimeInterval(24 * 3600))
-                    }
-                }
-                
-                let window = dayWindow(for: latestSample.endDate)
-                
-                // 过滤并转换为 SleepStageDetail
-                var stageDetails: [SleepStageDetail] = []
-                
-                for sample in rawSamples {
-                    // 与窗口无交集跳过
-                    if sample.endDate <= window.start || sample.startDate >= window.end { continue }
-                    
-                    let clippedStart = max(sample.startDate, window.start)
-                    let clippedEnd = min(sample.endDate, window.end)
-                    
-                    let stage: SleepStageDetail.Stage
-                    if #available(iOS 16.0, *) {
-                        switch sample.value {
-                        case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                            stage = .deep
-                        case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                            stage = .rem
-                        case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                            stage = .core
-                        case HKCategoryValueSleepAnalysis.awake.rawValue:
-                            stage = .awake
-                        case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
-                            stage = .core  // 默认当作核心睡眠
-                        default:
-                            continue  // 跳过 inBed 等其他状态
-                        }
-                    } else {
-                        // iOS 16 之前的版本只有 asleep 和 awake
-                        switch sample.value {
-                        case HKCategoryValueSleepAnalysis.asleep.rawValue:
-                            stage = .core  // 旧系统全部当作核心睡眠
-                        case HKCategoryValueSleepAnalysis.awake.rawValue:
-                            stage = .awake
-                        default:
-                            continue
-                        }
-                    }
-                    
-                    stageDetails.append(SleepStageDetail(stage: stage, startTime: clippedStart, endTime: clippedEnd))
-                }
-                
-                // 按开始时间排序
-                stageDetails.sort { $0.startTime < $1.startTime }
-                
-                cont.resume(returning: stageDetails)
-            }
-            
-            self.healthStore.execute(query)
-        }
-    }
-    
-    /// 生成 Debug 模式的模拟睡眠阶段数据
-    /// 与 DesignConstants.DebugHealthData 保持一致：
-    /// - 总睡眠时间（实际睡着）：7小时57分钟 = 477分钟
-    /// - 在床上的总时间：8小时30分钟 = 510分钟
-    /// - 清醒时间：33分钟
-    private func generateDebugSleepStages() -> [SleepStageDetail] {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        // 模拟昨晚 22:30 上床，今早 7:00 起床（8.5小时）
-        let bedTime = calendar.date(bySettingHour: 22, minute: 30, second: 0, of: calendar.date(byAdding: .day, value: -1, to: now)!)!
-        
-        // 创建一个真实的睡眠周期模式，确保总时长匹配：
-        // 实际睡着时间：477分钟（深度+核心+REM）
-        // 清醒时间：33分钟
-        // 总时长：510分钟（8.5小时）
-        //
-        // 睡眠周期分布：
-        // 22:30-22:45: 清醒（入睡前）15分钟
-        // 22:45-23:45: 核心睡眠 60分钟
-        // 23:45-01:15: 深度睡眠 90分钟
-        // 01:15-01:30: 核心睡眠 15分钟
-        // 01:30-02:15: REM 睡眠 45分钟
-        // 02:15-02:20: 清醒（短暂醒来）5分钟
-        // 02:20-03:20: 核心睡眠 60分钟
-        // 03:20-04:30: 深度睡眠 70分钟
-        // 04:30-04:50: 核心睡眠 20分钟
-        // 04:50-05:40: REM 睡眠 50分钟
-        // 05:40-05:45: 清醒（短暂醒来）5分钟
-        // 05:45-06:30: 核心睡眠 45分钟
-        // 06:30-06:52: REM 睡眠 22分钟
-        // 06:52-07:00: 清醒（准备起床）8分钟
-        //
-        // 总计检查：
-        // 核心睡眠：60+15+60+20+45 = 200分钟
-        // 深度睡眠：90+70 = 160分钟
-        // REM睡眠：45+50+22 = 117分钟
-        // 总睡眠：200+160+117 = 477分钟 ✓
-        // 清醒：15+5+5+8 = 33分钟 ✓
-        // 总时长：477+33 = 510分钟 = 8.5小时 ✓
-        
-        var stages: [SleepStageDetail] = []
-        
-        func addStage(_ stage: SleepStageDetail.Stage, fromMinutes: Int, toMinutes: Int) {
-            let start = bedTime.addingTimeInterval(TimeInterval(fromMinutes * 60))
-            let end = bedTime.addingTimeInterval(TimeInterval(toMinutes * 60))
-            stages.append(SleepStageDetail(stage: stage, startTime: start, endTime: end))
-        }
-        
-        // 入睡前清醒 (15分钟)
-        addStage(.awake, fromMinutes: 0, toMinutes: 15)
-        
-        // 第一个睡眠周期
-        addStage(.core, fromMinutes: 15, toMinutes: 75)      // 60分钟
-        addStage(.deep, fromMinutes: 75, toMinutes: 165)     // 90分钟
-        addStage(.core, fromMinutes: 165, toMinutes: 180)    // 15分钟
-        addStage(.rem, fromMinutes: 180, toMinutes: 225)     // 45分钟
-        
-        // 短暂醒来 (5分钟)
-        addStage(.awake, fromMinutes: 225, toMinutes: 230)
-        
-        // 第二个睡眠周期
-        addStage(.core, fromMinutes: 230, toMinutes: 290)    // 60分钟
-        addStage(.deep, fromMinutes: 290, toMinutes: 360)    // 70分钟
-        addStage(.core, fromMinutes: 360, toMinutes: 380)    // 20分钟
-        addStage(.rem, fromMinutes: 380, toMinutes: 430)     // 50分钟
-        
-        // 短暂醒来 (5分钟)
-        addStage(.awake, fromMinutes: 430, toMinutes: 435)
-        
-        // 第三个睡眠周期（早晨更多 REM）
-        addStage(.core, fromMinutes: 435, toMinutes: 480)    // 45分钟
-        addStage(.rem, fromMinutes: 480, toMinutes: 502)     // 22分钟
-        
-        // 起床前清醒 (8分钟)
-        addStage(.awake, fromMinutes: 502, toMinutes: 510)
-        
-        return stages
-    }
 
     // MARK: - Series (bulk) fetch for uploading
-    struct HealthSeriesData {
-        struct SamplePoint { let timestamp: Int; let value: Double }
-        var heartRate: [SamplePoint] = []            // bpm
-        var hrv: [SamplePoint] = []                  // ms
-        // 睡眠阶段：用区间表示；为了复用 behaviors 的 [timestamp,value] 结构，后续上传时会采用 [startTs, durationSeconds]
-        struct SleepStagePoint { let startTs: Int; let endTs: Int; let duration: Double }
-        var deepSleep: [SleepStagePoint] = []
-        var remSleep: [SleepStagePoint] = []
-        var lightSleep: [SleepStagePoint] = []       // core/light
-        // 可以按需扩展其它指标
-    }
 
     /// 批量抓取最近 hoursBack 小时内的数据（简单方式：普通 sampleQuery）
     /// - Parameters:
@@ -313,9 +179,20 @@ final class HealthDataManager {
 
         async let hrSamples = fetchSeries(.heartRate, unit: HKUnit.count().unitDivided(by: .minute()), predicate: predicate, limit: maxSamples)
         async let hrvSamples = fetchSeries(.heartRateVariabilitySDNN, unit: HKUnit.secondUnit(with: .milli), predicate: predicate, limit: maxSamples)
+        async let respiratorySamples = fetchSeries(.respiratoryRate, unit: HKUnit.count().unitDivided(by: .minute()), predicate: predicate, limit: maxSamples)
+        async let restingHeartRateSamples = fetchSeries(.restingHeartRate, unit: HKUnit.count().unitDivided(by: .minute()), predicate: predicate, limit: maxSamples)
+        async let bodyTemperatureSamples = fetchSeries(.bodyTemperature, unit: .degreeCelsius(), predicate: predicate, limit: maxSamples)
 
         result.heartRate = try await hrSamples
         result.hrv = try await hrvSamples
+        result.respiratoryRate = try await respiratorySamples
+        result.restingHeartRate = try await restingHeartRateSamples
+        result.bodyTemperature = try await bodyTemperatureSamples
+
+        if #available(iOS 16.0, *) {
+            result.sleepingWristTemperature = try await fetchSeries(.appleSleepingWristTemperature, unit: .degreeCelsius(), predicate: predicate, limit: maxSamples)
+        }
+
         if let stages = try await fetchSleepStages(start: startDate, end: endDate) {
             result.deepSleep = stages.deep
             result.remSleep = stages.rem
@@ -358,9 +235,9 @@ final class HealthDataManager {
     }
 
     // MARK: - Helpers
-    private func fetchLatestQuantity(_ identifier: HKQuantityTypeIdentifier, unit: HKUnit) async throws -> Double? {
-        guard let type = HKObjectType.quantityType(forIdentifier: identifier) else { return nil }
-        return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Double?, Error>) in
+    private func fetchLatestQuantity(_ identifier: HKQuantityTypeIdentifier, unit: HKUnit) async throws -> (value: Double?, date: Date?) {
+        guard let type = HKObjectType.quantityType(forIdentifier: identifier) else { return (nil, nil) }
+        return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<(value: Double?, date: Date?), Error>) in
             #if swift(>=5.7)
             let sp = _SendablePredicate(value: HKQuery.predicateForSamples(withStart: Date.distantPast, end: Date(), options: []))
             let sd = _SendableSortDescriptor(value: NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false))
@@ -372,178 +249,145 @@ final class HealthDataManager {
             let localSort = [sd.value]
             let query = HKSampleQuery(sampleType: type, predicate: localPredicate, limit: 1, sortDescriptors: localSort) { _, samples, error in
                 if let error = error { cont.resume(throwing: error); return }
-                guard let quantitySample = samples?.first as? HKQuantitySample else { cont.resume(returning: nil); return }
+                guard let quantitySample = samples?.first as? HKQuantitySample else { cont.resume(returning: (nil, nil)); return }
                 let value = quantitySample.quantity.doubleValue(for: unit)
-                cont.resume(returning: value)
+                cont.resume(returning: (value, quantitySample.endDate))
             }
             healthStore.execute(query)
         }
     }
-
-    private func fetchSleepSummary() async throws -> HealthMetrics.SleepSummary? {
-        guard let type = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return nil }
+    
+    // MARK: - Debug Mode Helpers
+    
+    /// Debug 模式下的数据有效期限制（天数）
+    /// 只能查看最近这么多天的数据，超出范围返回空数据
+    /// 3年 = 365 * 3 = 1095 天
+    private static let debugDataMaxDaysBack: Int = 1095
+    
+    /// 检查 anchorDate 是否在 debug 数据的有效范围内
+    /// - Parameter anchorDate: 锚点日期
+    /// - Returns: 是否在有效范围内
+    private func isDebugDataAvailable(for anchorDate: Date) -> Bool {
         let calendar = Calendar.current
-        let now = Date()
-        // 第一步：先抓取最近 48 小时所有睡眠样本（包含主睡眠与可能的小睡），用于定位“最近一次主睡眠”的结束时间。
-        // 主睡眠的结束时间(早晨醒来)决定其归属的“日历日”（采用 18:00 → 次日 18:00 的日界）。
-        let roughWindowStart = now.addingTimeInterval(-48 * 3600)
-        #if swift(>=5.7)
-        let roughPredicateSendable = _SendablePredicate(value: HKQuery.predicateForSamples(withStart: roughWindowStart, end: now, options: []))
-        #else
-        let roughPredicateSendable = HKQuery.predicateForSamples(withStart: roughWindowStart, end: now, options: [])
-        #endif
-
-        // 辅助函数：根据一个结束时间计算它所属“苹果日”窗口（18:00 ~ 次日 18:00）
-        func dayWindow(for endDate: Date) -> (start: Date, end: Date) {
-            let dayStartCandidate = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: calendar.startOfDay(for: endDate))!
-            if endDate >= dayStartCandidate { // 结束时间在当日 18:00 之后 => 属于下一个“苹果日”窗口的前半段
-                return (dayStartCandidate, dayStartCandidate.addingTimeInterval(24 * 3600))
-            } else {
-                let start = dayStartCandidate.addingTimeInterval(-24 * 3600)
-                return (start, start.addingTimeInterval(24 * 3600))
-            }
+        let today = calendar.startOfDay(for: Date())
+        let anchor = calendar.startOfDay(for: anchorDate)
+        
+        // 不能查看未来的数据
+        if anchor > today { return false }
+        
+        // 计算距今天数
+        guard let daysDiff = calendar.dateComponents([.day], from: anchor, to: today).day else {
+            return false
         }
-
-        // 第二步：查询后在本地计算窗口并汇总
-        return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<HealthMetrics.SleepSummary?, Error>) in
-            let localPredicate = roughPredicateSendable.value
-            let query = HKSampleQuery(sampleType: type, predicate: localPredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
-                if let error = error { cont.resume(throwing: error); return }
-                guard let rawSamples = samples as? [HKCategorySample], !rawSamples.isEmpty else { cont.resume(returning: nil); return }
-
-                // 仅选择真正代表睡眠阶段的样本（排除 inBed）用于决定最近一次主睡眠结束时间
-                let sleepStageValues: Set<Int>
-                if #available(iOS 16.0, *) {
-                    sleepStageValues = [
-                        HKCategoryValueSleepAnalysis.asleepCore.rawValue,
-                        HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
-                        HKCategoryValueSleepAnalysis.asleepREM.rawValue,
-                        HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue // 兜底
-                    ]
-                } else {
-                    sleepStageValues = [HKCategoryValueSleepAnalysis.asleep.rawValue]
-                }
-
-                // 最近一次“主睡眠”简单近似：最近一段连续睡眠阶段中结束时间最晚的那个阶段的 endDate。
-                // 我们取所有阶段样本里 endDate 最大者。
-                guard let latestStageSample = rawSamples.filter({ sleepStageValues.contains($0.value) }).max(by: { $0.endDate < $1.endDate }) else {
-                    cont.resume(returning: nil); return
-                }
-                let window = dayWindow(for: latestStageSample.endDate)
-
-                // 过滤到该 18:00→18:00 窗口内（与窗口有交集即可），并按阶段汇总时长（截断到窗口边界以防越界）。
-                var total: TimeInterval = 0
-                var deep: TimeInterval = 0
-                var rem: TimeInterval = 0
-                var light: TimeInterval = 0
-                var inBed: TimeInterval = 0  // 卧床时间
-
-                for s in rawSamples {
-                    // 与窗口无交集跳过
-                    if s.endDate <= window.start || s.startDate >= window.end { continue }
-                    let clippedStart = max(s.startDate, window.start)
-                    let clippedEnd = min(s.endDate, window.end)
-                    let dur = clippedEnd.timeIntervalSince(clippedStart)
-                    if dur <= 0 { continue }
-
-                    if #available(iOS 16.0, *) {
-                        switch s.value {
-                        case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                            deep += dur; total += dur
-                        case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                            rem += dur; total += dur
-                        case HKCategoryValueSleepAnalysis.asleepCore.rawValue, HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
-                            light += dur; total += dur
-                        case HKCategoryValueSleepAnalysis.inBed.rawValue:
-                            inBed += dur  // 统计卧床时间
-                        default:
-                            break
-                        }
-                    } else {
-                        if s.value == HKCategoryValueSleepAnalysis.asleep.rawValue { light += dur; total += dur }
-                        else if s.value == HKCategoryValueSleepAnalysis.inBed.rawValue { inBed += dur }
-                    }
-                }
-
-                let summary = HealthMetrics.SleepSummary(
-                    totalSleepHours: total / 3600.0,
-                    deepSleepHours: deep > 0 ? deep / 3600.0 : nil,
-                    remSleepHours: rem > 0 ? rem / 3600.0 : nil,
-                    lightSleepHours: light > 0 ? light / 3600.0 : nil,
-                    timeInBed: inBed > 0 ? inBed / 3600.0 : nil
-                )
-                cont.resume(returning: summary)
-            }
-            self.healthStore.execute(query)
+        
+        // 超过最大天数限制则无数据
+        return daysDiff <= Self.debugDataMaxDaysBack
+    }
+    
+    /// 根据 anchorDate 生成可重复的随机种子
+    /// 确保同一日期生成的数据是一致的
+    private func debugRandomSeed(for anchorDate: Date) -> UInt64 {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day], from: anchorDate)
+        let year = UInt64(components.year ?? 2025)
+        let month = UInt64(components.month ?? 1)
+        let day = UInt64(components.day ?? 1)
+        return year * 10000 + month * 100 + day
+    }
+    
+    /// 使用种子生成伪随机数（简单的 LCG 算法）
+    private func seededRandom(seed: inout UInt64, min: Double, max: Double) -> Double {
+        seed = (seed &* 6364136223846793005) &+ 1442695040888963407
+        let normalized = Double(seed % 10000) / 10000.0
+        return min + normalized * (max - min)
+    }
+    
+    /// 生成 debug 模式下基于日期的心率范围数据
+    private func generateDebugHeartRateRange(for anchorDate: Date, count: Int) -> [HeartRateRangePoint] {
+        var seed = debugRandomSeed(for: anchorDate)
+        return (0..<count).map { index in
+            // 约 15% 的概率没有数据
+            let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.15
+            if !hasData { return HeartRateRangePoint.empty }
+            
+            let minHR = seededRandom(seed: &seed, min: 50, max: 70)
+            let maxHR = seededRandom(seed: &seed, min: 85, max: 130)
+            return HeartRateRangePoint(min: minHR, max: maxHR)
         }
     }
-
-    // MARK: - Sleep Stages (interval samples)
-    private func fetchSleepStages(start: Date, end: Date) async throws -> (deep: [HealthSeriesData.SleepStagePoint], rem: [HealthSeriesData.SleepStagePoint], light: [HealthSeriesData.SleepStagePoint])? {
-        guard let type = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return nil }
-        return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<(deep: [HealthSeriesData.SleepStagePoint], rem: [HealthSeriesData.SleepStagePoint], light: [HealthSeriesData.SleepStagePoint])?, Error>) in
-            #if swift(>=5.7)
-            let sp = _SendablePredicate(value: HKQuery.predicateForSamples(withStart: start, end: end, options: []))
-            #else
-            let sp = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
-            #endif
-            let localPredicate = sp.value
-            let query = HKSampleQuery(sampleType: type, predicate: localPredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
-                if let error = error { cont.resume(throwing: error); return }
-                guard let samples = samples as? [HKCategorySample], !samples.isEmpty else { cont.resume(returning: nil); return }
-                var deep: [HealthSeriesData.SleepStagePoint] = []
-                var rem: [HealthSeriesData.SleepStagePoint] = []
-                var light: [HealthSeriesData.SleepStagePoint] = []
-                for s in samples {
-                    let startTs = Int(s.startDate.timeIntervalSince1970)
-                    let endTs = Int(s.endDate.timeIntervalSince1970)
-                    let dur = s.endDate.timeIntervalSince(s.startDate)
-                    if #available(iOS 16.0, *) {
-                        switch s.value {
-                        case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                            deep.append(.init(startTs: startTs, endTs: endTs, duration: dur))
-                        case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                            rem.append(.init(startTs: startTs, endTs: endTs, duration: dur))
-                        case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                            light.append(.init(startTs: startTs, endTs: endTs, duration: dur))
-                        default:
-                            break
-                        }
-                    } else {
-                        if s.value == HKCategoryValueSleepAnalysis.asleep.rawValue { // 旧系统：全部归为 light
-                            light.append(.init(startTs: startTs, endTs: endTs, duration: dur))
-                        }
-                    }
-                }
-                cont.resume(returning: (deep: deep, rem: rem, light: light))
-            }
-            healthStore.execute(query)
+    
+    /// 生成 debug 模式下基于日期的 HRV 数据
+    private func generateDebugHRV(for anchorDate: Date, count: Int) -> [Double] {
+        var seed = debugRandomSeed(for: anchorDate) + 1000 // 偏移种子，确保与心率数据不同
+        return (0..<count).map { _ in
+            seededRandom(seed: &seed, min: 15, max: 45)
+        }
+    }
+    
+    /// 生成 debug 模式下基于日期的睡眠范围数据
+    private func generateDebugSleepRange(for anchorDate: Date, count: Int) -> [SleepRangePoint] {
+        var seed = debugRandomSeed(for: anchorDate) + 2000
+        return (0..<count).map { index in
+            // 约 15% 的概率没有数据
+            let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.15
+            if !hasData { return SleepRangePoint.empty }
+            
+            // 卧床开始：22:00-00:00 (120-240分钟，相对于20:00)
+            let bedStart = seededRandom(seed: &seed, min: 120, max: 240)
+            // 入睡时间：卧床后15-45分钟
+            let sleepStart = bedStart + seededRandom(seed: &seed, min: 15, max: 45)
+            // 睡眠时长：5-9小时
+            let sleepDuration = seededRandom(seed: &seed, min: 300, max: 540)
+            let sleepEnd = sleepStart + sleepDuration
+            // 起床时间：醒后5-20分钟
+            let bedEnd = sleepEnd + seededRandom(seed: &seed, min: 5, max: 20)
+            
+            return SleepRangePoint(
+                bedStartMinutes: bedStart,
+                bedEndMinutes: bedEnd,
+                sleepStartMinutes: sleepStart,
+                sleepEndMinutes: sleepEnd
+            )
         }
     }
     
     // MARK: - Monthly & Yearly Data
-    /// 月度和年度健康数据
-    struct PeriodHealthData {
-        var heartRate: [Double] = []
-        var hrv: [Double] = []
-        var sleep: [Double] = []
-    }
     
-    /// 获取月度数据（最近30天）
-    func fetchMonthlyData() async throws -> PeriodHealthData {
-        // Debug 模式：返回模拟数据
+    /// 获取月度数据（最近30天，以 anchorDate 结尾）
+    /// - Parameter anchorDate: 作为时间窗口结束的日期（默认为当前时间）
+    func fetchMonthlyData(anchorDate: Date = Date()) async throws -> PeriodHealthData {
+        // Debug 模式：返回基于 anchorDate 的模拟数据
         if DesignConstants.isDebugMode {
+            // 检查日期是否在有效范围内
+            guard isDebugDataAvailable(for: anchorDate) else {
+                // 超出范围，返回空数据
+                return PeriodHealthData()
+            }
+            
+            // 生成基于 anchorDate 的随机数据
+            let heartRateRange = generateDebugHeartRateRange(for: anchorDate, count: 30)
+            let hrvData = generateDebugHRV(for: anchorDate, count: 30)
+            let sleepRange = generateDebugSleepRange(for: anchorDate, count: 30)
+            
+            // 从心率范围数据生成普通心率数据（取平均值）
+            let heartRate = heartRateRange.map { $0.isValid ? ($0.min + $0.max) / 2 : 0 }
+            // 从睡眠范围数据生成普通睡眠数据（睡眠时长，单位：小时）
+            let sleep = sleepRange.map { $0.isValid ? ($0.sleepEndMinutes - $0.sleepStartMinutes) / 60.0 : 0 }
+            
             return PeriodHealthData(
-                heartRate: DesignConstants.DebugHealthData.monthlyHeartRate,
-                hrv: DesignConstants.DebugHealthData.monthlyHRV,
-                sleep: DesignConstants.DebugHealthData.monthlySleep
+                heartRate: heartRate,
+                heartRateRange: heartRateRange,
+                hrv: hrvData,
+                sleep: sleep,
+                sleepRange: sleepRange
             )
         }
         
         // 真实模式：从 HealthKit 获取最近30天的平均数据
         let calendar = Calendar.current
-        let endDate = Date()
-        let startDate = calendar.date(byAdding: .day, value: -30, to: endDate)!
+        // 以 anchorDate 当天 23:59:59 作为窗口结束，向前取30天
+        let endOfAnchorDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: anchorDate))!
+        let startDate = calendar.date(byAdding: .day, value: -30, to: endOfAnchorDay)!
         
         var result = PeriodHealthData()
         
@@ -552,7 +396,14 @@ final class HealthDataManager {
             .heartRate,
             unit: HKUnit.count().unitDivided(by: .minute()),
             startDate: startDate,
-            endDate: endDate,
+            endDate: endOfAnchorDay,
+            days: 30
+        )
+        
+        // 获取每天的心率范围（最小/最大值）
+        result.heartRateRange = try await fetchDailyHeartRateRanges(
+            startDate: startDate,
+            endDate: endOfAnchorDay,
             days: 30
         )
         
@@ -561,34 +412,78 @@ final class HealthDataManager {
             .heartRateVariabilitySDNN,
             unit: HKUnit.secondUnit(with: .milli),
             startDate: startDate,
-            endDate: endDate,
+            endDate: endOfAnchorDay,
             days: 30
         )
         
         // 获取每天的睡眠时长
         result.sleep = try await fetchDailySleepHours(
             startDate: startDate,
-            endDate: endDate,
+            endDate: endOfAnchorDay,
             days: 30
         )
         
         return result
     }
     
-    /// 获取年度数据（最近12个月）
-    func fetchYearlyData() async throws -> PeriodHealthData {
-        // Debug 模式：返回模拟数据
+    /// 获取年度数据（最近12个月，以 anchorDate 所在月结尾）
+    /// - Parameter anchorDate: 作为时间窗口结束的日期（默认为当前时间）
+    func fetchYearlyData(anchorDate: Date = Date()) async throws -> PeriodHealthData {
+        // Debug 模式：返回基于 anchorDate 的模拟数据
         if DesignConstants.isDebugMode {
+            // 检查日期是否在有效范围内
+            guard isDebugDataAvailable(for: anchorDate) else {
+                // 超出范围，返回空数据
+                return PeriodHealthData()
+            }
+            
+            // 年度数据用不同的种子偏移，避免与月度数据相同
+            var seed = debugRandomSeed(for: anchorDate) + 5000
+            
+            // 生成12个月的数据
+            let heartRateRange = (0..<12).map { _ -> HeartRateRangePoint in
+                let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.1
+                if !hasData { return HeartRateRangePoint.empty }
+                let minHR = seededRandom(seed: &seed, min: 48, max: 65)
+                let maxHR = seededRandom(seed: &seed, min: 90, max: 140)
+                return HeartRateRangePoint(min: minHR, max: maxHR)
+            }
+            
+            let hrvData = (0..<12).map { _ -> Double in
+                seededRandom(seed: &seed, min: 18, max: 42)
+            }
+            
+            let sleepRange = (0..<12).map { _ -> SleepRangePoint in
+                let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.1
+                if !hasData { return SleepRangePoint.empty }
+                let bedStart = seededRandom(seed: &seed, min: 120, max: 240)
+                let sleepStart = bedStart + seededRandom(seed: &seed, min: 15, max: 45)
+                let sleepDuration = seededRandom(seed: &seed, min: 300, max: 540)
+                let sleepEnd = sleepStart + sleepDuration
+                let bedEnd = sleepEnd + seededRandom(seed: &seed, min: 5, max: 20)
+                return SleepRangePoint(
+                    bedStartMinutes: bedStart, bedEndMinutes: bedEnd,
+                    sleepStartMinutes: sleepStart, sleepEndMinutes: sleepEnd
+                )
+            }
+            
+            let heartRate = heartRateRange.map { $0.isValid ? ($0.min + $0.max) / 2 : 0 }
+            let sleep = sleepRange.map { $0.isValid ? ($0.sleepEndMinutes - $0.sleepStartMinutes) / 60.0 : 0 }
+            
             return PeriodHealthData(
-                heartRate: DesignConstants.DebugHealthData.yearlyHeartRate,
-                hrv: DesignConstants.DebugHealthData.yearlyHRV,
-                sleep: DesignConstants.DebugHealthData.yearlySleep
+                heartRate: heartRate,
+                heartRateRange: heartRateRange,
+                hrv: hrvData,
+                sleep: sleep,
+                sleepRange: sleepRange
             )
         }
         
         // 真实模式：从 HealthKit 获取最近12个月的平均数据
         let calendar = Calendar.current
-        let endDate = Date()
+        // 以 anchorDate 所在月的月末为窗口结束，向前取12个月
+        let endOfAnchorMonthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: anchorDate)) ?? anchorDate
+        let endDate = calendar.date(byAdding: .month, value: 1, to: endOfAnchorMonthStart) ?? anchorDate
         let startDate = calendar.date(byAdding: .month, value: -12, to: endDate)!
         
         var result = PeriodHealthData()
@@ -597,6 +492,13 @@ final class HealthDataManager {
         result.heartRate = try await fetchMonthlyAverages(
             .heartRate,
             unit: HKUnit.count().unitDivided(by: .minute()),
+            startDate: startDate,
+            endDate: endDate,
+            months: 12
+        )
+        
+        // 获取每月的心率范围（最小/最大值）
+        result.heartRateRange = try await fetchMonthlyHeartRateRanges(
             startDate: startDate,
             endDate: endDate,
             months: 12
@@ -621,7 +523,500 @@ final class HealthDataManager {
         return result
     }
     
+    /// 获取周数据（最近7天，以 anchorDate 结尾）
+    /// - Parameter anchorDate: 作为时间窗口结束的日期（默认为当前时间）
+    func fetchWeeklyData(anchorDate: Date = Date()) async throws -> PeriodHealthData {
+        // Debug 模式：返回基于 anchorDate 的模拟数据
+        if DesignConstants.isDebugMode {
+            // 检查日期是否在有效范围内
+            guard isDebugDataAvailable(for: anchorDate) else {
+                return PeriodHealthData()
+            }
+            
+            // 周数据用不同的种子偏移
+            var seed = debugRandomSeed(for: anchorDate) + 3000
+            
+            // 生成7天的数据
+            let heartRateRange = (0..<7).map { _ -> HeartRateRangePoint in
+                let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.12
+                if !hasData { return HeartRateRangePoint.empty }
+                let minHR = seededRandom(seed: &seed, min: 52, max: 68)
+                let maxHR = seededRandom(seed: &seed, min: 85, max: 125)
+                return HeartRateRangePoint(min: minHR, max: maxHR)
+            }
+            
+            let hrvData = (0..<7).map { _ -> Double in
+                seededRandom(seed: &seed, min: 18, max: 45)
+            }
+            
+            let sleepRange = (0..<7).map { _ -> SleepRangePoint in
+                let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.12
+                if !hasData { return SleepRangePoint.empty }
+                let bedStart = seededRandom(seed: &seed, min: 120, max: 240)
+                let sleepStart = bedStart + seededRandom(seed: &seed, min: 15, max: 45)
+                let sleepDuration = seededRandom(seed: &seed, min: 300, max: 540)
+                let sleepEnd = sleepStart + sleepDuration
+                let bedEnd = sleepEnd + seededRandom(seed: &seed, min: 5, max: 20)
+                return SleepRangePoint(
+                    bedStartMinutes: bedStart, bedEndMinutes: bedEnd,
+                    sleepStartMinutes: sleepStart, sleepEndMinutes: sleepEnd
+                )
+            }
+            
+            let heartRate = heartRateRange.map { $0.isValid ? ($0.min + $0.max) / 2 : 0 }
+            let sleep = sleepRange.map { $0.isValid ? ($0.sleepEndMinutes - $0.sleepStartMinutes) / 60.0 : 0 }
+            
+            return PeriodHealthData(
+                heartRate: heartRate,
+                heartRateRange: heartRateRange,
+                hrv: hrvData,
+                sleep: sleep,
+                sleepRange: sleepRange
+            )
+        }
+        
+        // 真实模式：从 HealthKit 获取最近7天的数据（从今天往前推7天）
+        let calendar = Calendar.current
+        let anchorStart = calendar.startOfDay(for: anchorDate)
+        // 往前推7天（包含 anchor 当天）
+        let startDate = calendar.date(byAdding: .day, value: -6, to: anchorStart)!
+        let endDate = calendar.date(byAdding: .day, value: 1, to: anchorStart)!
+        
+        var result = PeriodHealthData()
+        
+        // 获取每天的平均心率
+        result.heartRate = try await fetchDailyAverages(
+            .heartRate,
+            unit: HKUnit.count().unitDivided(by: .minute()),
+            startDate: startDate,
+            endDate: endDate,
+            days: 7
+        )
+        
+        // 获取每天的心率范围（最小/最大值）
+        result.heartRateRange = try await fetchDailyHeartRateRanges(
+            startDate: startDate,
+            endDate: endDate,
+            days: 7
+        )
+        
+        // 获取每天的平均HRV
+        result.hrv = try await fetchDailyAverages(
+            .heartRateVariabilitySDNN,
+            unit: HKUnit.secondUnit(with: .milli),
+            startDate: startDate,
+            endDate: endDate,
+            days: 7
+        )
+        
+        // 获取每天的睡眠时长
+        result.sleep = try await fetchDailySleepHours(
+            startDate: startDate,
+            endDate: endDate,
+            days: 7
+        )
+        
+        return result
+    }
+    
+    /// 获取日数据（指定日期0-23时，每小时一个数据点）
+    /// X轴固定显示0-23时，若 anchorDate 为今天，未来时间为0
+    /// - Parameter anchorDate: 作为时间窗口结束的日期（默认为当前时间）
+    func fetchDailyData(anchorDate: Date = Date()) async throws -> PeriodHealthData {
+        // Debug 模式：返回基于 anchorDate 的模拟数据
+        if DesignConstants.isDebugMode {
+            // 检查日期是否在有效范围内
+            guard isDebugDataAvailable(for: anchorDate) else {
+                return PeriodHealthData()
+            }
+            
+            let calendar = Calendar.current
+            let isToday = calendar.isDateInToday(anchorDate)
+            let currentHour = isToday ? calendar.component(.hour, from: Date()) : 23
+            
+            // 日数据用不同的种子偏移
+            var seed = debugRandomSeed(for: anchorDate) + 4000
+            
+            // 生成24小时的数据
+            let hourlyHeartRateRange = (0..<24).map { hour -> HeartRateRangePoint in
+                // 今天的未来时间没有数据
+                if isToday && hour > currentHour { return HeartRateRangePoint.empty }
+                
+                // 约 20% 概率没有数据
+                let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.2
+                if !hasData { return HeartRateRangePoint.empty }
+                
+                let minHR = seededRandom(seed: &seed, min: 55, max: 72)
+                let maxHR = seededRandom(seed: &seed, min: 80, max: 120)
+                return HeartRateRangePoint(min: minHR, max: maxHR)
+            }
+            
+            let hourlyHRV = (0..<24).map { hour -> Double in
+                if isToday && hour > currentHour { return 0 }
+                return seededRandom(seed: &seed, min: 20, max: 75)
+            }
+            
+            // 睡眠范围数据（单条数据，表示昨晚的睡眠）
+            let bedStart = seededRandom(seed: &seed, min: 120, max: 200)
+            let sleepStart = bedStart + seededRandom(seed: &seed, min: 15, max: 40)
+            let sleepDuration = seededRandom(seed: &seed, min: 330, max: 510)
+            let sleepEnd = sleepStart + sleepDuration
+            let bedEnd = sleepEnd + seededRandom(seed: &seed, min: 5, max: 15)
+            let sleepRange = [SleepRangePoint(
+                bedStartMinutes: bedStart,
+                bedEndMinutes: bedEnd,
+                sleepStartMinutes: sleepStart,
+                sleepEndMinutes: sleepEnd
+            )]
+            
+            let heartRate = hourlyHeartRateRange.map { $0.isValid ? ($0.min + $0.max) / 2 : 0 }
+            // 每小时睡眠数据（0-6点睡眠）
+            let hourlySleep = (0..<24).map { hour -> Double in
+                if isToday && hour > currentHour { return 0 }
+                if hour >= 0 && hour < 7 {
+                    return seededRandom(seed: &seed, min: 0.7, max: 1.0)
+                }
+                return 0
+            }
+            
+            return PeriodHealthData(
+                heartRate: heartRate,
+                heartRateRange: hourlyHeartRateRange,
+                hrv: hourlyHRV,
+                sleep: hourlySleep,
+                sleepRange: sleepRange
+            )
+        }
+        
+        // 真实模式：从 HealthKit 获取今天0-23时的数据（每小时一个数据点）
+        // X轴固定显示0-23时，未来时间的数据将为0
+        let calendar = Calendar.current
+        let currentHour = calendar.component(.hour, from: anchorDate)
+        let isToday = calendar.isDateInToday(anchorDate)
+
+        // 获取 anchorDate 当天0时作为起始时间
+        let startOfDay = calendar.startOfDay(for: anchorDate)
+        
+        var result = PeriodHealthData()
+        
+        // 获取每小时的平均心率（0-23时，但只有到当前小时有数据）
+        if isToday {
+            result.heartRate = try await fetchHourlyAveragesForToday(
+                .heartRate,
+                unit: HKUnit.count().unitDivided(by: .minute()),
+                startDate: startOfDay,
+                currentHour: currentHour
+            )
+        } else {
+            result.heartRate = try await fetchHourlyAverages(
+                .heartRate,
+                unit: HKUnit.count().unitDivided(by: .minute()),
+                startDate: startOfDay,
+                hours: 24
+            )
+        }
+        
+        // 获取每小时的心率范围（最小/最大值）
+        if isToday {
+            result.heartRateRange = try await fetchHourlyHeartRateRangesForToday(
+                startDate: startOfDay,
+                currentHour: currentHour
+            )
+        } else {
+            result.heartRateRange = try await fetchHourlyHeartRateRanges(
+                startDate: startOfDay,
+                hours: 24
+            )
+        }
+        
+        // 获取每小时的平均HRV
+        if isToday {
+            result.hrv = try await fetchHourlyAveragesForToday(
+                .heartRateVariabilitySDNN,
+                unit: HKUnit.secondUnit(with: .milli),
+                startDate: startOfDay,
+                currentHour: currentHour
+            )
+        } else {
+            result.hrv = try await fetchHourlyAverages(
+                .heartRateVariabilitySDNN,
+                unit: HKUnit.secondUnit(with: .milli),
+                startDate: startOfDay,
+                hours: 24
+            )
+        }
+        
+        // 获取每小时的睡眠时长（小时内睡眠的分钟数/60）
+        if isToday {
+            result.sleep = try await fetchHourlySleepHoursForToday(
+                startDate: startOfDay,
+                currentHour: currentHour
+            )
+        } else {
+            result.sleep = try await fetchHourlySleepHours(
+                startDate: startOfDay,
+                hours: 24
+            )
+        }
+        
+        return result
+    }
+    
+    /// 获取6个月数据（按周聚合，周日到周六为一个周期，以 anchorDate 所在周为末尾）
+    /// - Parameter anchorDate: 作为时间窗口结束的日期（默认为当前时间）
+    func fetchSixMonthsData(anchorDate: Date = Date()) async throws -> PeriodHealthData {
+        // Debug 模式：返回基于 anchorDate 的模拟数据
+        if DesignConstants.isDebugMode {
+            // 检查日期是否在有效范围内
+            guard isDebugDataAvailable(for: anchorDate) else {
+                return PeriodHealthData()
+            }
+            
+            // 6个月数据用不同的种子偏移
+            var seed = debugRandomSeed(for: anchorDate) + 6000
+            
+            // 生成约26周的数据
+            let weeklyHeartRateRange = (0..<26).map { _ -> HeartRateRangePoint in
+                let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.12
+                if !hasData { return HeartRateRangePoint.empty }
+                let minHR = seededRandom(seed: &seed, min: 48, max: 65)
+                let maxHR = seededRandom(seed: &seed, min: 92, max: 135)
+                return HeartRateRangePoint(min: minHR, max: maxHR)
+            }
+            
+            let weeklyHRV = (0..<26).map { _ -> Double in
+                seededRandom(seed: &seed, min: 25, max: 55)
+            }
+            
+            let sleepRange = (0..<26).map { _ -> SleepRangePoint in
+                let hasData = seededRandom(seed: &seed, min: 0, max: 1) > 0.12
+                if !hasData { return SleepRangePoint.empty }
+                let bedStart = seededRandom(seed: &seed, min: 120, max: 240)
+                let sleepStart = bedStart + seededRandom(seed: &seed, min: 15, max: 45)
+                let sleepDuration = seededRandom(seed: &seed, min: 300, max: 540)
+                let sleepEnd = sleepStart + sleepDuration
+                let bedEnd = sleepEnd + seededRandom(seed: &seed, min: 5, max: 20)
+                return SleepRangePoint(
+                    bedStartMinutes: bedStart, bedEndMinutes: bedEnd,
+                    sleepStartMinutes: sleepStart, sleepEndMinutes: sleepEnd
+                )
+            }
+            
+            let weeklyHeartRate = weeklyHeartRateRange.map { $0.isValid ? ($0.min + $0.max) / 2 : 0 }
+            let weeklySleep = sleepRange.map { $0.isValid ? ($0.sleepEndMinutes - $0.sleepStartMinutes) / 60.0 : 0 }
+            
+            return PeriodHealthData(
+                heartRate: weeklyHeartRate,
+                heartRateRange: weeklyHeartRateRange,
+                hrv: weeklyHRV,
+                sleep: weeklySleep,
+                sleepRange: sleepRange
+            )
+        }
+        
+        // 真实模式：从 HealthKit 获取最近6个月的周平均数据
+        let calendar = Calendar.current
+        let anchorDay = calendar.startOfDay(for: anchorDate)
+
+        // 找到 anchor 所在周的周六结束（次日0点）
+        let weekday = calendar.component(.weekday, from: anchorDay)
+        let daysUntilSaturday = (7 - weekday + 7) % 7
+        let currentWeekEnd = calendar.date(byAdding: .day, value: daysUntilSaturday + 1, to: anchorDay)!
+
+        // 往前推6个月
+        let sixMonthsAgo = calendar.date(byAdding: .month, value: -6, to: anchorDay)!
+
+        // 找到6个月前那周的周日开始时间
+        let sixMonthsAgoWeekday = calendar.component(.weekday, from: sixMonthsAgo)
+        let daysToSunday = (sixMonthsAgoWeekday - 1 + 7) % 7
+        let startSunday = calendar.date(byAdding: .day, value: -daysToSunday, to: calendar.startOfDay(for: sixMonthsAgo))!
+        
+        // 计算周数
+        let weeks = calendar.dateComponents([.weekOfYear], from: startSunday, to: currentWeekEnd).weekOfYear ?? 26
+        
+        var result = PeriodHealthData()
+        
+        // 获取每周的平均心率（周日到周六）
+        result.heartRate = try await fetchWeeklyAveragesSundayToSaturday(
+            .heartRate,
+            unit: HKUnit.count().unitDivided(by: .minute()),
+            startSunday: startSunday,
+            weeks: weeks
+        )
+        
+        // 获取每周的心率范围（最小/最大值）
+        result.heartRateRange = try await fetchWeeklyHeartRateRangesSundayToSaturday(
+            startSunday: startSunday,
+            weeks: weeks
+        )
+        
+        // 获取每周的平均HRV
+        result.hrv = try await fetchWeeklyAveragesSundayToSaturday(
+            .heartRateVariabilitySDNN,
+            unit: HKUnit.secondUnit(with: .milli),
+            startSunday: startSunday,
+            weeks: weeks
+        )
+        
+        // 获取每周的睡眠时长
+        result.sleep = try await fetchWeeklySleepHoursSundayToSaturday(
+            startSunday: startSunday,
+            weeks: weeks
+        )
+        
+        return result
+    }
+    
     // MARK: - Helper methods for statistics
+    
+    /// 获取今天0-23时每小时的平均值（用于日视图）
+    /// 只获取到当前小时的数据，未来时间返回0
+    private func fetchHourlyAveragesForToday(
+        _ identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
+        startDate: Date,
+        currentHour: Int
+    ) async throws -> [Double] {
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
+            return Array(repeating: 0, count: 24)
+        }
+        
+        let calendar = Calendar.current
+        var results: [Double] = []
+        
+        for hour in 0..<24 {
+            // 未来的小时返回0
+            if hour > currentHour {
+                results.append(0)
+                continue
+            }
+            
+            guard let hourStart = calendar.date(byAdding: .hour, value: hour, to: startDate),
+                  let hourEnd = calendar.date(byAdding: .hour, value: 1, to: hourStart) else {
+                results.append(0)
+                continue
+            }
+            
+            let predicate = HKQuery.predicateForSamples(withStart: hourStart, end: hourEnd, options: .strictStartDate)
+            
+            let average = try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Double, Error>) in
+                let query = HKStatisticsQuery(
+                    quantityType: quantityType,
+                    quantitySamplePredicate: predicate,
+                    options: .discreteAverage
+                ) { _, statistics, error in
+                    if let error = error {
+                        cont.resume(throwing: error)
+                        return
+                    }
+                    
+                    let avg = statistics?.averageQuantity()?.doubleValue(for: unit) ?? 0
+                    cont.resume(returning: avg)
+                }
+                
+                self.healthStore.execute(query)
+            }
+            
+            results.append(average)
+        }
+        
+        return results
+    }
+    
+    /// 获取每小时的平均值（用于日视图，24小时数据）
+    private func fetchHourlyAverages(
+        _ identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
+        startDate: Date,
+        hours: Int
+    ) async throws -> [Double] {
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
+            return []
+        }
+        
+        let calendar = Calendar.current
+        var results: [Double] = []
+        
+        for hourOffset in 0..<hours {
+            guard let hourStart = calendar.date(byAdding: .hour, value: hourOffset, to: startDate),
+                  let hourEnd = calendar.date(byAdding: .hour, value: 1, to: hourStart) else {
+                results.append(0)
+                continue
+            }
+            
+            let predicate = HKQuery.predicateForSamples(withStart: hourStart, end: hourEnd, options: .strictStartDate)
+            
+            let average = try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Double, Error>) in
+                let query = HKStatisticsQuery(
+                    quantityType: quantityType,
+                    quantitySamplePredicate: predicate,
+                    options: .discreteAverage
+                ) { _, statistics, error in
+                    if let error = error {
+                        cont.resume(throwing: error)
+                        return
+                    }
+                    
+                    let avg = statistics?.averageQuantity()?.doubleValue(for: unit) ?? 0
+                    cont.resume(returning: avg)
+                }
+                
+                self.healthStore.execute(query)
+            }
+            
+            results.append(average)
+        }
+        
+        return results
+    }
+    
+    /// 获取每周的平均值（周日到周六为一个周期，用于6个月视图）
+    private func fetchWeeklyAveragesSundayToSaturday(
+        _ identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
+        startSunday: Date,
+        weeks: Int
+    ) async throws -> [Double] {
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
+            return []
+        }
+        
+        let calendar = Calendar.current
+        var results: [Double] = []
+        
+        for weekOffset in 0..<weeks {
+            guard let weekStart = calendar.date(byAdding: .day, value: weekOffset * 7, to: startSunday),
+                  let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) else {
+                results.append(0)
+                continue
+            }
+            
+            let predicate = HKQuery.predicateForSamples(withStart: weekStart, end: weekEnd, options: .strictStartDate)
+            
+            let average = try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Double, Error>) in
+                let query = HKStatisticsQuery(
+                    quantityType: quantityType,
+                    quantitySamplePredicate: predicate,
+                    options: .discreteAverage
+                ) { _, statistics, error in
+                    if let error = error {
+                        cont.resume(throwing: error)
+                        return
+                    }
+                    
+                    let avg = statistics?.averageQuantity()?.doubleValue(for: unit) ?? 0
+                    cont.resume(returning: avg)
+                }
+                
+                self.healthStore.execute(query)
+            }
+            
+            results.append(average)
+        }
+        
+        return results
+    }
+    
     /// 获取指定时间段内每天的平均值
     private func fetchDailyAverages(
         _ identifier: HKQuantityTypeIdentifier,
@@ -718,154 +1113,49 @@ final class HealthDataManager {
         return results
     }
     
-    /// 获取指定时间段内每天的睡眠时长
-    private func fetchDailySleepHours(
+    /// 获取指定时间段内每周的平均值
+    private func fetchWeeklyAverages(
+        _ identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
         startDate: Date,
         endDate: Date,
-        days: Int
+        weeks: Int
     ) async throws -> [Double] {
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
             return []
         }
         
         let calendar = Calendar.current
         var results: [Double] = []
         
-        for dayOffset in 0..<days {
-            guard let dayStart = calendar.date(byAdding: .day, value: -days + dayOffset, to: endDate),
-                  let _ = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
+        for weekOffset in 0..<weeks {
+            guard let weekStart = calendar.date(byAdding: .weekOfYear, value: -weeks + weekOffset, to: endDate),
+                  let weekEnd = calendar.date(byAdding: .weekOfYear, value: 1, to: weekStart) else {
                 results.append(0)
                 continue
             }
             
-            // 使用 18:00 作为一天的开始
-            let sleepDayStart = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: dayStart)!
-            let sleepDayEnd = calendar.date(byAdding: .day, value: 1, to: sleepDayStart)!
+            let predicate = HKQuery.predicateForSamples(withStart: weekStart, end: weekEnd, options: .strictStartDate)
             
-            let predicate = HKQuery.predicateForSamples(withStart: sleepDayStart, end: sleepDayEnd, options: [])
-            
-            let sleepHours = try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Double, Error>) in
-                let query = HKSampleQuery(
-                    sampleType: sleepType,
-                    predicate: predicate,
-                    limit: HKObjectQueryNoLimit,
-                    sortDescriptors: nil
-                ) { _, samples, error in
+            let average = try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Double, Error>) in
+                let query = HKStatisticsQuery(
+                    quantityType: quantityType,
+                    quantitySamplePredicate: predicate,
+                    options: .discreteAverage
+                ) { _, statistics, error in
                     if let error = error {
                         cont.resume(throwing: error)
                         return
                     }
                     
-                    guard let sleepSamples = samples as? [HKCategorySample] else {
-                        cont.resume(returning: 0)
-                        return
-                    }
-                    
-                    // 计算实际睡眠时间（不包括清醒时间）
-                    var totalSeconds: TimeInterval = 0
-                    let sleepStageValues: Set<Int>
-                    if #available(iOS 16.0, *) {
-                        sleepStageValues = [
-                            HKCategoryValueSleepAnalysis.asleepCore.rawValue,
-                            HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
-                            HKCategoryValueSleepAnalysis.asleepREM.rawValue
-                        ]
-                    } else {
-                        sleepStageValues = [HKCategoryValueSleepAnalysis.asleep.rawValue]
-                    }
-                    
-                    for sample in sleepSamples {
-                        if sleepStageValues.contains(sample.value) {
-                            totalSeconds += sample.endDate.timeIntervalSince(sample.startDate)
-                        }
-                    }
-                    
-                    cont.resume(returning: totalSeconds / 3600.0)
+                    let avg = statistics?.averageQuantity()?.doubleValue(for: unit) ?? 0
+                    cont.resume(returning: avg)
                 }
                 
                 healthStore.execute(query)
             }
             
-            results.append(sleepHours)
-        }
-        
-        return results
-    }
-    
-    /// 获取指定时间段内每月的睡眠时长
-    private func fetchMonthlySleepHours(
-        startDate: Date,
-        endDate: Date,
-        months: Int
-    ) async throws -> [Double] {
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
-            return []
-        }
-        
-        let calendar = Calendar.current
-        var results: [Double] = []
-        
-        for monthOffset in 0..<months {
-            guard let monthStart = calendar.date(byAdding: .month, value: -months + monthOffset, to: endDate),
-                  let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) else {
-                results.append(0)
-                continue
-            }
-            
-            let predicate = HKQuery.predicateForSamples(withStart: monthStart, end: monthEnd, options: [])
-            
-            let avgSleepHours = try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Double, Error>) in
-                let query = HKSampleQuery(
-                    sampleType: sleepType,
-                    predicate: predicate,
-                    limit: HKObjectQueryNoLimit,
-                    sortDescriptors: nil
-                ) { _, samples, error in
-                    if let error = error {
-                        cont.resume(throwing: error)
-                        return
-                    }
-                    
-                    guard let sleepSamples = samples as? [HKCategorySample], !sleepSamples.isEmpty else {
-                        cont.resume(returning: 0)
-                        return
-                    }
-                    
-                    // 按天分组并计算每天的睡眠时间，然后求平均
-                    var dailySleepHours: [String: TimeInterval] = [:]
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd"
-                    
-                    let sleepStageValues: Set<Int>
-                    if #available(iOS 16.0, *) {
-                        sleepStageValues = [
-                            HKCategoryValueSleepAnalysis.asleepCore.rawValue,
-                            HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
-                            HKCategoryValueSleepAnalysis.asleepREM.rawValue
-                        ]
-                    } else {
-                        sleepStageValues = [HKCategoryValueSleepAnalysis.asleep.rawValue]
-                    }
-                    
-                    for sample in sleepSamples {
-                        if sleepStageValues.contains(sample.value) {
-                            let dateKey = dateFormatter.string(from: sample.startDate)
-                            let duration = sample.endDate.timeIntervalSince(sample.startDate)
-                            dailySleepHours[dateKey, default: 0] += duration
-                        }
-                    }
-                    
-                    // 计算平均睡眠时长
-                    let totalHours = dailySleepHours.values.reduce(0, +) / 3600.0
-                    let avgHours = dailySleepHours.isEmpty ? 0 : totalHours / Double(dailySleepHours.count)
-                    
-                    cont.resume(returning: avgHours)
-                }
-                
-                healthStore.execute(query)
-            }
-            
-            results.append(avgSleepHours)
+            results.append(average)
         }
         
         return results

@@ -37,6 +37,11 @@
 
 // MARK: - Health Screen
 "health.title" = "健康";
+"health.page_title" = "すべての健康データ";
+"health.time.today" = "今日";
+"health.time.past_7_days" = "過去7日間";
+"health.time.past_12_months" = "過去12か月";
+"health.time.earlier" = "さらに前";
 // MARK: - Health Metrics
 "health.status.initial" = "ヘルスアクセスを要求";
 "health.status.loading" = "健康データを読み込み中";
@@ -66,11 +71,29 @@
 "health.sleep.stage.core" = "コア";
 "health.sleep.stage.deep" = "深睡";
 "health.sleep.no_data" = "睡眠データなし";
+"health.sleep.bed_time" = "ベッドにいた時間";
+"health.sleep.sleep_time" = "睡眠時間";
+"health.sleep.avg_bed_time" = "平均ベッド時間";
+"health.sleep.avg_sleep_time" = "平均睡眠時間";
 "health.period.day" = "日";
+"health.period.week" = "週";
 "health.period.month" = "月";
+"health.period.six_months" = "6ヶ月";
 "health.period.year" = "年";
+"health.period.today" = "今日";
 "health.period.daily_average" = "1日平均";
+"health.period.hourly_average" = "時間平均";
+"health.period.weekly_average" = "週平均";
 "health.period.monthly_average" = "月平均";
+"health.period.range" = "範囲";
+"health.period.hour" = "時";
+"health.weekday.sun" = "日";
+"health.weekday.mon" = "月";
+"health.weekday.tue" = "火";
+"health.weekday.wed" = "水";
+"health.weekday.thu" = "木";
+"health.weekday.fri" = "金";
+"health.weekday.sat" = "土";
 
 // MARK: - Settings Screen
 "settings.title" = "設定";
@@ -150,7 +173,7 @@
 "onboarding.start" = "開始";
 "onboarding.no_device" = "Mindoraをお持ちではありませんか？";
 "onboarding.connect_mindora" = "Mindora を接続";
-"onboarding.page3.health_card_text" = "「ヘルスケア」アプリで Mindora のデータアクセス権限を設定してください\nタップして「ヘルスケア」アプリを開く";
+"onboarding.page3.health_card_text" = "「ヘルスケア」アプリで Mindora のデータアクセス権限を設定してください";
 "onboarding.page3.bluetooth_card_text" = "現在のデバイスのBluetoothがオンになっていません\nタップしてBluetooth設定を開く";
 "onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth権限が有効になっています\nデバイスは正常に接続できます";
 "onboarding.page4.scanning_title" = "近くのデバイスをスキャン";
@@ -227,7 +250,7 @@
 "permission.bluetooth.reminder_message" = "Mindora デバイスに接続するには、アプリにBluetooth権限が必要です。";
 "permission.request_authorization" = "アクセスを許可";
 "permission.open_settings" = "設定を開く";
-"permission.open_health_app" = "「ヘルスケア」Appを開く";
+"permission.open_health_app" = "「ヘルスケア」を開く";
 "permission.later" = "後で";
 "permission.authorization_success" = "許可成功";
 "permission.authorization_failed" = "許可失敗";
@@ -240,8 +263,15 @@
 // Health Settings Guide
 "permission.health.settings_title" = "ヘルスケアプライバシー設定";
 "permission.health.settings_message" = "「設定 > プライバシーとセキュリティ > ヘルスケア」に移動し、Mindora を見つけて、必要なデータタイプをオンにしてください。";
-"permission.health.guide_title" = "健康データ権限の設定方法";
-"permission.health.guide_message" = "1. 「ヘルスケア」アプリを開く\n2. 画面下部の「共有」をタップ\n3. 「App」を選択\n4. Mindora を開く\n5. 必要なデータタイプをオンにする";
+"permission.health.guide_title" = "ヘルスケアデータ権限の設定方法";
+"permission.health.guide_message" = "「ヘルスケア」アプリを開く\n画面下部の「 共有」をタップ\n「App」を選択\nMindora を開く\n必要なデータタイプをオンにする";
 
 // Health Permission CTA (avoid misleading status)
-"permission.health.confirm" = "ヘルスケアAppで確認する";
+"permission.health.confirm" = "設定";
+
+// Local Network Permission CTA
+"permission.local_network.confirm" = "設定で確認してください";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "デバイスを検索できません";
+"permission.local_network.denied_message" = "近くのMindoraデバイスを検索するにはローカルネットワークへのアクセスが必要です。設定でローカルネットワークアクセスを有効にしてください。";
