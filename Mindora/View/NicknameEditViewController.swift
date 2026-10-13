@@ -9,7 +9,7 @@ class NicknameEditViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Scaled Metrics Helper
     // Base design width is 375pt
     private var scale: CGFloat {
-        return UIScreen.main.bounds.width / 375.0
+        return iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0
     }
     
     private func s(_ value: CGFloat) -> CGFloat {
@@ -92,7 +92,8 @@ class NicknameEditViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         setupUI()
         setupActions()
-        
+        installTapToDismissKeyboard()
+
         if let nick = currentNickname {
             nicknameTextField.text = nick
         }

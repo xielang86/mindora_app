@@ -249,6 +249,7 @@ final class RegisterP4Controller: UIViewController {
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
         // Simple linear scaling based on height mostly for vertical flows
         // For fonts, we usually scale based on width or height, here sticking to height for consistency with previous file (RegisterP3)
-        return (designValue / designDimension) * dimension
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return (designValue / designDimension) * capped
     }
 }

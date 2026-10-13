@@ -15,11 +15,20 @@ import UIKit
 final class OnboardingPage4ViewController: UIViewController {
     
     // MARK: - Device Discovery
-    private let discovery = BonjourDiscovery.shared
+    private let discovery = UnifiedDeviceDiscovery.shared
     private var hasFoundDevice = false
     private var searchTimeout: Timer?
     private var isSearching = false
     private let searchTimeoutDuration: TimeInterval = 6.0
+    /// Unified device picked from discovery list. Cleared once we move to confirmedDevice.
+    private var candidateDevice: UnifiedDevice?
+    /// Resolved device awaiting user confirmation. Set after a successful resolve (Wi-Fi)
+    /// or immediately for BLE-only devices. Consumed when user taps Connect. We deliberately
+    /// do NOT write DeviceSession until the user confirms, to avoid auto-binding the wrong device.
+    private var confirmedDevice: UnifiedDevice?
+    /// Found device display name, persisted so the searching-label animation can re-render
+    /// "<name> Found" instead of just "Mindora Found" after the timer tick.
+    private var foundDeviceName: String?
     
     // MARK: - Design Constants (设计稿尺寸)
     private let designWidth: CGFloat = 1242
@@ -39,9 +48,6 @@ final class OnboardingPage4ViewController: UIViewController {
     private let designDescriptionTrailing: CGFloat = 160   // 描述文字距离屏幕右边的边距（让宽度变小）
     
     // 设计稿中的像素值 - Mindora 文字
-    private let designMindoraTextBottom: CGFloat = 609     // Mindora 文字距离底部
-    private let designMindoraTextFontSize: CGFloat = 57    // Mindora 字体大小
-    
     // 设计稿中的像素值 - 底部按钮容器
     private let designButtonWidth: CGFloat = 1129          // 按钮宽度
     private let designButtonHeight: CGFloat = 187          // 按钮高度
@@ -64,7 +70,8 @@ final class OnboardingPage4ViewController: UIViewController {
     
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - UI Components
@@ -108,17 +115,26 @@ final class OnboardingPage4ViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    // Mindora 文字（底部按钮上方）
-    private let mindoraTextLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Mindora"
-        label.textColor = UIColor(white: 1.0, alpha: 0.4)  // 白色，40%不透明度
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+
+    /// 内嵌设备选择列表：扫到 ≥2 台 Mindora 时显示在 description 和底部按钮之间。
+    /// 单台 / 零台时 isHidden = true。点击行直接 confirmedDevice + onDeviceFound。
+    private lazy var deviceListView: UITableView = {
+        let tv = UITableView(frame: .zero, style: .plain)
+        tv.backgroundColor = .clear
+        tv.separatorColor = UIColor(white: 1.0, alpha: 0.12)
+        tv.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        tv.rowHeight = 56
+        tv.dataSource = self
+        tv.delegate = self
+        tv.register(InlineDeviceCell.self, forCellReuseIdentifier: InlineDeviceCell.identifier)
+        tv.isHidden = true
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        return tv
     }()
-    
+
+    /// 当前给 deviceListView 渲染的可绑设备快照。
+    private var bindableDevices: [UnifiedDevice] = []
+
     // 底部白色按钮容器（灰色禁用状态）
     private let bottomContainerView: UIView = {
         let view = UIView()
@@ -162,15 +178,19 @@ final class OnboardingPage4ViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupActions()
+        NotificationCenter.default.addObserver(self, selector: #selector(discoveryDidUpdate), name: UnifiedDeviceDiscovery.didUpdateNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(discoveryDidFail(_:)), name: BonjourDiscovery.didFailNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(bleDidFail(_:)), name: BLEDiscovery.didFailNotification, object: nil)
         startScanning()
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopScanning()
     }
-    
+
     deinit {
+        NotificationCenter.default.removeObserver(self)
         stopScanning()
     }
     
@@ -184,7 +204,7 @@ final class OnboardingPage4ViewController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(searchingLabel)
         view.addSubview(descriptionLabel)
-        view.addSubview(mindoraTextLabel)
+        view.addSubview(deviceListView)
         view.addSubview(bottomContainerView)
         bottomContainerView.addSubview(questionIconView)
         bottomContainerView.addSubview(connectLabel)
@@ -219,10 +239,6 @@ final class OnboardingPage4ViewController: UIViewController {
         let buttonTextFontSize = scale(designButtonTextFontSize, basedOn: view.bounds.height, designDimension: designHeight)
         connectLabel.font = UIFont.systemFont(ofSize: buttonTextFontSize, weight: .medium)
         
-        // Mindora 文字字体
-        let mindoraTextFontSize = scale(designMindoraTextFontSize, basedOn: view.bounds.height, designDimension: designHeight)
-        mindoraTextLabel.font = UIFont.systemFont(ofSize: mindoraTextFontSize, weight: .medium)
-        
         // 按钮容器圆角
         let buttonCornerRadius = scale(designButtonCornerRadius, basedOn: view.bounds.height, designDimension: designHeight)
         bottomContainerView.layer.cornerRadius = buttonCornerRadius
@@ -239,9 +255,7 @@ final class OnboardingPage4ViewController: UIViewController {
         let buttonWidth = scale(designButtonWidth, basedOn: view.bounds.width, designDimension: designWidth)
         let buttonHeight = scale(designButtonHeight, basedOn: view.bounds.height, designDimension: designHeight)
         let buttonBottomMargin = scale(designButtonBottomMargin, basedOn: view.bounds.height, designDimension: designHeight)
-        
-        let mindoraTextBottom = scale(designMindoraTextBottom, basedOn: view.bounds.height, designDimension: designHeight)
-        
+
         let questionIconSize = scale(designQuestionIconSize, basedOn: view.bounds.width, designDimension: designWidth)
         let questionIconLeading = scale(designQuestionIconLeading, basedOn: view.bounds.width, designDimension: designWidth)
         let buttonTextTrailing = scale(designButtonTextTrailing, basedOn: view.bounds.width, designDimension: designWidth)
@@ -267,11 +281,15 @@ final class OnboardingPage4ViewController: UIViewController {
             descriptionLabel.topAnchor.constraint(equalTo: searchingLabel.bottomAnchor, constant: descriptionTop),
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: textLeading),
             descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -descriptionTrailing),
-            
-            // Mindora 文字 - 居中，距离底部609px
-            mindoraTextLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            mindoraTextLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -mindoraTextBottom),
-            
+
+            // 内嵌设备选择列表（仅多设备时显示）
+            // 用 equalTo 而不是 lessThanOrEqualTo 给一个 concrete 的 frame，否则 UITableView
+            // 没自带 intrinsicContentSize 时会被收成 0 高度看不见。列表内容超过这个高度自带滚动。
+            deviceListView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 32),
+            deviceListView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: textLeading),
+            deviceListView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -textLeading),
+            deviceListView.bottomAnchor.constraint(equalTo: bottomContainerView.topAnchor, constant: -32),
+
             // 底部白色按钮容器
             bottomContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             bottomContainerView.widthAnchor.constraint(equalToConstant: buttonWidth),
@@ -314,21 +332,20 @@ final class OnboardingPage4ViewController: UIViewController {
     private func startScanning() {
         isSearching = true
         hasFoundDevice = false
-        
+
         // 重置UI状态
         connectLabel.text = L("onboarding.connect_mindora")
         connectLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
         bottomContainerView.isUserInteractionEnabled = false
-        mindoraTextLabel.textColor = UIColor(white: 1.0, alpha: 0.4)
-        
+
         // 开始动画
         startSearchingAnimation()
-        
-        // 设置 Bonjour 发现代理
-        discovery.delegate = self
-        
-        // 开始扫描设备
-        discovery.startContinuous(rescanInterval: 6.0)
+
+        // 开始扫描设备（Bonjour + BLE，订阅在 viewDidLoad 已建立）
+        candidateDevice = nil
+        confirmedDevice = nil
+        hideInlineDeviceList()
+        discovery.startContinuous()
         
         // 启动超时计时器
         searchTimeout?.invalidate()
@@ -343,7 +360,7 @@ final class OnboardingPage4ViewController: UIViewController {
         stopSearchingAnimation()
         searchTimeout?.invalidate()
         searchTimeout = nil
-        discovery.stopContinuous()
+        discovery.stop()
     }
     
     // MARK: - Animation
@@ -367,18 +384,19 @@ final class OnboardingPage4ViewController: UIViewController {
     
     /// 更新搜索文字（循环显示 1-3 个点）
     private func updateSearchingText() {
-        // 如果已经找到设备，显示静态文案，不再显示动画
+        // 如果已经找到设备，显示具体设备名（"Mindora 2026 Found"），不再显示动画
         if hasFoundDevice {
-            searchingLabel.text = L("onboarding.page4.device_found")
+            let name = foundDeviceName ?? "Mindora"
+            searchingLabel.text = String(format: L("onboarding.page4.device_found"), name)
             return
         }
-        
+
         // 如果不在搜索状态，显示未找到
         if !isSearching {
             searchingLabel.text = L("onboarding.page4.no_device_found")
             return
         }
-        
+
         dotCount = (dotCount % 3) + 1
         let dots = String(repeating: ".", count: dotCount)
         searchingLabel.text = L("onboarding.page4.searching") + dots
@@ -392,7 +410,7 @@ final class OnboardingPage4ViewController: UIViewController {
         
         // 停止动画和扫描
         stopSearchingAnimation()
-        discovery.stopContinuous()
+        discovery.stop()
         
         // 更新文案
         searchingLabel.text = L("onboarding.page4.no_device_found")
@@ -401,40 +419,37 @@ final class OnboardingPage4ViewController: UIViewController {
         enableConnectButton()
     }
     
-    /// 设备被找到时的 UI 更新
-    private func onDeviceFound() {
+    /// 设备被找到时的 UI 更新。`displayName` 是用户可读的设备名（来自 Bonjour `service.name`），
+    /// 让用户在按"连接"前看清自己要绑哪一台。
+    private func onDeviceFound(displayName: String) {
         guard !hasFoundDevice else { return }
         hasFoundDevice = true
         isSearching = false
-        
-        // 取消超时计时器
+        foundDeviceName = displayName
+
         searchTimeout?.invalidate()
         searchTimeout = nil
-        
-        // 停止动画
+
         stopSearchingAnimation()
-        
-        // 更新文案为"已搜索到 Mindora"
-        searchingLabel.text = L("onboarding.page4.device_found")
-        
-        // Mindora 文字去掉不透明度
-        mindoraTextLabel.textColor = .white
-        
-        // 启用连接按钮
+        hideInlineDeviceList()
+
+        // 搜索状态行直接显示具体设备名："Mindora 2026 Found" / "已搜索到 Mindora 2026"
+        searchingLabel.text = String(format: L("onboarding.page4.device_found"), displayName)
+
         enableConnectButton()
-        
-        // 3秒后自动跳转到 Page5
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-            self?.navigateToPage5()
-        }
+        // No auto-navigate. User must explicitly tap "Connect Mindora" to confirm binding.
     }
     
     /// 跳转到 Page5（连接成功页面）
     private func navigateToPage5() {
         let page5 = OnboardingPage5ViewController()
-        page5.modalPresentationStyle = .fullScreen
-        page5.modalTransitionStyle = .crossDissolve
-        self.present(page5, animated: true)
+        if let nav = self.navigationController {
+            nav.pushViewController(page5, animated: true)
+        } else {
+            page5.modalPresentationStyle = .fullScreen
+            page5.modalTransitionStyle = .crossDissolve
+            self.present(page5, animated: true)
+        }
     }
         // MARK: - Actions
     
@@ -452,12 +467,19 @@ final class OnboardingPage4ViewController: UIViewController {
     @objc private func bottomContainerTapped() {
         self.bottomContainerView.animateButtonTap { [weak self] in
             guard let self = self else { return }
-            // 如果已找到设备，跳转到 Page5
-            if self.hasFoundDevice {
+            if self.hasFoundDevice, let dev = self.confirmedDevice {
+                // Bind happens HERE, only after explicit user confirmation. Pass through
+                // whatever transport(s) the discovery layer collected for this device.
+                DeviceSession.shared.connect(
+                    bonjour: dev.bonjour,
+                    bleIdentifier: dev.ble?.identifier,
+                    deviceID: dev.deviceID,
+                    displayName: dev.displayName
+                )
+                self.confirmedDevice = nil
                 self.navigateToPage5()
-            }
-            // 如果未找到设备且不在搜索中（超时状态），重新开始扫描
-            else if !self.isSearching {
+            } else if !self.isSearching {
+                // Timed out with no device — tapping restarts the scan.
                 self.startScanning()
             }
         }
@@ -479,34 +501,70 @@ final class OnboardingPage4ViewController: UIViewController {
     }
 }
 
-// MARK: - BonjourDiscoveryDelegate
-extension OnboardingPage4ViewController: BonjourDiscoveryDelegate {
-    func discoveryDidUpdate(_ discovery: BonjourDiscovery) {
-        // 当扫描到设备时更新 UI
-        if let service = discovery.services.first, !hasFoundDevice {
-            // 自动连接第一个发现的设备
-            let host = service.hostName ?? service.name
-            
-            // 保存连接会话
-            DeviceSession.shared.host = host
-            DeviceSession.shared.port = 9102
-            print("[OnboardingPage4] Device found and saved: \(host)")
-            
-            DispatchQueue.main.async { [weak self] in
-                self?.onDeviceFound()
-            }
+// MARK: - UnifiedDeviceDiscovery notifications
+extension OnboardingPage4ViewController {
+    @objc fileprivate func discoveryDidUpdate() {
+        // 用户已经选定后不再处理后续 discovery 更新
+        guard !hasFoundDevice, candidateDevice == nil else { return }
+
+        // 仅看实际可绑定的（至少有一条信道）
+        let bindable = discovery.devices.filter { $0.hasWifi || $0.hasBle }
+        guard !bindable.isEmpty else { return }
+
+        // 多台设备：在页面内展示列表让用户选
+        if bindable.count >= 2 {
+            showInlineDeviceList(bindable)
+            return
+        }
+
+        // 单台设备（常见路径）：自动选并展示 Found 状态
+        hideInlineDeviceList()
+        let dev = bindable[0]
+        Log.info("Onboarding", "device picked name=\(dev.displayName) transport=\(dev.transportLabel)")
+        confirmedDevice = dev
+        onDeviceFound(displayName: dev.displayName)
+    }
+
+    /// 扫到 ≥2 台时把列表显示在 descriptionLabel 和底部按钮之间。
+    /// discovery 更新会重复调本方法刷新列表内容，所以重入安全。
+    fileprivate func showInlineDeviceList(_ devices: [UnifiedDevice]) {
+        bindableDevices = devices
+        // 用户已选过一台后不再覆盖 searchingLabel（保留 "Mindora 2026 Found" 状态）
+        if confirmedDevice == nil {
+            searchingLabel.text = String(format: L("onboarding.page4.multiple_found"), devices.count)
+            stopSearchingAnimation()
+        }
+        deviceListView.isHidden = false
+        deviceListView.reloadData()
+    }
+
+    fileprivate func hideInlineDeviceList() {
+        bindableDevices = []
+        deviceListView.isHidden = true
+    }
+
+    @objc fileprivate func discoveryDidFail(_ notification: Notification) {
+        let code = (notification.object as? Int) ?? -1
+        Log.error("Onboarding", "bonjour failed errorCode=\(code)")
+        // Suppress late failures once the user has a device staged for confirmation —
+        // a delayed -72000 from an earlier permission denial shouldn't pop an alert
+        // over a green "Found Mindora" state.
+        guard !hasFoundDevice else { return }
+        showLocalNetworkPermissionAlert()
+    }
+
+    @objc fileprivate func bleDidFail(_ notification: Notification) {
+        let stateRaw = (notification.object as? Int) ?? -1
+        Log.error("Onboarding", "ble failed centralState=\(stateRaw)")
+        guard !hasFoundDevice else { return }
+        // BLE unauthorized = user explicitly denied; nudge to Settings. Other states
+        // (poweredOff / unsupported / resetting) silently fall through — Bonjour may still find the device.
+        if stateRaw == 3 { // CBManagerState.unauthorized
+            showBluetoothPermissionAlert()
         }
     }
-    
-    func discoveryDidFail(_ discovery: BonjourDiscovery, errorCode: Int) {
-        Log.error("Onboarding", "discovery failed errorCode=\(errorCode)")
-        // 本地网络权限被拒绝或其他搜索错误，引导用户去设置
-        DispatchQueue.main.async { [weak self] in
-            self?.showLocalNetworkPermissionAlert()
-        }
-    }
-    
-    private func showLocalNetworkPermissionAlert() {
+
+    fileprivate func showLocalNetworkPermissionAlert() {
         let customAlert = CustomAlertViewController(
             title: L("permission.local_network.denied_title"),
             description: L("permission.local_network.denied_message"),
@@ -521,4 +579,109 @@ extension OnboardingPage4ViewController: BonjourDiscoveryDelegate {
         )
         self.present(customAlert, animated: true)
     }
+
+    fileprivate func showBluetoothPermissionAlert() {
+        let customAlert = CustomAlertViewController(
+            title: L("permission.bluetooth.denied_title"),
+            description: L("permission.bluetooth.denied_message"),
+            confirmButtonTitle: L("permission.open_settings"),
+            cancelButtonTitle: L("common.cancel"),
+            onConfirm: {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            },
+            onCancel: nil
+        )
+        self.present(customAlert, animated: true)
+    }
 }
+
+// MARK: - Inline device list（多设备时显示在页面中部）
+extension OnboardingPage4ViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        bindableDevices.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: InlineDeviceCell.identifier, for: indexPath) as! InlineDeviceCell
+        cell.configure(with: bindableDevices[indexPath.row])
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard indexPath.row < bindableDevices.count else { return }
+        let dev = bindableDevices[indexPath.row]
+        Log.info("Onboarding", "user picked \(dev.displayName) from inline list")
+        confirmedDevice = dev
+        onDeviceFound(displayName: dev.displayName)
+    }
+}
+
+/// 内嵌设备选择列表的单元格：白色名字 + 灰色 transport 副标，深色背景透出。
+private final class InlineDeviceCell: UITableViewCell {
+    static let identifier = "InlineDeviceCell"
+
+    private let nameLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let transportLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor(white: 1.0, alpha: 0.55)
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let chevron: UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "chevron.right"))
+        iv.tintColor = UIColor(white: 1.0, alpha: 0.4)
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
+        // 选中高亮：浅白透明
+        let bg = UIView()
+        bg.backgroundColor = UIColor(white: 1.0, alpha: 0.08)
+        selectedBackgroundView = bg
+
+        contentView.addSubview(nameLabel)
+        contentView.addSubview(transportLabel)
+        contentView.addSubview(chevron)
+
+        NSLayoutConstraint.activate([
+            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            nameLabel.trailingAnchor.constraint(lessThanOrEqualTo: chevron.leadingAnchor, constant: -8),
+
+            transportLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            transportLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
+            transportLabel.trailingAnchor.constraint(lessThanOrEqualTo: chevron.leadingAnchor, constant: -8),
+
+            chevron.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            chevron.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            chevron.widthAnchor.constraint(equalToConstant: 12),
+            chevron.heightAnchor.constraint(equalToConstant: 16),
+        ])
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    func configure(with device: UnifiedDevice) {
+        nameLabel.text = device.displayName
+        transportLabel.text = device.transportLabel
+    }
+}
+
+

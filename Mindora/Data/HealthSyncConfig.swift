@@ -2,7 +2,7 @@ import Foundation
 
 /// 支持的健康指标键（与 HealthDataUploader.buildPayload 中 behaviors key 对应的语义）
 enum HealthMetricKey: String, CaseIterable, Codable, Hashable {
-    case heartRate              // heart_rate
+    case heartRate              // sleep_heart_rate_min / _max（睡眠心率区间，不再上传心率序列）
     case hrv                    // heart_rate_variability_sdnn
     case respiratoryRate        // respiratory_rate
     case restingHeartRate       // resting_heart_rate
@@ -12,7 +12,8 @@ enum HealthMetricKey: String, CaseIterable, Codable, Hashable {
 
     var localizedName: String {
         switch self {
-        case .heartRate: return L("health.metric.heart_rate")
+        // 这一档控制的是睡眠心率区间（sleep_heart_rate_min/max），不是全天心率
+        case .heartRate: return L("health.sleep.sleep_heart_rate")
         case .hrv: return L("health.metric.hrv")
         case .respiratoryRate: return "Respiratory Rate"
         case .restingHeartRate: return "Resting Heart Rate"

@@ -43,7 +43,8 @@ final class CustomAlertViewController: UIViewController {
     
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - Properties

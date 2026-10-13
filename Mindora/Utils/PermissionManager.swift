@@ -261,6 +261,15 @@ final class PermissionManager {
         }
     }
     
+    /// 蜂窝数据的**原始**受限状态。
+    ///
+    /// 与 getCellularDataStatus 的区别：后者把 `.restrictedStateUnknown`（系统「无线数据」
+    /// 弹窗还没回答）和 `.restricted`（用户明确拒绝）都归为 notDetermined。要判断「该不该
+    /// 引导用户去设置」必须区分这两者——首次启动弹窗未答时去催用户改设置是错的。
+    var cellularRestrictedState: CTCellularDataRestrictedState {
+        cellularData.restrictedState
+    }
+
     /// 检查蓝牙权限状态
     func checkBluetoothPermissionStatus() -> PermissionStatus {
         let authorization = BluetoothManager.shared.checkBluetoothAuthorization()
@@ -548,6 +557,94 @@ final class PermissionManager {
         viewController.present(customAlert, animated: true)
     }
     
+    // MARK: - 「读不到本地健康数据」引导
+
+    /// 本次前台会话是否已经提示过。日/周/月三个视图共用一个标记，
+    /// 否则用户在健康页左右切一圈就会连着挨三个弹窗。
+    private static var promptedHealthDataUnreadableThisSession = false
+
+    /// 回到前台时复位，让下一次进入健康页有机会再判一次。
+    static func resetHealthDataUnreadableSession() {
+        promptedHealthDataUnreadableThisSession = false
+    }
+
+    /// 日/周/月读不到任何本地睡眠数据时的引导。
+    ///
+    /// ⚠️ 判据刻意**不是**权限状态。HealthKit 的读权限查不出来（见本文件顶部的说明：
+    /// `authorizationStatus` 对读权限恒返回 sharingDenied，被拒时查询也只是静默返回空
+    /// 数组而不报错），所以历史上 `shouldShowHealthReminder()` 被整个禁用掉了 —— 那是对的，
+    /// 拿测不准的状态去提醒只会误伤授权正常的用户。
+    ///
+    /// 这里换成可靠得多的启发式：**查询成功**（没报错）**且回溯 45 天一条睡眠样本都没有**。
+    /// 两个前提缺一不可：
+    /// - `queryFailed` 必须为 false。锁屏时 HealthKit 报 “Protected health data is
+    ///   inaccessible”，这跟权限毫无关系；把报错当成没权限，会让权限全开的用户被反复打扰。
+    /// - `hasRecentSleepSamples` 必须为 false。只看「当前窗口为空」是不够的 ——
+    ///   用户往前翻到一个没数据的旧月份，那是正常的空，不该弹。
+    ///
+    /// 即便如此仍有误报（用户就是没戴表睡觉），所以复用的文案是「需要健康数据权限」这种
+    /// 请求式表述，不去断言用户关了权限。
+    @MainActor
+    func promptIfHealthDataUnreadable(from view: UIView, queryFailed: Bool, hasRecentSleepSamples: Bool) {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+
+        // 读到数据了：把提醒次数清零，之后真的断了才好重新提醒。
+        guard !hasRecentSleepSamples else {
+            if getHealthReminderCount() > 0 { resetHealthReminderCount() }
+            return
+        }
+        // 查询报错 ≠ 没权限。这是最容易写错也最伤用户的一条，绝不能省。
+        guard !queryFailed else {
+            Log.info("PermissionManager", "健康数据为空但查询报过错，不做权限引导（可能只是锁屏/后台不可读）")
+            return
+        }
+        guard !Self.promptedHealthDataUnreadableThisSession else { return }
+        guard getHealthReminderCount() < DesignConstants.maxHealthPermissionReminderCount else { return }
+        if let last = userDefaults.object(forKey: healthPermissionLastCheckKey) as? Date,
+           Date().timeIntervalSince(last) / 3600 < DesignConstants.permissionReminderIntervalHours {
+            return
+        }
+
+        // 弹窗要挂在当前视图所在的控制器上；取不到（还没进 window）就放弃这一次。
+        guard let host = Self.owningViewController(of: view), host.presentedViewController == nil else { return }
+
+        healthStore.getRequestStatusForAuthorization(toShare: [], read: Self.healthReadTypesForPrompt) { [weak self] status, _ in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                guard !Self.promptedHealthDataUnreadableThisSession else { return }
+                Self.promptedHealthDataUnreadableThisSession = true
+
+                if status == .shouldRequest {
+                    // 唯一 100% 可信的信号：确实有类型从没问过（首装，或版本升级新增了读取类型）。
+                    // 这时该走系统授权框，而不是自定义弹窗去教用户点设置。
+                    Log.info("PermissionManager", "健康数据为空且 shouldRequest：直接发起系统授权")
+                    self.incrementHealthReminderCount()
+                    Task { try? await HealthDataManager.shared.requestAuthorization() }
+                } else {
+                    // 已经问过了，但读不到数据 —— 只能引导去健康 App 自查。
+                    Log.info("PermissionManager", "健康数据为空且已请求过授权：弹出健康权限引导")
+                    self.showHealthPermissionReminder(from: host)
+                }
+            }
+        }
+    }
+
+    /// 引导判定用的读取类型：只看睡眠。生命体征缺失是常态（没戴表就没有），
+    /// 拿它们一起判会把大量正常用户误判成「没权限」。
+    private static let healthReadTypesForPrompt: Set<HKObjectType> = {
+        guard let sleep = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return [] }
+        return [sleep]
+    }()
+
+    private static func owningViewController(of view: UIView) -> UIViewController? {
+        var responder: UIResponder? = view
+        while let current = responder {
+            if let vc = current as? UIViewController { return vc }
+            responder = current.next
+        }
+        return nil
+    }
+
     // MARK: - Deprecated (保留向后兼容)
     
     /// 获取权限提醒次数（已废弃，使用 getHealthReminderCount）

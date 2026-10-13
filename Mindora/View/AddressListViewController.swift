@@ -1,14 +1,5 @@
 import UIKit
 
-struct AddrModel: Codable {
-    var id: String
-    var isDefault: Bool
-    var region: String
-    var detail: String
-    var name: String
-    var phone: String
-}
-
 class AddressListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - Properties
@@ -20,7 +11,7 @@ class AddressListViewController: UIViewController, UITableViewDataSource, UITabl
 
     // MARK: - Scaled Metrics Helper
     private var scale: CGFloat {
-        return UIScreen.main.bounds.width / 375.0
+        return iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0
     }
     
     private func s(_ value: CGFloat) -> CGFloat {
@@ -115,35 +106,25 @@ class AddressListViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     private func loadData() {
-        let isInitialized = UserDefaults.standard.bool(forKey: kMockDataInitializedKey)
-        
-        if !isInitialized {
-            // First time: Create Mock Data
-            #if DEBUG
-            addresses = [
-                AddrModel(id: "1", isDefault: true, region: "上海市 普陀区", detail: "中海中心A座1501室", name: "Mindora", phone: "13866666678"),
-                AddrModel(id: "2", isDefault: false, region: "上海市 普陀区", detail: "中海中心A座1501室", name: "Mindora", phone: "13866666678")
-            ]
-            saveToDisk()
-            #endif
-            UserDefaults.standard.set(true, forKey: kMockDataInitializedKey)
-        } else {
-            // Subsequent times: Load from disk
-            if let data = UserDefaults.standard.data(forKey: kAddressStorageKey),
-               let saved = try? JSONDecoder().decode([AddrModel].self, from: data) {
-                addresses = saved
-            } else {
-                addresses = []
+        // 不再塞任何示例/demo 地址，一律从磁盘加载真实数据；无则为空。
+        if let data = UserDefaults.standard.data(forKey: kAddressStorageKey),
+           let saved = try? JSONDecoder().decode([AddrModel].self, from: data) {
+            // 一次性清掉历史 DEBUG 塞进磁盘的示例地址（精确签名匹配），避免老装置仍显示 demo。
+            let cleaned = saved.filter {
+                !($0.name == "Mindora" && $0.phone == "13866666678" && $0.detail == "中海中心A座1501室")
             }
+            addresses = cleaned
+            if cleaned.count != saved.count { saveToDisk() }
+        } else {
+            addresses = []
         }
-        
         updateState()
     }
     
+    // 走 UserProfileSync 而不是自己写 UserDefaults：地址改完要立刻同步到服务端，
+    // 商城发货用的就是这份数据，等用户下次打开资料页才补传太晚了。
     private func saveToDisk() {
-        if let data = try? JSONEncoder().encode(addresses) {
-            UserDefaults.standard.set(data, forKey: kAddressStorageKey)
-        }
+        UserProfileSync.saveAddresses(addresses)
     }
     
     private func updateState() {
@@ -336,7 +317,7 @@ class AddressListViewController: UIViewController, UITableViewDataSource, UITabl
 class AddressListCell: UITableViewCell {
     
     // Scale helper duplicate for Cell
-    private var scale: CGFloat { return UIScreen.main.bounds.width / 375.0 }
+    private var scale: CGFloat { return iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0 }
     private func s(_ val: CGFloat) -> CGFloat { return val * scale }
 
     let defaultTag: UILabel = {

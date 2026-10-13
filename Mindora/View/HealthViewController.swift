@@ -8,7 +8,8 @@ final class HealthViewController: UIViewController {
     let designItemCornerRadius: CGFloat = 38
     
     func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
 
     // MARK: - UI Components
@@ -21,10 +22,13 @@ final class HealthViewController: UIViewController {
     }()
     
     private let logoImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "logo"))
+        let iv = UIImageView(image: UIImage(named: "logo_dream"))
         iv.contentMode = .scaleAspectFit
         return iv
     }()
+
+    // 右上角消息通知入口（红点跟随全局未读状态）
+    private let notificationButton = NotificationBellButton()
     
     // Custom Segment Control
     private let segmentContainer: UIView = {
@@ -73,6 +77,18 @@ final class HealthViewController: UIViewController {
             name: NSNotification.Name("SubscriptionStatusChanged"),
             object: nil
         )
+
+        // 在首页切换「构造健康数据」档位后，健康页可能已经加载过旧数据，需要整页重刷。
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleHealthSimulationChanged),
+            name: HealthDataSimulator.didChangeNotification,
+            object: nil
+        )
+    }
+
+    @objc private func handleHealthSimulationChanged() {
+        refreshAllHealthViews()
     }
     
     deinit {
@@ -102,7 +118,9 @@ final class HealthViewController: UIViewController {
     }
     
     private func updateMembershipStatus() {
-        let isMember = SubscriptionManager.shared.isSubscribed
+        // 权益未解析完前按「会员」处理（不上遮罩），解析完成后会再收到 SubscriptionStatusChanged 刷新。
+        // 否则首次进入周/月图会在权益还没加载好时被错误地盖上订阅遮罩，再次进入才正常。
+        let isMember = !SubscriptionManager.shared.shouldGatePremiumContent
         weekView.isMember = isMember
         monthView.isMember = isMember
     }
@@ -128,25 +146,33 @@ final class HealthViewController: UIViewController {
         // Header Layout
         headerView.addSubview(sideBarButton)
         headerView.addSubview(logoImageView)
+        headerView.addSubview(notificationButton)
         sideBarButton.translatesAutoresizingMaskIntoConstraints = false
         sideBarButton.addTarget(self, action: #selector(handleSideBarBtnTapped), for: .touchUpInside)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        
+        notificationButton.translatesAutoresizingMaskIntoConstraints = false
+        notificationButton.addTarget(self, action: #selector(handleNotificationTapped), for: .touchUpInside)
+
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 60),
-            
+
             sideBarButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
             sideBarButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
             sideBarButton.widthAnchor.constraint(equalToConstant: 24),
             sideBarButton.heightAnchor.constraint(equalToConstant: 24),
-            
+
             logoImageView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             logoImageView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
             logoImageView.heightAnchor.constraint(equalToConstant: 30),
-            logoImageView.widthAnchor.constraint(lessThanOrEqualToConstant: 200)
+            logoImageView.widthAnchor.constraint(lessThanOrEqualToConstant: 153),
+
+            notificationButton.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -20),
+            notificationButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            notificationButton.widthAnchor.constraint(equalToConstant: 28),
+            notificationButton.heightAnchor.constraint(equalToConstant: 28)
         ])
         
         // Segment Control Layout
@@ -310,7 +336,13 @@ final class HealthViewController: UIViewController {
         sideMenuVC.modalPresentationStyle = .overFullScreen
         self.present(sideMenuVC, animated: false, completion: nil)
     }
-    
+
+    @objc private func handleNotificationTapped() {
+        let vc = NotificationsViewController()
+        vc.modalPresentationStyle = .fullScreen
+        self.present(vc, animated: true, completion: nil)
+    }
+
     // MARK: - Debug Interactions
     private func setupDebugInteractions() {
         #if DEBUG

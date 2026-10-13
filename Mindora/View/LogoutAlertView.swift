@@ -115,12 +115,21 @@ class LogoutAlertView: UIView {
     }
     
     private func setupConstraints() {
+        // 弹窗默认两侧留 45.5pt 铺开，但在 iPad 宽屏上会被拉成横贯整屏的超宽条。
+        // 把左右约束降为软约束 + 加一个 340pt 最大宽度上限，iPad 上弹窗保持手机宽度居中，
+        // iPhone 上宽度远小于 340（软约束满足），外观不变。
+        let leadingFill = containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 45.5)
+        let trailingFill = containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -45.5)
+        leadingFill.priority = .defaultHigh
+        trailingFill.priority = .defaultHigh
+
         NSLayoutConstraint.activate([
             containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
             containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 45.5),
-            containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -45.5),
-            
+            leadingFill,
+            trailingFill,
+            containerView.widthAnchor.constraint(lessThanOrEqualToConstant: 340),
+
             titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 24),
             titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 27.5),
             titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -27.5),

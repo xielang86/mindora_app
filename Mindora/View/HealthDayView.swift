@@ -248,6 +248,14 @@ class HealthDayView: UIView {
     }
     
     // MARK: - Reload Data
+    /// 自增代号：异步回来只认最新一号，防止并发 reloadData 的旧任务中间态把新评分覆盖回 "--"。
+    private var realLoadGeneration = 0
+
+    /// 同步取锚点：优先「最近睡眠日」缓存，没有则退回今天。
+    private func currentAnchor() -> Date {
+        HealthDataManager.shared.cachedMostRecentSleepDay ?? Calendar.current.startOfDay(for: Date())
+    }
+
     func reloadData() {
         let showMock = Constants.Config.showMockData
         if showMock {
@@ -261,7 +269,7 @@ class HealthDayView: UIView {
             rebuildStatsSection(
                 sleepSubtitle: L("health.sleep.performance"),
                 timeInBed: mockLocal.timeInBedText,
-                restingHeartRate: mockLocal.restingHeartRateText,
+                sleepHeartRate: mockLocal.sleepHeartRateText,
                 vitalsSubtitle: L("health.sleep.overnight_vitals"),
                 respiratoryRate: mockLocal.respiratoryRateText,
                 bodyTemperature: mockLocal.bodyTemperatureText
@@ -285,78 +293,151 @@ class HealthDayView: UIView {
             graphView.showMockData = true
             graphView.mockSegments = mockLocal.graphSegments
             graphView.realSegments = []
+            graphView.realStageDetails = []
             graphView.setNeedsDisplay()
         } else {
             durationLabel.text = "--"
             dateLabel.text = "--"
-            efficiencyValueLabel.text = "--"
+            // 评分用上次缓存即时填充（按最近睡眠日锚点取），避免每次进入先空着干等分析 API；无缓存才 "--"。
+            if let cached = HealthAnalysisService.shared.cachedDayAnalysis(date: currentAnchor()) {
+                efficiencyValueLabel.text = cached.scoreSummary?.score.map(String.init) ?? "--"
+            } else {
+                efficiencyValueLabel.text = "--"
+            }
             rebuildStatsSection()
             rebuildScenarioSection()
             rebuildStagesSection()
             graphView.showMockData = false
             graphView.mockSegments = []
             graphView.realSegments = []
+            graphView.realStageDetails = []
             graphView.setNeedsDisplay()
             loadRealSummaryData()
         }
     }
 
     private func loadRealSummaryData() {
+        realLoadGeneration += 1
+        let gen = realLoadGeneration
         Task { @MainActor in
+            // 解析「最近睡眠日」作为锚点（拿不到就用今天），日视图对齐到最近一晚——像 Apple 那样
+            // 数据停在几天前时显示那一晚，而不是死锚今天导致全空。
+            // 用 do/catch 而不是 `try?`：要区分「查询报错」和「真的一条睡眠样本都没有」，
+            // 后面的权限引导判定全靠这个区分（报错时绝不能提醒用户去开权限）。
+            var recentSleepDay: Date?
+            var localQueryFailed = false
             do {
-                async let metricsTask = HealthDataManager.shared.fetchLatestMetrics(forceLive: true)
-                async let stagesTask = HealthDataManager.shared.fetchLatestSleepStages(forceLive: true)
-                async let aggregatesTask = HealthDataManager.shared.fetchSleepDailyAggregates(days: 1)
-                async let analysisTask = HealthAnalysisService.shared.fetchDayAnalysis(date: Date())
-
-                let metrics = try await metricsTask
-                let stages = try await stagesTask
-                let aggregates = try await aggregatesTask
-                let analysis = try? await analysisTask
-                applyRealMetrics(metrics, analysis: analysis)
-                applyRealSleepDetails(aggregates: aggregates, stages: stages, analysis: analysis)
+                recentSleepDay = try await HealthDataManager.shared.fetchMostRecentSleepDay(forceLive: true)
             } catch {
-                durationLabel.text = "--"
-                dateLabel.text = "--"
-                efficiencyValueLabel.text = "--"
+                localQueryFailed = true
+                Log.error("HealthDayView", "最近睡眠日解析失败：\(error)")
             }
+            let anchor = recentSleepDay ?? self.currentAnchor()
+            guard gen == self.realLoadGeneration else { return }
+            // 上次缓存的分析。除了评分，Time in Bed 的服务端兜底值也在里面，
+            // 先拿它渲染一遍，免得等网络这段时间那一格先空成 "--" 再跳出值。
+            let cachedAnalysis = HealthAnalysisService.shared.cachedDayAnalysis(date: anchor)
+            if let cachedAnalysis {
+                efficiencyValueLabel.text = cachedAnalysis.scoreSummary?.score.map(String.init) ?? efficiencyValueLabel.text
+            }
+
+            // 三态由 ServerBackedStore 统一裁决（见 ServerDataResolution.swift）：
+            // 应答有内容 → 用新内容；应答说没有 → 清空显示 "--"；没应答 → 沿用上次缓存。
+            let analysisTask = Task { await HealthAnalysisService.shared.resolveDayAnalysis(date: anchor) }
+
+            // 用非结构化 Task 而不是 `async let`：优化构建下 async let 的子任务栈回收
+            // 顺序会与内联后的调用帧错位，作用域一旦带着错误退出就撞上
+            // swift_task_dealloc 的致命断言直接 abort（见 HealthDataManager 里的说明）。
+            let metricsTask = Task { try await HealthDataManager.shared.fetchLatestSleepVitalsMetrics(forceLive: true) }
+            let stagesTask = Task { try await HealthDataManager.shared.fetchLatestSleepStages(forceLive: true) }
+            let aggregatesTask = Task { try await HealthDataManager.shared.fetchSleepDailyAggregates(days: 1, endingAt: anchor) }
+
+            // 每项本地数据独立成败：读到什么就展示什么。原来三个 `try await` 串在一个 do 块里，
+            // 排在最前的生命体征一抛错就整体跳进 catch，后面的睡眠阶段/聚合连读都没读，
+            // 日视图整页空白 —— 明明数据已经在手里。
+            var metrics = HealthMetrics.empty
+            do {
+                metrics = try await metricsTask.value
+            } catch {
+                Log.error("HealthDayView", "生命体征读取失败，降级后继续渲染睡眠数据：\(error)")
+            }
+            var stages: [HealthDataManager.SleepStageDetail] = []
+            do {
+                stages = try await stagesTask.value
+            } catch {
+                Log.error("HealthDayView", "睡眠阶段读取失败：\(error)")
+            }
+            var aggregates: [HealthDataManager.SleepDailyAggregate] = []
+            do {
+                aggregates = try await aggregatesTask.value
+            } catch {
+                localQueryFailed = true
+                Log.error("HealthDayView", "睡眠日聚合读取失败：\(error)")
+            }
+            guard gen == self.realLoadGeneration else { return }
+
+            applyRealMetrics(metrics, analysis: cachedAnalysis)
+            // 同样传缓存而不是 nil：Sleep Scenarios 卡头那行「XXmin Sleep Onset」
+            // 本地读不到时要靠分析里的估算值，传 nil 会先闪一下 "--"。
+            applyRealSleepDetails(aggregates: aggregates, stages: stages, analysis: cachedAnalysis)
+
+            // 一条本地睡眠数据都没有 → 走「读不到健康数据」引导。
+            // 具体弹不弹由 PermissionManager 判：查询是否报过错、45 天内是否真的没有样本、
+            // 以及去重与冷却。这里只负责报告「这个窗口是空的」。
+            if !aggregates.contains(where: { $0.hasData }) {
+                PermissionManager.shared.promptIfHealthDataUnreadable(
+                    from: self,
+                    queryFailed: localQueryFailed,
+                    hasRecentSleepSamples: recentSleepDay != nil
+                )
+            }
+
+            let analysis = await analysisTask.value.displayValue
+            guard gen == self.realLoadGeneration else { return }
+            applyRealMetrics(metrics, analysis: analysis)
+            applyRealSleepDetails(aggregates: aggregates, stages: stages, analysis: analysis)
+            // 评分以最终分析为准：只要本地确实有这一晚的睡眠（汇总或聚合任一读到）且拿到分数就显示。
+            // 不能只认 sleepSummary —— 它属于生命体征那一组，降级时会是 nil，
+            // 那样明明有睡眠数据却把评分抹成 "--"。
+            let hasLocalSleep = metrics.sleepSummary != nil || aggregates.contains(where: { $0.hasData })
+            efficiencyValueLabel.text = (hasLocalSleep ? analysis?.scoreSummary?.score.map(String.init) : nil)
+                ?? HealthAnalysisService.shared.cachedDayAnalysis(date: anchor)?.scoreSummary?.score.map(String.init)
+                ?? "--"
         }
     }
 
     private func applyRealMetrics(_ metrics: HealthMetrics, analysis: HealthAnalysisService.DayAnalysis?) {
-        efficiencyValueLabel.text = "--"
-
+        // 评分不在这里设置（中间态 analysis==nil 会把已显示评分清成 "--" 造成闪烁）；
+        // 由 loadRealSummaryData 在最终拿到 analysis 后统一设置。
         if let sleep = metrics.sleepSummary {
-            let totalMinutes = Int((sleep.totalSleepHours * 60.0).rounded(.down))
-            let hours = totalMinutes / 60
-            let minutes = totalMinutes % 60
-            durationLabel.text = minutes > 0 ? "\(hours)h \(minutes)min" : "\(hours)h"
+            // 走 formatDuration 统一四舍五入到分钟：向下取整会比苹果健康少 1 分钟
+            durationLabel.text = formatDuration(hours: sleep.totalSleepHours)
 
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US")
-            formatter.dateFormat = "d MMM yyyy"
-            dateLabel.text = formatter.string(from: sleep.date)
-
-            if let score = analysis?.scoreSummary?.score {
-                efficiencyValueLabel.text = "\(score)"
-            }
+            dateLabel.text = DateDisplay.date(sleep.date)
         }
 
-        let timeInBedText: String = {
-            guard let timeInBed = metrics.sleepSummary?.timeInBed else { return "--" }
-            let hours = Int(timeInBed)
-            let minutes = Int(((timeInBed - Double(hours)) * 60.0).rounded())
-            return minutes > 0 ? "\(hours)h \(minutes)min" : "\(hours)h"
-        }()
+        // 同样走 formatDuration：原先分开取整，59.5 分钟会被显示成「1h 60min」。
+        //
+        // 本地优先、服务端估算兜底：只戴 Apple Watch 的用户 HealthKit 里根本没有 inBed
+        // 样本（真机日志实测 inBed 恒为 0），这一格会永远是 "--"。服务端按上传的睡眠数据
+        // 估算一份，仅在本地读不到时顶上；服务端也没有才 "--"。
+        // 走同一个 formatDuration，保证本地值和服务端值显示格式完全一致。
+        let localTimeInBedHours = metrics.sleepSummary?.timeInBed
+        let serverTimeInBedHours = analysis?.sleepMetrics?.timeInBedMinutes.map { Double($0) / 60.0 }
+        let timeInBedText = (localTimeInBedHours ?? serverTimeInBedHours)
+            .map { formatDuration(hours: $0) } ?? "--"
 
-        let restingHeartRateText = metrics.restingHeartRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--"
-        let respiratoryRateText = metrics.respiratoryRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--"
-        let temperatureText = (metrics.sleepingWristTemperature ?? metrics.bodyTemperature).map { String(format: "%.1f°C", $0.value) } ?? "--"
+        // Sleep Heart Rate：睡眠期间的心率区间（如「56-79」），对齐苹果健康「睡眠 → 比较 → 心率」
+        let sleepHeartRateText = metrics.sleepHeartRateRange.map {
+            UnitDisplay.bpmRange(min: $0.min, max: $0.max)
+        } ?? "--"
+        let respiratoryRateText = metrics.respiratoryRate.map { UnitDisplay.breathsPerMinute($0.value) } ?? "--"
+        let temperatureText = (metrics.sleepingWristTemperature ?? metrics.bodyTemperature).map { UnitDisplay.temperature(celsius: $0.value) } ?? "--"
 
         rebuildStatsSection(
             sleepSubtitle: L("health.sleep.performance"),
             timeInBed: timeInBedText,
-            restingHeartRate: restingHeartRateText,
+            sleepHeartRate: sleepHeartRateText,
             vitalsSubtitle: L("health.sleep.overnight_vitals"),
             respiratoryRate: respiratoryRateText,
             bodyTemperature: temperatureText
@@ -370,37 +451,45 @@ class HealthDayView: UIView {
     ) {
         guard let aggregate = aggregates.last(where: { $0.hasData }) ?? aggregates.last else { return }
 
-        let onsetText = formatMinutes(aggregate.sleepOnsetMinutes)
-        let scenarioDescription: String
-        if let onsetMinutes = aggregate.sleepOnsetMinutes {
-            scenarioDescription = String(format: "You fell asleep in %d minutes based on the latest sleep session recorded in Apple Health.", Int(onsetMinutes.rounded()))
-        } else {
-            scenarioDescription = "Latest sleep timing is based on the most recent Apple Health sleep session."
-        }
+        // Sleep Scenarios 卡头的「XXmin Sleep Onset」。和首页那一格同源同病：
+        // 只戴 Apple Watch 的用户本地恒空，本地读不到时用服务端估算值兜底。
+        let onsetText = formatOnsetMinutes(
+            aggregate.sleepOnsetMinutes ?? analysis?.sleepMetrics?.sleepOnsetMinutes.map(Double.init)
+        )
 
         rebuildScenarioSection(
             onsetText: onsetText,
-            titleText: analysis?.sleepScenarios?.title ?? L("home.metric.sleep_onset"),
-            descriptionText: analysis?.sleepScenarios?.description ?? scenarioDescription
+            // 空串要当缺失处理（服务端稳定返回 ""），但缺失就让它空着 ——
+            // 这块是服务端的场景叙述位，客户端往里填自造文案会和标题（场景名）割裂，
+            // 也让用户以为读到的是分析结论。descriptionText 传 nil 时显示 "--"。
+            titleText: analysis?.sleepScenarios?.title.nonBlank ?? L("home.metric.sleep_onset"),
+            descriptionText: analysis?.sleepScenarios?.description.nonBlank
         )
 
-        let segments = sleepStageSegments(from: stages)
+        // 过滤出有正时长的阶段，segments 与 details 保持顺序和长度一致（浮层需要用 detail 展示绝对时间）
+        let validStages = stages.filter { $0.endTime.timeIntervalSince($0.startTime) / 60.0 > 0 }
+        let segments: [(Int, Double)] = validStages.map {
+            (stageIndex(for: $0.stage), $0.endTime.timeIntervalSince($0.startTime) / 60.0)
+        }
         graphView.realSegments = segments
+        graphView.realStageDetails = validStages
         graphView.showMockData = false
         graphView.setNeedsDisplay()
 
+        // 睡眠阶段（REM/Core/Deep）= 0 时通常是该夜数据源没有该阶段样本，展示 "--" 更诚实
+        // Awake = 0 是合理结果（整夜没醒），保留 "0min"
         let stageValues: [Int: String] = [
             0: formatMinutes(aggregate.awakeMinutes),
-            1: formatDuration(hours: aggregate.remSleepHours),
-            2: formatDuration(hours: aggregate.coreSleepHours),
-            3: formatDuration(hours: aggregate.deepSleepHours)
+            1: formatStageDuration(hours: aggregate.remSleepHours),
+            2: formatStageDuration(hours: aggregate.coreSleepHours),
+            3: formatStageDuration(hours: aggregate.deepSleepHours)
         ]
 
         let stageDescriptions: [Int: String] = [
-            0: analysis?.stageInsights?.awake?.description,
-            1: analysis?.stageInsights?.rem?.description,
-            2: analysis?.stageInsights?.core?.description,
-            3: analysis?.stageInsights?.deep?.description
+            0: analysis?.stageInsights?.awake?.description.nonBlank,
+            1: analysis?.stageInsights?.rem?.description.nonBlank,
+            2: analysis?.stageInsights?.core?.description.nonBlank,
+            3: analysis?.stageInsights?.deep?.description.nonBlank
         ].compactMapValues { $0 }
 
         rebuildStagesSection(stageValues: stageValues, stageDescriptions: stageDescriptions, graphSegments: segments)
@@ -428,17 +517,7 @@ class HealthDayView: UIView {
     }
 
     private func formatDuration(hours: Double) -> String {
-        let totalMinutes = Int((hours * 60.0).rounded())
-        let hourPart = totalMinutes / 60
-        let minutePart = totalMinutes % 60
-
-        if hourPart <= 0 {
-            return "\(minutePart)min"
-        }
-        if minutePart == 0 {
-            return "\(hourPart)h"
-        }
-        return "\(hourPart)h \(minutePart)min"
+        UnitDisplay.duration(hours: hours)
     }
 
     private func formatMinutes(_ minutes: Double?) -> String {
@@ -447,7 +526,27 @@ class HealthDayView: UIView {
         if rounded >= 60 {
             return formatDuration(hours: Double(rounded) / 60.0)
         }
-        return "\(rounded)min"
+        return UnitDisplay.minutes(rounded)
+    }
+
+    /// onset 专用：nil = 数据源没记录入睡前时段（不可测），展示 "--"；
+    /// 有值就一定是真实的入睡用时，不足 1 分钟展示 "<1min"。
+    private func formatOnsetMinutes(_ minutes: Double?) -> String {
+        guard let minutes else { return "--" }
+        let rounded = Int(minutes.rounded())
+        if rounded < 1 {
+            return UnitDisplay.underOneMinute
+        }
+        if rounded >= 60 {
+            return formatDuration(hours: Double(rounded) / 60.0)
+        }
+        return UnitDisplay.minutes(rounded)
+    }
+
+    /// 睡眠阶段专用：0 当作无数据展示为 "--"
+    private func formatStageDuration(hours: Double) -> String {
+        guard hours > 0 else { return "--" }
+        return formatDuration(hours: hours)
     }
     
     private func setupUI() {
@@ -563,7 +662,7 @@ class HealthDayView: UIView {
     private func rebuildStatsSection(
         sleepSubtitle: String? = nil,
         timeInBed: String? = nil,
-        restingHeartRate: String? = nil,
+        sleepHeartRate: String? = nil,
         vitalsSubtitle: String? = nil,
         respiratoryRate: String? = nil,
         bodyTemperature: String? = nil
@@ -576,19 +675,19 @@ class HealthDayView: UIView {
 
         let performanceSubtitle = sleepSubtitle ?? "--"
         let timeInBedValue = timeInBed ?? "--"
-        let restingHeartRateValue = restingHeartRate ?? "--"
+        let sleepHeartRateValue = sleepHeartRate ?? "--"
         let vitalsSubtitleValue = vitalsSubtitle ?? "--"
         let respiratoryRateValue = respiratoryRate ?? "--"
         let bodyTemperatureValue = bodyTemperature ?? "--"
         
         let performanceView = createStatsCard(
             backgroundImageName: "sleep_day_sleep_bg",
-            icon: "sleep_day_scene_icon",
+            icon: "sleep_day_sleep_icon",
             title: L("health.sleep.performance"),
             subtitle: performanceSubtitle,
             items: [
                 (L("health.sleep.time_in_bed"), timeInBedValue),
-                (L("health.sleep.resting_heart_rate"), restingHeartRateValue)
+                (L("health.sleep.sleep_heart_rate"), sleepHeartRateValue)
             ]
         )
         
@@ -613,7 +712,10 @@ class HealthDayView: UIView {
         card.clipsToBounds = true
         
         let bgImageView = UIImageView(image: UIImage(named: backgroundImageName))
-        bgImageView.contentMode = .scaleToFill
+        // .scaleToFill would stretch this non-uniformly: card's width tracks screen
+        // width (much wider on iPad) while its height stays content-driven.
+        bgImageView.contentMode = .scaleAspectFill
+        bgImageView.clipsToBounds = true
         bgImageView.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(bgImageView)
         
@@ -641,16 +743,22 @@ class HealthDayView: UIView {
         textGroup.spacing = 0
         
         // Note: CSS uses text_15 (Sleep) SemiBold 24px/12pt, text_16 (Sleep Perf) Light 22px/11pt
-        // mapped to input: subtitle -> "Sleep", title -> "Sleep Perf"
+        // 半屏卡片宽度吃紧，统一下调 1pt（12→11, 11→10），保证 "Sleep Performance" /
+        // "Overnight Vitals" 都能单行显示；两张卡用同一套字号，视觉一致，不再使用
+        // adjustsFontSizeToFitWidth（各自独立缩放会导致两卡字号不一致）。
         let topLabel = UILabel()
         topLabel.text = subtitle
-        topLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        topLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
         topLabel.textColor = .white
-        
+        topLabel.numberOfLines = 1
+        topLabel.lineBreakMode = .byClipping
+
         let bottomLabel = UILabel()
         bottomLabel.text = title
-        bottomLabel.font = UIFont.systemFont(ofSize: 11, weight: .light)
+        bottomLabel.font = UIFont.systemFont(ofSize: 10, weight: .light)
         bottomLabel.textColor = .white
+        bottomLabel.numberOfLines = 1
+        bottomLabel.lineBreakMode = .byClipping
         
         textGroup.addArrangedSubview(topLabel)
         textGroup.addArrangedSubview(bottomLabel)
@@ -711,7 +819,10 @@ class HealthDayView: UIView {
         scenarioView.subviews.forEach { $0.removeFromSuperview() }
         
         let bgImageView = UIImageView(image: UIImage(named: "sleep_day_scene_bg"))
-        bgImageView.contentMode = .scaleToFill
+        // .scaleToFill would stretch this non-uniformly: scenarioView's width tracks
+        // screen width (much wider on iPad) while its height stays content-driven.
+        bgImageView.contentMode = .scaleAspectFill
+        bgImageView.clipsToBounds = true
         bgImageView.translatesAutoresizingMaskIntoConstraints = false
         scenarioView.addSubview(bgImageView)
         
@@ -795,7 +906,10 @@ class HealthDayView: UIView {
             descLabel.topAnchor.constraint(equalTo: mainTitle.bottomAnchor, constant: 12), // margin reduced
             descLabel.leadingAnchor.constraint(equalTo: scenarioView.leadingAnchor, constant: 22),
             descLabel.trailingAnchor.constraint(equalTo: scenarioView.trailingAnchor, constant: -42),
-            descLabel.bottomAnchor.constraint(equalTo: scenarioView.bottomAnchor, constant: -24)
+            // 背景图的固有高度（约 268pt）撑出卡片最小高度；文字短时多出的空间若用等式约束，
+            // 会被拉伸的 headerStack 吃掉（alignment = .center 让表头漂到卡片中下部，且每次重建位置不定）。
+            // 底部改成不等式：文字一律从顶部排起，多余空间留在底部。
+            descLabel.bottomAnchor.constraint(lessThanOrEqualTo: scenarioView.bottomAnchor, constant: -24)
         ])
     }
     
@@ -812,37 +926,37 @@ class HealthDayView: UIView {
             title: L("health.sleep.awake_time"),
             value: stageValues[0] ?? "--",
             color: Colors.colorAwake,
-            description: stageDescriptions[0] ?? "Awake time detected during your latest sleep session.",
+            description: stageDescriptions[0] ?? "--",
             stats: stageStats[0] ?? [],
             stageIndex: 0,
             graphSegments: graphSegments
         )
         
         let remItem = StageItemView(
-            title: L("health.sleep.stage.rem"),
+            title: L("health.sleep.stage_card.rem"),
             value: stageValues[1] ?? "--",
             color: Colors.colorREM,
-            description: stageDescriptions[1] ?? "REM sleep from your latest Apple Health sleep stages.",
+            description: stageDescriptions[1] ?? "--",
             stats: stageStats[1] ?? [],
             stageIndex: 1,
             graphSegments: graphSegments
         )
         
         let coreItem = StageItemView(
-            title: L("health.sleep.stage.core"),
+            title: L("health.sleep.stage_card.core"),
             value: stageValues[2] ?? "--",
             color: Colors.colorCore,
-            description: stageDescriptions[2] ?? "Core sleep from your latest Apple Health sleep stages.",
+            description: stageDescriptions[2] ?? "--",
             stats: stageStats[2] ?? [],
             stageIndex: 2,
             graphSegments: graphSegments
         )
         
         let deepItem = StageItemView(
-            title: L("health.sleep.stage.deep"),
+            title: L("health.sleep.stage_card.deep"),
             value: stageValues[3] ?? "--",
             color: Colors.colorDeep,
-            description: stageDescriptions[3] ?? "Deep sleep from your latest Apple Health sleep stages.",
+            description: stageDescriptions[3] ?? "--",
             stats: stageStats[3] ?? [],
             stageIndex: 3,
             graphSegments: graphSegments
@@ -897,8 +1011,11 @@ class HealthDayView: UIView {
             mainStack.addArrangedSubview(headerWrapper)
             
             // Header Background
+            // .scaleToFill would stretch this non-uniformly: headerWrapper's width tracks
+            // screen width (much wider on iPad) while its height is a fixed >=74pt constant.
             let bgImageView = UIImageView(image: UIImage(named: "sleep_detail_bg"))
-            bgImageView.contentMode = .scaleToFill
+            bgImageView.contentMode = .scaleAspectFill
+            bgImageView.clipsToBounds = true
             bgImageView.translatesAutoresizingMaskIntoConstraints = false
             headerWrapper.addSubview(bgImageView)
             
@@ -1320,11 +1437,245 @@ class HealthDayView: UIView {
 
     // MARK: - Custom Graph View
     private class DaySleepGraphView: UIView {
-        
+
         var showMockData: Bool = true
         var mockSegments: [(Int, Double)] = []
         var realSegments: [(Int, Double)] = []
-        
+        /// 与 realSegments 一一对应（调用方需保证顺序和长度一致）；用于点击浮层展示绝对时间
+        var realStageDetails: [HealthDataManager.SleepStageDetail] = []
+
+        private var tooltipView: UIView?
+        private var dotViews: [UIView] = []
+        private var selectedSegmentIndex: Int?
+        private let connectorLayer = CAShapeLayer()
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            setupInteractions()
+        }
+
+        required init?(coder: NSCoder) {
+            super.init(coder: coder)
+            setupInteractions()
+        }
+
+        private func setupInteractions() {
+            clipsToBounds = false
+            isUserInteractionEnabled = true
+            connectorLayer.strokeColor = UIColor.white.cgColor
+            connectorLayer.lineWidth = 1
+            connectorLayer.fillColor = nil
+            layer.addSublayer(connectorLayer)
+            let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+            addGestureRecognizer(tap)
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            updateConnector()
+        }
+
+        private func updateConnector() {
+            guard let tooltip = tooltipView, let dot = dotViews.first else {
+                connectorLayer.path = nil
+                return
+            }
+            let tooltipFrame = tooltip.frame
+            let dotFrame = dot.frame
+            if tooltipFrame.isEmpty || dotFrame.isEmpty {
+                connectorLayer.path = nil
+                return
+            }
+
+            // L 形走线（参考 Week 视图）：从浮层靠圆点一侧边的中点出发 → 水平到圆点 x → 垂直到圆点
+            let path = UIBezierPath()
+            let tooltipMidY = tooltipFrame.midY
+            let startX: CGFloat
+            if tooltipFrame.minX > dotFrame.maxX {
+                // 浮层在圆点右侧
+                startX = tooltipFrame.minX
+            } else {
+                // 浮层在圆点左侧
+                startX = tooltipFrame.maxX
+            }
+            path.move(to: CGPoint(x: startX, y: tooltipMidY))
+            path.addLine(to: CGPoint(x: dotFrame.midX, y: tooltipMidY))
+            path.addLine(to: CGPoint(x: dotFrame.midX, y: dotFrame.midY))
+            connectorLayer.path = path.cgPath
+        }
+
+        @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+            let segments: [(Int, Double)] = showMockData ? mockSegments : realSegments
+            guard !segments.isEmpty else { return }
+            let point = gesture.location(in: self)
+            let totalDuration = segments.reduce(0.0) { $0 + $1.1 }
+            guard totalDuration > 0, bounds.width > 0 else { return }
+            let pointsPerMin = bounds.width / CGFloat(totalDuration)
+
+            var cursor: CGFloat = 0
+            for (i, segment) in segments.enumerated() {
+                let next = cursor + CGFloat(segment.1) * pointsPerMin
+                if point.x >= cursor && point.x <= next {
+                    if selectedSegmentIndex == i {
+                        hideTooltip(animated: true)
+                    } else {
+                        hideTooltip(animated: false)
+                        showTooltip(for: i, segStartX: cursor, segEndX: next)
+                    }
+                    return
+                }
+                cursor = next
+            }
+            hideTooltip(animated: true)
+        }
+
+        private func hideTooltip(animated: Bool) {
+            selectedSegmentIndex = nil
+            let tip = tooltipView
+            let dots = dotViews
+            tooltipView = nil
+            dotViews = []
+            connectorLayer.path = nil
+            let cleanup = {
+                tip?.removeFromSuperview()
+                dots.forEach { $0.removeFromSuperview() }
+            }
+            if animated {
+                UIView.animate(withDuration: 0.2, animations: {
+                    tip?.alpha = 0
+                    dots.forEach { $0.alpha = 0 }
+                }, completion: { _ in cleanup() })
+            } else {
+                cleanup()
+            }
+        }
+
+        private func showTooltip(for index: Int, segStartX: CGFloat, segEndX: CGFloat) {
+            let segments: [(Int, Double)] = showMockData ? mockSegments : realSegments
+            guard index < segments.count else { return }
+            selectedSegmentIndex = index
+            let (stageIdx, duration) = segments[index]
+
+            let stageName: String = {
+                switch stageIdx {
+                case 0: return L("health.sleep.stage.awake")
+                case 1: return L("health.sleep.stage.rem")
+                case 2: return L("health.sleep.stage.core")
+                case 3: return L("health.sleep.stage.deep")
+                default: return ""
+                }
+            }()
+
+            let durationText: String = {
+                UnitDisplay.duration(minutes: Int(duration.rounded()))
+            }()
+
+            var timeRangeText: String? = nil
+            if !showMockData, index < realStageDetails.count {
+                let detail = realStageDetails[index]
+                // 写死 "h:mm a" 会让所有语言都变 12 小时制；用 timeRange 跟随 locale 与系统设置
+                timeRangeText = DateDisplay.timeRange(from: detail.startTime, to: detail.endTime)
+            }
+
+            let tooltip = UIView()
+            tooltip.translatesAutoresizingMaskIntoConstraints = false
+            tooltip.backgroundColor = UIColor(red: 87/255, green: 87/255, blue: 87/255, alpha: 0.85)
+            tooltip.layer.cornerRadius = 4
+            tooltip.layer.borderWidth = 1
+            tooltip.layer.borderColor = UIColor.white.cgColor
+            tooltip.alpha = 0
+
+            let titleLabel = UILabel()
+            titleLabel.text = "\(stageName)  \(durationText)"
+            titleLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+            titleLabel.textColor = .white
+
+            var arranged: [UIView] = [titleLabel]
+            if let tr = timeRangeText {
+                let subtitle = UILabel()
+                subtitle.text = tr
+                subtitle.font = .systemFont(ofSize: 10)
+                subtitle.textColor = UIColor(white: 1, alpha: 0.75)
+                arranged.append(subtitle)
+            }
+
+            let stack = UIStackView(arrangedSubviews: arranged)
+            stack.axis = .vertical
+            stack.spacing = 1
+            stack.translatesAutoresizingMaskIntoConstraints = false
+            tooltip.addSubview(stack)
+            addSubview(tooltip)
+
+            // 单个圆点：放在被点击的 stage 段内部，靠段顶 3.5pt（与 Week 视图 dot.top = bar.top + 3.5 一致）
+            let segMidX = (segStartX + segEndX) / 2
+            let stageTopY: CGFloat = {
+                let paddingVertical: CGFloat = 6.0
+                let availableHeight = 134.5 - paddingVertical * 2
+                let verticalGap: CGFloat = 4.5
+                let blockHeight = (availableHeight - verticalGap * 3) / 4
+                return paddingVertical + (blockHeight + verticalGap) * CGFloat(max(0, min(3, stageIdx)))
+            }()
+            let dotSize: CGFloat = 6.5
+            let dotTopY: CGFloat = stageTopY + 3.5
+            let dotCenterY: CGFloat = dotTopY + dotSize / 2
+            let dot = UIView(frame: CGRect(
+                x: segMidX - dotSize / 2,
+                y: dotTopY,
+                width: dotSize,
+                height: dotSize
+            ))
+            dot.backgroundColor = .white
+            dot.layer.cornerRadius = dotSize / 2
+            let innerSize: CGFloat = dotSize - 3
+            let inner = UIView(frame: CGRect(
+                x: (dotSize - innerSize) / 2,
+                y: (dotSize - innerSize) / 2,
+                width: innerSize,
+                height: innerSize
+            ))
+            inner.backgroundColor = UIColor(red: 0.74, green: 0.64, blue: 0.76, alpha: 1)
+            inner.layer.cornerRadius = innerSize / 2
+            dot.addSubview(inner)
+            dot.alpha = 0
+            addSubview(dot)
+            dotViews = [dot]
+
+            // 浮层默认出现在圆点的右上方；若圆点已接近右边界，翻到左上方
+            // bottom 对齐 dot.centerY，让浮层整体位于圆点上方
+            let showOnRight = segMidX < bounds.width / 2
+            var positioningConstraints: [NSLayoutConstraint] = [
+                tooltip.bottomAnchor.constraint(equalTo: topAnchor, constant: dotCenterY)
+            ]
+            if showOnRight {
+                // leading 离开圆点右边 10pt
+                positioningConstraints.append(
+                    tooltip.leadingAnchor.constraint(equalTo: leadingAnchor, constant: segMidX + dotSize / 2 + 10)
+                )
+            } else {
+                // trailing 离开圆点左边 10pt
+                positioningConstraints.append(
+                    tooltip.trailingAnchor.constraint(equalTo: leadingAnchor, constant: segMidX - dotSize / 2 - 10)
+                )
+            }
+
+            NSLayoutConstraint.activate([
+                stack.topAnchor.constraint(equalTo: tooltip.topAnchor, constant: 6),
+                stack.leadingAnchor.constraint(equalTo: tooltip.leadingAnchor, constant: 8),
+                stack.trailingAnchor.constraint(equalTo: tooltip.trailingAnchor, constant: -8),
+                stack.bottomAnchor.constraint(equalTo: tooltip.bottomAnchor, constant: -6)
+            ] + positioningConstraints)
+
+            tooltipView = tooltip
+
+            setNeedsLayout()
+            layoutIfNeeded()
+
+            UIView.animate(withDuration: 0.2) {
+                tooltip.alpha = 1
+                self.dotViews.forEach { $0.alpha = 1 }
+            }
+        }
+
         override func draw(_ rect: CGRect) {
             super.draw(rect)
             

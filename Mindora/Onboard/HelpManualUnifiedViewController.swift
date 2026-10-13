@@ -47,7 +47,8 @@ final class HelpManualUnifiedViewController: UIViewController {
     private let designButtonTextTrailing: CGFloat = 108
     
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - Properties

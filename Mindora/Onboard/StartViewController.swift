@@ -26,7 +26,7 @@ final class StartViewController: UIViewController {
     
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "logo")
+        imageView.image = UIImage(named: "logo_dream")
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -68,8 +68,21 @@ final class StartViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupActions()
+
+        // 切后台时 UIKit 会把动画从图层上摘掉，而回前台不会再触发 viewDidAppear ——
+        // 不补这个监听的话，切一次后台再回来背景就永久不动了。
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
     }
-    
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
@@ -79,7 +92,20 @@ final class StartViewController: UIViewController {
         super.viewDidAppear(animated)
         startBackgroundAnimation()
     }
-    
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        // 这是个全屏图层的无限循环形变动画，不停的话离开本页后 GPU 仍在逐帧合成，
+        // ProMotion 机型还会被一直顶在高刷新率上。
+        stopBackgroundAnimation()
+    }
+
+    @objc private func handleWillEnterForeground() {
+        // 只有本页仍在屏上才恢复，避免离开后被这条通知重新拉起来。
+        guard view.window != nil else { return }
+        startBackgroundAnimation()
+    }
+
     // MARK: - Setup
     
     private func setupUI() {
@@ -143,46 +169,67 @@ final class StartViewController: UIViewController {
         let contentLeadingMargin = scale(60, basedOn: view.bounds.width, designDimension: designWidth)
         
         // Logo Size: 288x34
-        let logoWidth = scale(288, basedOn: view.bounds.width, designDimension: designWidth)
-        let logoHeight = scale(34, basedOn: view.bounds.height, designDimension: designHeight)
+        let logoWidth = scale(330, basedOn: view.bounds.width, designDimension: designWidth)
+        let logoHeight = scale(23.7, basedOn: view.bounds.height, designDimension: designHeight)
         
         // Tagline Top: 120px from Logo Bottom
         let taglineTopMargin = scale(120, basedOn: view.bounds.height, designDimension: designHeight)
         let taglineWidth = scale(438, basedOn: view.bounds.width, designDimension: designWidth)
         
-        // Start Button Top: 728px from Tagline Bottom (based on CSS previous sibling margin)
-        let startButtonTopMargin = scale(728, basedOn: view.bounds.height, designDimension: designHeight)
+        // 开始按钮改为「底部锚定」：整组（开始 + 还没有 Mindora?）贴屏幕底部，
+        // 对齐 Android StartScreen 的 Spacer(weight(1f)) 布局。原来用「tagline 底部下推
+        // 728px」是把按钮按 iPhone 画布高度铺到底部，但 iPad 上 scale 被封顶后 728 变小，
+        // 按钮就悬在了屏幕中间。底部锚定后各尺寸都稳定贴底。
+        let startButtonBottomMargin = scale(80, basedOn: view.bounds.height, designDimension: designHeight)
         let startButtonHeight = scale(80, basedOn: view.bounds.height, designDimension: designHeight)
         
-        // Start Button Side Margins: 185px each side
+        // Start Button Side Margins: 185px each side（iPhone 保持原样：贴左右边缘 ± 185）
         let startButtonSideMargin = scale(185, basedOn: view.bounds.width, designDimension: designWidth)
-        
+        // iPad 专用：改成固定宽度 + 居中，宽度对齐注册流程的「继续」按钮（scale(546)），
+        // 否则贴边 ± 185 在宽屏上会把按钮拉成超长条。
+        let startButtonWidth = scale(546, basedOn: view.bounds.width, designDimension: designWidth)
+
         // No Device Top: 18px from Start Button Bottom
         let noDeviceTopMargin = scale(18, basedOn: view.bounds.height, designDimension: designHeight)
-        
+
         NSLayoutConstraint.activate([
             backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
+
             logoImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: logoTopMargin),
             logoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: contentLeadingMargin),
             logoImageView.widthAnchor.constraint(equalToConstant: logoWidth),
             logoImageView.heightAnchor.constraint(equalToConstant: logoHeight),
-            
+
             taglineLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: taglineTopMargin),
             taglineLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: contentLeadingMargin),
             taglineLabel.widthAnchor.constraint(equalToConstant: taglineWidth),
-            
-            startButton.topAnchor.constraint(equalTo: taglineLabel.bottomAnchor, constant: startButtonTopMargin),
-            startButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: startButtonSideMargin),
-            startButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -startButtonSideMargin),
+
+            // 开始按钮垂直位置由「贴底的 noDeviceButton」反推（整组贴底，已提交 61dc9fe，两端一致）。
             startButton.heightAnchor.constraint(equalToConstant: startButtonHeight),
-            
+            // 防御：内容再多也不至于顶到 tagline（正常尺寸下不会触发）。
+            startButton.topAnchor.constraint(greaterThanOrEqualTo: taglineLabel.bottomAnchor, constant: 20),
+
             noDeviceButton.topAnchor.constraint(equalTo: startButton.bottomAnchor, constant: noDeviceTopMargin),
-            noDeviceButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            noDeviceButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            noDeviceButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -startButtonBottomMargin)
         ])
+
+        // 开始按钮水平约束按设备分开：iPhone 完全保持原来「贴左右边缘 ± 185」的布局（不受影响）；
+        // iPad 才改成固定宽度居中，避免超长条。
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NSLayoutConstraint.activate([
+                startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                startButton.widthAnchor.constraint(equalToConstant: startButtonWidth)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                startButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: startButtonSideMargin),
+                startButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -startButtonSideMargin)
+            ])
+        }
     }
     
     private func setupActions() {
@@ -214,11 +261,17 @@ final class StartViewController: UIViewController {
             }
         }, completion: nil)
     }
-    
+
+    private func stopBackgroundAnimation() {
+        backgroundImageView.layer.removeAllAnimations()
+        backgroundImageView.transform = .identity
+    }
+
     // MARK: - Helpers
     
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - Actions
@@ -226,11 +279,16 @@ final class StartViewController: UIViewController {
     @objc private func startTapped() {
         self.startButton.animateButtonTap { [weak self] in
             guard let self = self else { return }
-            
+
+
+
+
+
+
             // Check auth storage which prioritizes keychain + expiration check
             let isLoggedIn = AuthStorage.shared.isLoggedIn
             if isLoggedIn {
-                 UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                  UserDefaults.standard.set(true, forKey: Constants.Storage.UserDefaults.isLoggedIn)
             }
             let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
             
@@ -251,9 +309,8 @@ final class StartViewController: UIViewController {
                 // 否则（已登录且已引导） -> 首页
                 guard let window = self.view.window else { return }
                 let mainVC = MainTabBarController()
-                UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                    window.rootViewController = mainVC
-                }, completion: nil)
+                window.rootViewController = mainVC
+                window.makeKeyAndVisible()
             }
         }
     }

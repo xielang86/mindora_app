@@ -32,23 +32,6 @@ class HealthWeekView: UIView {
     }
     
     // MARK: - Date Helpers
-    private static func currentWeekDateString() -> String {
-        let now = Date()
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: now)
-        // Monday = 2 in Gregorian calendar
-        let daysToMonday = (weekday == 1) ? -6 : (2 - weekday)
-        let monday = calendar.date(byAdding: .day, value: daysToMonday, to: now)!
-        let sunday = calendar.date(byAdding: .day, value: 6, to: monday)!
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "d"
-        let startDay = formatter.string(from: monday)
-        formatter.dateFormat = "d MMM yyyy"
-        let endStr = formatter.string(from: sunday)
-        return "\(startDay) - \(endStr)"
-    }
-    
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.text = "--"
@@ -156,7 +139,10 @@ class HealthWeekView: UIView {
     
     private let bestBgImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "sleep_week_onset_bg"))
-        iv.contentMode = .scaleToFill
+        // .scaleToFill would stretch this non-uniformly: the container's width tracks
+        // screen width (much wider on iPad) while its height stays content-driven.
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
         return iv
     }()
     
@@ -249,7 +235,10 @@ class HealthWeekView: UIView {
     
     private let insightsBgImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "sleep_week_sleep_bg"))
-        iv.contentMode = .scaleToFill
+        // .scaleToFill would stretch this non-uniformly: the container's width tracks
+        // screen width (much wider on iPad) while its height stays content-driven.
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
         return iv
     }()
     
@@ -273,17 +262,21 @@ class HealthWeekView: UIView {
     }
     
     // MARK: - Reload Data
+    /// 自增代号：异步回来只认最新一号，防止并发 reloadData 的旧任务中间态把新评分覆盖回 "--"。
+    private var realLoadGeneration = 0
+
+    /// 同步取锚点：优先「最近睡眠日」缓存，没有则退回今天。
+    private func currentAnchor() -> Date {
+        HealthDataManager.shared.cachedMostRecentSleepDay ?? Calendar.current.startOfDay(for: Date())
+    }
+
     func reloadData() {
         let showMock = Constants.Config.showMockData
         if showMock {
             let mockLocal = HealthMockDataService.shared.weekLocalData()
-            let calendar = Calendar.current
-            let now = Date()
-            let weekday = calendar.component(.weekday, from: now)
-            let daysToMonday = (weekday == 1) ? -6 : (2 - weekday)
-            let monday = calendar.startOfDay(for: calendar.date(byAdding: .day, value: daysToMonday, to: now) ?? now)
-            let sunday = calendar.date(byAdding: .day, value: 6, to: monday) ?? now
-            let analysis = HealthAnalysisService.shared.mockWeekAnalysis(startDate: monday, endDate: sunday)
+            // 假数据以今天收尾，走的仍是同一个窗口定义。
+            let window = HealthChartWindow.week(anchor: Date())
+            let analysis = HealthAnalysisService.shared.mockWeekAnalysis(startDate: window.start, endDate: window.end)
 
             dateLabel.text = mockLocal.dateText
             scoreValueLabel.text = analysis.scoreSummary?.score.map(String.init) ?? "--"
@@ -297,72 +290,133 @@ class HealthWeekView: UIView {
             )
             chartView.setMockValues(mockLocal.chartValues)
         } else {
-            dateLabel.text = HealthWeekView.currentWeekDateString()
-            scoreValueLabel.text = "--"
-            scoreStateLabel.text = "--"
+            // 用同步缓存的锚点先算区间 + 填日期标签 + 用缓存评分即时渲染；loadRealData 再用最新锚点刷新。
+            let window = HealthChartWindow.week(anchor: currentAnchor())
+            dateLabel.text = window.displayText
+            if let cached = HealthAnalysisService.shared.cachedWeekAnalysis(startDate: window.start, endDate: window.end) {
+                scoreValueLabel.text = cached.scoreSummary?.score.map(String.init) ?? "--"
+                scoreStateLabel.text = cached.scoreSummary?.label ?? "--"
+                cachedSleepMetrics = cached.sleepMetrics
+            }
         }
         chartView.showMockData = showMock
-        rebuildContent(showMock: showMock)
+        rebuildContent(showMock: showMock, sleepMetrics: cachedSleepMetrics)
         if !showMock {
             loadRealData()
         }
     }
 
     private func loadRealData() {
+        realLoadGeneration += 1
+        let gen = realLoadGeneration
         Task { @MainActor in
+            // 解析「最近睡眠日」作为锚点（拿不到就用今天），把周窗口对齐到那一周（周一→周日）。
+            // 用 do/catch 而不是 `try?`：要区分「查询报错」和「真的一条睡眠样本都没有」，
+            // 后面的权限引导判定全靠这个区分（报错时绝不能提醒用户去开权限）。
+            var recentSleepDay: Date?
+            var localQueryFailed = false
             do {
-                let calendar = Calendar.current
-                let now = Date()
-                let weekday = calendar.component(.weekday, from: now)
-                let daysToMonday = (weekday == 1) ? -6 : (2 - weekday)
-                let monday = calendar.startOfDay(for: calendar.date(byAdding: .day, value: daysToMonday, to: now) ?? now)
-                let sunday = calendar.date(byAdding: .day, value: 6, to: monday) ?? now
-
-                async let metricsTask = HealthDataManager.shared.fetchLatestMetrics(forceLive: true)
-                async let aggregatesTask = HealthDataManager.shared.fetchSleepDailyAggregates(startingFrom: monday, days: 7)
-                async let analysisTask = HealthAnalysisService.shared.fetchWeekAnalysis(startDate: monday, endDate: sunday)
-
-                let metrics = try await metricsTask
-                let aggregates = try await aggregatesTask
-                let analysis = try? await analysisTask
-
-                applyRealWeekData(metrics: metrics, aggregates: aggregates, analysis: analysis)
+                recentSleepDay = try await HealthDataManager.shared.fetchMostRecentSleepDay(forceLive: true)
             } catch {
+                localQueryFailed = true
+                Log.error("HealthWeekView", "最近睡眠日解析失败：\(error)")
+            }
+            let anchor = recentSleepDay ?? self.currentAnchor()
+            guard gen == self.realLoadGeneration else { return }
+            let window = HealthChartWindow.week(anchor: anchor)
+            dateLabel.text = window.displayText
+            let cachedAnalysis = HealthAnalysisService.shared.cachedWeekAnalysis(startDate: window.start, endDate: window.end)
+            if let cachedAnalysis {
+                scoreValueLabel.text = cachedAnalysis.scoreSummary?.score.map(String.init) ?? scoreValueLabel.text
+                scoreStateLabel.text = cachedAnalysis.scoreSummary?.label ?? scoreStateLabel.text
+                self.cachedSleepMetrics = cachedAnalysis.sleepMetrics
+            }
+
+            // 三态统一走 resolve（见 ServerDataResolution.swift）。
+            let analysisTask = Task {
+                await HealthAnalysisService.shared.resolveWeekAnalysis(startDate: window.start, endDate: window.end)
+            }
+
+            // 用非结构化 Task 而不是 `async let`：优化构建下 async let 的子任务栈回收
+            // 顺序会与内联后的调用帧错位，作用域一旦带着错误退出就撞上
+            // swift_task_dealloc 的致命断言直接 abort（见 HealthDataManager 里的说明）。
+            let metricsTask = Task { try await HealthDataManager.shared.fetchLatestSleepVitalsMetrics(forceLive: true) }
+            let aggregatesTask = Task { try await HealthDataManager.shared.fetchSleepDailyAggregates(startingFrom: window.start, days: window.dayCount) }
+
+            // 每项本地数据独立成败：读到什么就展示什么。以前这几行套在一个 do 块里连着
+            // `try await`，生命体征一抛错就整体跳进 catch —— 明明已经取到的睡眠聚合
+            // 连读都没读，图表因此整块空白，而 catch 里又不打日志，故障在日志里是隐形的。
+            var metrics = HealthMetrics.empty
+            do {
+                metrics = try await metricsTask.value
+            } catch {
+                Log.error("HealthWeekView", "生命体征读取失败，降级后继续渲染睡眠数据：\(error)")
+            }
+            var aggregates: [HealthDataManager.SleepDailyAggregate] = []
+            do {
+                aggregates = try await aggregatesTask.value
+            } catch {
+                localQueryFailed = true
+                Log.error("HealthWeekView", "睡眠日聚合读取失败：\(error)")
+            }
+            // 生命体征卡按「睡眠期间 + 按晚等权平均」取，不再用最新一条样本。
+            let vitals = try? await HealthDataManager.shared.fetchSleepVitalsAverages(days: window.dayCount, endingAt: window.end)
+            guard gen == self.realLoadGeneration else { return }
+
+            // 第一遍带上缓存兜底值：本地读不到 Time in Bed 时，先用上次服务端估算顶着，
+            // 等下面拿到最新 analysis 再覆盖。传 nil 会让这一格先空一下再填。
+            applyRealWeekData(window: window, metrics: metrics, aggregates: aggregates, vitals: vitals, analysis: nil, fallbackSleepMetrics: self.cachedSleepMetrics)
+
+            // 一条本地睡眠数据都没有 → 走「读不到健康数据」引导。
+            // 具体弹不弹由 PermissionManager 判：查询是否报过错、45 天内是否真的没有样本、
+            // 以及去重与冷却。这里只负责报告「这个窗口是空的」。
+            if !aggregates.contains(where: { $0.hasData }) {
+                PermissionManager.shared.promptIfHealthDataUnreadable(
+                    from: self,
+                    queryFailed: localQueryFailed,
+                    hasRecentSleepSamples: recentSleepDay != nil
+                )
+            }
+
+            let analysis = await analysisTask.value.displayValue
+            guard gen == self.realLoadGeneration else { return }
+            if let analysis { self.cachedSleepMetrics = analysis.sleepMetrics }
+            applyRealWeekData(window: window, metrics: metrics, aggregates: aggregates, vitals: vitals, analysis: analysis, fallbackSleepMetrics: self.cachedSleepMetrics)
+            // 评分以最终分析为准：拿到分数就显示；分析缺失时保留已渲染的缓存评分，没缓存才回退 "--"。
+            if let analysis {
+                scoreValueLabel.text = analysis.scoreSummary?.score.map(String.init) ?? "--"
+                scoreStateLabel.text = analysis.scoreSummary?.label ?? "--"
+            } else if HealthAnalysisService.shared.cachedWeekAnalysis(startDate: window.start, endDate: window.end) == nil {
                 scoreValueLabel.text = "--"
                 scoreStateLabel.text = "--"
             }
         }
     }
 
-    private func applyRealWeekData(metrics: HealthMetrics, aggregates: [HealthDataManager.SleepDailyAggregate], analysis: HealthAnalysisService.WeekAnalysis?) {
+    private func applyRealWeekData(window: HealthChartWindow, metrics: HealthMetrics, aggregates: [HealthDataManager.SleepDailyAggregate], vitals: HealthDataManager.SleepVitalsAverages?, analysis: HealthAnalysisService.WeekAnalysis?, fallbackSleepMetrics: HealthAnalysisService.PeriodSleepMetrics? = nil) {
         let tracked = aggregates.filter(\.hasData)
         let sleepValues = aggregates.map { CGFloat(min(max($0.totalSleepHours, 0), 10)) }
-        chartView.setRealValues(sleepValues)
+        // 值和日期出自同一个窗口：aggregates 就是按 window 取的，横轴与气泡也用 window.days。
+        chartView.setRealValues(sleepValues, days: window.days)
 
-        scoreValueLabel.text = analysis?.scoreSummary?.score.map(String.init) ?? "--"
-        scoreStateLabel.text = analysis?.scoreSummary?.label ?? "--"
+        // 评分不在这里设置：中间态（analysis==nil）会把已显示的评分清成 "--" 造成闪烁。
+        // 由 loadRealData 在最终拿到 analysis 后统一设置。
 
-        let averageDeep = average(tracked.map(\.deepSleepHours)) ?? 0
-        let averageTotal = average(tracked.map(\.totalSleepHours)) ?? 0
-        let deepRatio = averageTotal > 0 ? (averageDeep / averageTotal) * 100.0 : 0
-        insightsBodyLabel.text = analysis?.sleepTrends?.body ?? String(format: "Deep sleep %.0f%% of total", deepRatio)
-        insightsDescLabel.text = analysis?.sleepTrends?.description ?? "Average sleep this week was \(formatHours(averageTotal)) across \(tracked.count) tracked nights."
+        // 服务端返回空串 = 明确说「这段没有分析内容」，不是「没带这个字段」。
+        // 客户端不再拿本地数字凑一段叙述顶上去：那既占了服务端字段的位置，
+        // 又让用户以为读到的是分析结论。缺失一律显示 "--"，与本页其余缺失项一致。
+        insightsBodyLabel.text = analysis?.sleepTrends?.body.nonBlank ?? "--"
+        insightsDescLabel.text = analysis?.sleepTrends?.description.nonBlank ?? "--"
 
         bestTitleLabel.text = L("health.week.best_title")
         bestSubtitleLabel.text = L("health.week.best_sub")
-        if let scenarioName = analysis?.onsetEfficiency?.scenarioName, !scenarioName.isEmpty {
-            bestContentLabel.text = scenarioName
-        } else if let averageOnset = average(tracked.compactMap(\.sleepOnsetMinutes)) {
-            bestContentLabel.text = "Your average sleep onset this week was \(formatMinutesText(averageOnset))."
-        } else {
-            bestContentLabel.text = "Sleep onset will appear here after Apple Health records time in bed and sleep start."
-        }
+        bestContentLabel.text = analysis?.onsetEfficiency?.scenarioName.nonBlank ?? "--"
         rebuildBestStats(
             trackedDays: analysis?.onsetEfficiency?.usedTimes ?? tracked.count,
             score: analysis?.onsetEfficiency?.score.map(Double.init)
         )
 
-        rebuildContent(showMock: false, aggregates: tracked, metrics: metrics)
+        rebuildContent(showMock: false, aggregates: tracked, metrics: metrics, vitals: vitals, sleepMetrics: analysis?.sleepMetrics ?? fallbackSleepMetrics)
     }
 
     private func rebuildBestStats(trackedDays: Int, score: Double?) {
@@ -379,23 +433,21 @@ class HealthWeekView: UIView {
         bestStatsContainer.addArrangedSubview(scoreView)
     }
 
+    /// 上一次拿到的服务端日均兜底值。本地读不到、服务端这次还没应答时先用它顶着，
+    /// 否则 Time in Bed 卡会先闪一下 "--" 再填上（见 `feedback_cache_async_data_avoid_flicker`）。
+    private var cachedSleepMetrics: HealthAnalysisService.PeriodSleepMetrics?
+
     private func average(_ values: [Double]) -> Double? {
         guard !values.isEmpty else { return nil }
         return values.reduce(0, +) / Double(values.count)
     }
 
     private func formatHours(_ hours: Double) -> String {
-        let totalMinutes = Int((hours * 60.0).rounded())
-        let hourPart = totalMinutes / 60
-        let minutePart = totalMinutes % 60
-        if minutePart == 0 {
-            return "\(hourPart)hr"
-        }
-        return "\(hourPart)hr \(minutePart)min"
+        UnitDisplay.duration(hours: hours)
     }
 
     private func formatMinutesText(_ minutes: Double) -> String {
-        "\(Int(minutes.rounded()))min"
+        UnitDisplay.minutes(Int(minutes.rounded()))
     }
 
     // MARK: - Setup UI
@@ -619,11 +671,6 @@ class HealthWeekView: UIView {
         insightsBodyLabel.translatesAutoresizingMaskIntoConstraints = false
         insightsDescLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Image at top right corner
-        let rightImage = UIImageView(image: UIImage(named: "info")) // Using general info icon placeholder as specific image name unknown, user said 'label_6' in html is SketchPng...
-        // Actually html says "label_6" src="...SketchPng..."
-        // I'll stick to insightsIcon being the 'home_sleep_insights' on top left.
-        
         NSLayoutConstraint.activate([
             insightsIcon.leadingAnchor.constraint(equalTo: insightsContainer.leadingAnchor, constant: 20),
             insightsIcon.topAnchor.constraint(equalTo: insightsContainer.topAnchor, constant: 20),
@@ -729,7 +776,7 @@ class HealthWeekView: UIView {
         return view
     }
     
-    private func rebuildContent(showMock: Bool, aggregates: [HealthDataManager.SleepDailyAggregate] = [], metrics: HealthMetrics? = nil) {
+    private func rebuildContent(showMock: Bool, aggregates: [HealthDataManager.SleepDailyAggregate] = [], metrics: HealthMetrics? = nil, vitals: HealthDataManager.SleepVitalsAverages? = nil, sleepMetrics: HealthAnalysisService.PeriodSleepMetrics? = nil) {
         let mockLocal = HealthMockDataService.shared.weekLocalData()
         // Clear existing subviews
         for view in contentStackView.arrangedSubviews {
@@ -744,17 +791,27 @@ class HealthWeekView: UIView {
             let avgCore = average(aggregates.map(\.coreSleepHours)) ?? 0
             let avgDeep = average(aggregates.map(\.deepSleepHours)) ?? 0
             let avgTotal = average(aggregates.map(\.totalSleepHours)) ?? 0
+            // 不可测的夜晚 sleepOnsetMinutes 已是 nil，compactMap 直接跳过，不参与平均
             let avgOnset = average(aggregates.compactMap(\.sleepOnsetMinutes))
-            let avgTimeInBed = average(aggregates.map(\.timeInBedHours)) ?? 0
+            // Apple Watch 不写 inBed 样本，只戴表的用户这两项本地恒空（不是「卧床 0 分钟」）。
+            // 本地求得出就用本地的，一晚都求不出才用服务端估算的日均值，两者都没有才显示 --。
+            // 口径见 Tools/doc/服务端分析接口.md「睡眠指标估算（sleep_metrics）」。
+            let localAvgTimeInBed = average(aggregates.map(\.timeInBedHours)).flatMap { $0 > 0 ? $0 : nil }
+            let avgTimeInBedText = (localAvgTimeInBed ?? sleepMetrics?.avgTimeInBedMinutes.map { Double($0) / 60.0 })
+                .map(formatHours) ?? "--"
+            let avgOnsetText = (avgOnset ?? sleepMetrics?.avgSleepOnsetMinutes.map(Double.init))
+                .map(formatMinutesText) ?? "--"
 
+            // 生命体征卡：全部取自 fetchSleepVitalsAverages —— 限定睡眠期间、按晚等权平均。
+            // 心率是周期内的平均值（单值），不是某一晚的区间；区间只在日视图展示。
             let vitalsCard = WeekExpandableCard(
                 icon: "home_heart_rate",
-                title: L("health.week.header.heart_rate"),
-                value: metrics?.heartRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--",
+                title: L("health.sleep.sleep_heart_rate"),
+                value: vitals?.sleepHeartRate.map { UnitDisplay.bpm($0) } ?? "--",
                 detailRows: [
-                    (L("health.week.respiratory_rate"), metrics?.respiratoryRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--", nil),
-                    (L("health.week.avg_heart_rate"), metrics?.restingHeartRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--", nil),
-                    (L("health.week.avg_skin_temp"), (metrics?.sleepingWristTemperature ?? metrics?.bodyTemperature).map { String(format: "%.1f°C", $0.value) } ?? "--", L("health.week.metric.from_baseline"))
+                    (L("health.week.respiratory_rate"), vitals?.respiratoryRate.map { UnitDisplay.breathsPerMinute($0) } ?? "--", nil),
+                    (L("health.sleep.resting_heart_rate"), vitals?.restingHeartRate.map { UnitDisplay.bpm($0) } ?? "--", nil),
+                    (L("health.week.avg_wrist_temp"), vitals?.wristTemperature.map { UnitDisplay.temperature(celsius: $0) } ?? "--", nil)
                 ]
             )
             contentStackView.addArrangedSubview(vitalsCard)
@@ -762,12 +819,13 @@ class HealthWeekView: UIView {
             let trendsCard = WeekExpandableCard(
                 icon: "sleep_week_sleep",
                 title: L("health.week.header.total_sleep"),
-                value: formatHours(aggregates.map(\.totalSleepHours).reduce(0, +)),
+                // 苹果健康周视图给的是「日均」，这里跟它对齐；卡片里的明细行本来就是均值
+                value: formatHours(avgTotal),
                 detailRows: [
                     (L("health.week.avg_awake"), formatMinutesText(avgAwake), nil),
-                    (L("health.week.avg_rem"), formatHours(avgRem), nil),
-                    (L("health.week.avg_core"), formatHours(avgCore), nil),
-                    (L("health.week.avg_deep"), formatHours(avgDeep), nil)
+                    (L("health.week.avg_rem"), avgRem > 0 ? formatHours(avgRem) : "--", nil),
+                    (L("health.week.avg_core"), avgCore > 0 ? formatHours(avgCore) : "--", nil),
+                    (L("health.week.avg_deep"), avgDeep > 0 ? formatHours(avgDeep) : "--", nil)
                 ]
             )
             contentStackView.addArrangedSubview(trendsCard)
@@ -775,11 +833,11 @@ class HealthWeekView: UIView {
             let efficiencyCard = WeekExpandableCard(
                 icon: "sleep_week_timeinbed",
                 title: L("health.week.header.time_in_bed"),
-                value: formatHours(avgTimeInBed),
+                value: avgTimeInBedText,
                 detailRows: [
-                    (L("health.week.days_tracked"), "\(trackedDays)/7days", nil),
+                    (L("health.week.days_tracked"), UnitDisplay.daysTracked(trackedDays, of: 7), nil),
                     (L("health.week.avg_total"), formatHours(avgTotal), nil),
-                    (L("health.week.avg_onset"), avgOnset.map(formatMinutesText) ?? "--", nil)
+                    (L("health.week.avg_onset"), avgOnsetText, nil)
                 ]
             )
             contentStackView.addArrangedSubview(efficiencyCard)
@@ -789,12 +847,12 @@ class HealthWeekView: UIView {
         // Group 1: Vitals
         let vitalsCard = WeekExpandableCard(
             icon: "home_heart_rate",
-            title: L("health.week.header.heart_rate"),
+            title: L("health.sleep.sleep_heart_rate"),
             value: mockLocal.heartRateText,
             detailRows: [
-                (L("health.week.respiratory_rate"), mockLocal.respiratoryRangeText, nil),
-                (L("health.week.avg_heart_rate"), mockLocal.averageHeartRateRangeText, nil),
-                (L("health.week.avg_skin_temp"), mockLocal.skinTemperatureDeltaText, L("health.week.metric.from_baseline"))
+                (L("health.week.respiratory_rate"), mockLocal.respiratoryRateText, nil),
+                (L("health.sleep.resting_heart_rate"), mockLocal.restingHeartRateText, nil),
+                (L("health.week.avg_wrist_temp"), mockLocal.wristTemperatureText, nil)
             ]
         )
         contentStackView.addArrangedSubview(vitalsCard)
@@ -874,8 +932,11 @@ class WeekExpandableCard: UIView {
         mainStack.addArrangedSubview(headerWrapper)
         
         // Header Background
+        // .scaleToFill would stretch this non-uniformly: headerWrapper's width tracks
+        // screen width (much wider on iPad) while its height is a fixed >=74pt constant.
         let bgImageView = UIImageView(image: UIImage(named: "sleep_detail_bg"))
-        bgImageView.contentMode = .scaleToFill
+        bgImageView.contentMode = .scaleAspectFill
+        bgImageView.clipsToBounds = true
         bgImageView.translatesAutoresizingMaskIntoConstraints = false
         headerWrapper.addSubview(bgImageView)
         
@@ -1024,38 +1085,35 @@ class HealthWeekChartView: UIView {
     private let barWidth: CGFloat = 14.5
     
     // Data
+    /// 一根柱子。`date` 是它对应的那一天 —— 横轴的星期名和气泡里的日期都由它算，
+    /// **不再按索引去固定数组里取**：窗口是滚动的（右端贴着锚点），第 0 格不恒是周一。
     struct BarData {
         let value: CGFloat // 0-10
-        let label: String
+        let date: Date
+        var label: String { DateDisplay.weekdayShort(date) }
     }
-    
-    private var mockItems: [BarData] = [
-        BarData(value: 7.2, label: "Mon."),
-        BarData(value: 9.0, label: "Tue."),
-        BarData(value: 5.2, label: "Wed."),
-        BarData(value: 3.8, label: "Thu."),
-        BarData(value: 7.5, label: "Fri."),
-        BarData(value: 7.2, label: "Sat."),
-        BarData(value: 0.0, label: "Sun.")
-    ]
-    
-    private static let emptyItems: [BarData] = [
-        BarData(value: 0.0, label: "Mon."),
-        BarData(value: 0.0, label: "Tue."),
-        BarData(value: 0.0, label: "Wed."),
-        BarData(value: 0.0, label: "Thu."),
-        BarData(value: 0.0, label: "Fri."),
-        BarData(value: 0.0, label: "Sat."),
-        BarData(value: 0.0, label: "Sun.")
-    ]
-    
+
+    /// 假数据以今天收尾。`Date()` 只允许出现在这一条路径上：真实数据的日期一律由
+    /// 外部把窗口传进来（`setRealValues(_:days:)`），图表自己不许现算 —— 页头按锚点、
+    /// 图表按今天，两个基准一漂移，柱子就被标上错误甚至未来的日期。
+    private static var mockDays: [Date] { HealthChartWindow.week(anchor: Date()).days }
+
+    private lazy var mockItems: [BarData] = zip(
+        [7.2, 9.0, 5.2, 3.8, 7.5, 7.2, 0.0] as [CGFloat],
+        Self.mockDays
+    ).map { BarData(value: $0.0, date: $0.1) }
+
+    private static func emptyItems(days: [Date]) -> [BarData] {
+        days.map { BarData(value: 0.0, date: $0) }
+    }
+
     private var items: [BarData] = []
-    private var realItems: [BarData] = HealthWeekChartView.emptyItems
+    private var realItems: [BarData] = HealthWeekChartView.emptyItems(days: HealthWeekChartView.mockDays)
 
     func setMockValues(_ values: [CGFloat]) {
-        let labels = ["Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."]
-        guard values.count == labels.count else { return }
-        mockItems = zip(values, labels).map { BarData(value: $0.0, label: $0.1) }
+        let days = Self.mockDays
+        guard values.count == days.count else { return }
+        mockItems = zip(values, days).map { BarData(value: $0.0, date: $0.1) }
         if showMockData {
             items = mockItems
             rebuildChart()
@@ -1069,9 +1127,13 @@ class HealthWeekChartView: UIView {
         }
     }
 
-    func setRealValues(_ values: [CGFloat]) {
-        guard values.count == 7 else {
-            realItems = HealthWeekChartView.emptyItems
+    /// - Parameters:
+    ///   - values: 每天的睡眠小时数，与 `days` 一一对应。
+    ///   - days: 页头窗口的那几天（`HealthChartWindow.week(anchor:).days`）。
+    ///           柱子、横轴星期名、气泡日期全部由它推导，保证三者与页头区间恒等。
+    func setRealValues(_ values: [CGFloat], days: [Date]) {
+        guard values.count == days.count else {
+            realItems = HealthWeekChartView.emptyItems(days: days)
             if !showMockData {
                 items = realItems
                 rebuildChart()
@@ -1079,8 +1141,7 @@ class HealthWeekChartView: UIView {
             return
         }
 
-        let labels = ["Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."]
-        realItems = zip(values, labels).map { BarData(value: $0.0, label: $0.1) }
+        realItems = zip(values, days).map { BarData(value: $0.0, date: $0.1) }
         if !showMockData {
             items = realItems
             rebuildChart()
@@ -1385,35 +1446,24 @@ class HealthWeekChartView: UIView {
         let titleLabel = UILabel()
         let hours = Int(item.value)
         let minutes = Int((item.value - CGFloat(hours)) * 60)
-        titleLabel.text = String(format: "%dhr %dm", hours, minutes)
+        titleLabel.text = String(format: L("health.chart.tooltip.duration"), "\(hours)", "\(minutes)")
         
         titleLabel.textColor = .white
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         titleLabel.textAlignment = .left
         
         let dateSubtitle = UILabel()
-        // Dynamic Date Logic: Calculate actual date for each weekday
-        let now = Date()
-        let calendar = Calendar.current
-        let currentWeekday = calendar.component(.weekday, from: now)
-        let daysToMonday = (currentWeekday == 1) ? -6 : (2 - currentWeekday)
-        let monday = calendar.date(byAdding: .day, value: daysToMonday, to: now)!
-        let targetDate = calendar.date(byAdding: .day, value: index, to: monday)!
-        let day = calendar.component(.day, from: targetDate)
-        let suffix: String = {
-            switch day {
-            case 1, 21, 31: return "st"
-            case 2, 22: return "nd"
-            case 3, 23: return "rd"
-            default: return "th"
-            }
-        }()
-        let dayName = item.label.replacingOccurrences(of: ".", with: "")
-        let monthYearFormatter = DateFormatter()
-        monthYearFormatter.locale = Locale(identifier: "en_US")
-        monthYearFormatter.dateFormat = "MMM yyyy"
-        let monthYear = monthYearFormatter.string(from: targetDate)
-        dateSubtitle.text = "\(dayName), \(day)\(suffix) \(monthYear)"
+        // 日期直接取这根柱子自己的那一天，不做任何索引推算。
+        let targetDate = item.date
+        // 原来是手拼 "Wed, 6th Aug 2026"：序数后缀 st/nd/rd/th 和「星期, 日 月 年」的
+        // 顺序都是英文写死的，中日韩下会出现「周三, 6th 8月 2026」。改成让 ICU 按语言
+        // 排语序 —— dateFormat(fromTemplate:) 会给出该语言正确的字段顺序和分隔符。
+        let locale = LocalizationManager.shared.currentLocale
+        let subtitleFormatter = DateFormatter()
+        subtitleFormatter.locale = locale
+        subtitleFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "EEEdMMMy", options: 0, locale: locale)
+            ?? "EEE, d MMM yyyy"
+        dateSubtitle.text = subtitleFormatter.string(from: targetDate)
         
         dateSubtitle.textColor = .lightGray
         dateSubtitle.font = UIFont.systemFont(ofSize: 10)

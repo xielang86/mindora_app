@@ -1,0 +1,1259 @@
+/*
+  Localizable.strings
+  mindora
+
+  Created by gao chao on 2025/9/18.
+
+*/
+
+// MARK: - Tab Bar Titles
+"tab.home" = "Beranda";
+"tab.health" = "Kesehatan";
+"tab.sleep" = "Tidur";
+"tab.explore" = "Jelajahi";
+"tab.store" = "Toko";
+"tab.settings" = "Pengaturan";
+
+// MARK: - Theme Modes
+"theme.system" = "Ikuti Sistem";
+"theme.light" = "Mode Terang";
+"theme.dark" = "Mode Gelap";
+
+// MARK: - Register P3
+
+// MARK: - Register P4
+"register.p4.title" = "Hubungkan Mindora Anda";
+"register.p4.subtitle" = "Hubungkan Mindora Anda ke pengisi daya dan lanjutkan ke langkah berikutnya. Pastikan Bluetooth diaktifkan di ponsel Anda.";
+"register.p4.button.set_mindor" = "Siapkan Mindora";
+"register.p4.no_mindora" = "Belum punya Mindora?";
+
+// MARK: - Home Screen
+"home.title" = "Beranda";
+"home.device.status.connected" = "Terhubung";
+"home.device.status.offline" = "Luring";
+"home.nearby_devices" = "Perangkat Terdekat";
+"home.scan" = "Pindai";
+"home.scanning" = "Memindai perangkat terdekat…";
+"home.disconnect" = "Putuskan";
+"home.connected_format" = "Terhubung: %@:%d";
+"home.connected_state" = "Terhubung";
+"home.connection_success_title" = "Terhubung";
+"home.connection_success_message" = "Perangkat: %@ (%@)";
+"home.resolve_failed_title" = "Gagal Menyelesaikan";
+"home.resolve_failed_message" = "Gagal menyelesaikan";
+"home.no_devices" = "Tidak ada perangkat ditemukan";
+"home.find_devices" = "Temukan Perangkat";
+"home.search_finished_zero" = "Tidak ada perangkat ditemukan";
+"home.search_finished_one" = "1 perangkat ditemukan";
+"home.search_finished_many" = "%d perangkat ditemukan";
+
+// MARK: - Home Dashboard
+"home.metric.sleep_onset" = "Awal Tidur";
+"home.metric.deep_sleep" = "Tidur Nyenyak";
+"home.tab.sleep" = "Tidur";
+"home.tab.overall_score" = "Skor Keseluruhan";
+"home.tab.activity" = "Aktivitas";
+"home.insights.title" = "Wawasan Tidur";
+"home.insights.subtitle" = "Berdasarkan analisis data tidur Anda";
+"home.best.title" = "Terbaik Mingguan";
+"home.best.subtitle" = "Dirancang untuk memberi Anda tidur terbaik";
+"home.best.used_times" = "Frekuensi penggunaan";
+"home.best.score" = "skor";
+
+// MARK: - Health Screen
+"health.title" = "Kesehatan";
+"health.page_title" = "Semua Data Kesehatan";
+"health.time.today" = "Hari Ini";
+"health.time.past_7_days" = "7 Hari Terakhir";
+"health.time.past_12_months" = "12 Bulan Terakhir";
+"health.time.earlier" = "Sebelumnya";
+
+// MARK: - Health Metrics
+"health.status.initial" = "Meminta akses Kesehatan";
+"health.status.loading" = "Memuat data kesehatan";
+"health.status.updated" = "Data kesehatan terbaru dimuat";
+"health.status.error" = "Kesalahan data kesehatan";
+"health.metric.heart_rate" = "Detak Jantung";
+"health.metric.hrv" = "Variabilitas Detak Jantung";
+"health.metric.glucose" = "Glukosa Darah";
+"health.metric.spo2" = "Oksigen Darah (SpO₂)";
+"health.metric.blood_pressure" = "Tekanan Darah";
+"health.metric.sleep" = "Tidur";
+"health.metric.placeholder" = "Tidak ada data terbaru";
+"health.unit.bpm" = "bpm";
+"health.unit.ms" = "ms";
+"health.unit.mgdl" = "mg/dL";
+"health.unit.percent" = "%";
+"health.unit.mmhg" = "mmHg";
+"health.unit.hour" = "j";
+"health.unit.hours" = "j";
+"health.unit.minutes" = "mnt";
+"health.sleep.deep" = "Nyenyak";
+"health.sleep.rem" = "REM";
+"health.sleep.light" = "Ringan";
+"health.sleep.total_duration" = "Total Durasi";
+"health.sleep.stage.awake" = "Terjaga";
+"health.sleep.stage.rem" = "REM";
+"health.sleep.stage.core" = "Inti";
+"health.sleep.stage.deep" = "Nyenyak";
+"health.sleep.no_data" = "Tidak ada data tidur";
+"health.sleep.bed_time" = "Waktu di Tempat Tidur";
+"health.sleep.sleep_time" = "Waktu Tertidur";
+"health.sleep.avg_bed_time" = "Rata-rata Waktu di Tempat Tidur";
+"health.sleep.avg_sleep_time" = "Rata-rata Waktu Tertidur";
+"health.period.day" = "Hari";
+"health.period.week" = "Minggu";
+"health.period.month" = "Bulan";
+"health.period.six_months" = "6 Bulan";
+"health.period.year" = "Tahun";
+"health.period.today" = "Hari Ini";
+"health.period.daily_average" = "Rata-rata Harian";
+"health.period.hourly_average" = "Rata-rata per Jam";
+"health.period.weekly_average" = "Rata-rata Mingguan";
+"health.period.monthly_average" = "Rata-rata Bulanan";
+"health.period.range" = "Rentang";
+"health.period.hour" = "j";
+"health.weekday.sun" = "Min";
+"health.weekday.mon" = "Sen";
+"health.weekday.tue" = "Sel";
+"health.weekday.wed" = "Rab";
+"health.weekday.thu" = "Kam";
+"health.weekday.fri" = "Jum";
+"health.weekday.sat" = "Sab";
+
+// MARK: - Health Week View
+"health.week.avg_score" = "Rata-rata skor tidur";
+"health.week.good" = "Baik";
+"health.week.insights" = "Wawasan Tidur";
+"health.week.insights_sub" = "Berdasarkan analisis data tidur Anda";
+"health.week.insights_title" = "Tren Tidur";
+"health.week.insights.body" = "Performa Tidur Nyenyak \nyang Luar Biasa";
+"health.week.insights.desc" = "Tidur nyenyak Anda mencakup 29,8% dari \ntotal tidur Anda, di atas tingkat standar. \nTeruslah menjaga jadwal tidur yang teratur.";
+
+"health.week.best" = "Terbaik Mingguan";
+"health.week.best_title" = "Efisiensi Awal Tidur";
+"health.week.best_sub" = "Dirancang untuk memberi Anda tidur terbaik";
+"health.week.best.used_times" = "Frekuensi penggunaan";
+"health.week.best.score" = "skor";
+"health.week.sedona" = "Ketenangan Gurun Sedona";
+"health.week.respiratory_rate" = "Laju Pernapasan";
+"health.week.avg_heart_rate" = "Rata-rata Detak Jantung";
+"health.week.avg_wrist_temp" = "Suhu Pergelangan Tangan";
+"health.week.avg_awake" = "Rata-rata Terjaga";
+"health.week.avg_rem" = "Rata-rata REM";
+"health.week.avg_core" = "Rata-rata Tidur Inti";
+"health.week.avg_deep" = "Rata-rata Tidur Nyenyak";
+"health.week.days_tracked" = "Hari Terlacak";
+"health.week.avg_total" = "Rata-rata Total Tidur";
+"health.week.avg_onset" = "Rata-rata Awal Tidur";
+
+// MARK: - Health Week Expanded Headers
+"health.week.header.heart_rate" = "Rata-rata detak jantung";
+"health.week.header.total_sleep" = "Total tidur";
+"health.week.header.time_in_bed" = "Rata-rata waktu di tempat tidur";
+"health.week.metric.from_baseline" = "(dari Garis Dasar)";
+
+// MARK: - Health Month View
+"health.month.optimal" = "Optimal";
+
+
+// MARK: - Settings Screen
+"settings.title" = "Pengaturan";
+"settings.subtitle" = "Jadikan Mindora milik Anda";
+"settings.profile_subtitle" = "Lihat dan edit profil Anda";
+"settings.sync_subtitle" = "Sinkronkan data kesehatan di ponsel Anda";
+"settings.reset_subtitle" = "Reset pabrik akan mengembalikan semua pengaturan dan catatan";
+"settings.version_subtitle" = "Pembaruan perangkat lunak membawa fitur baru dan perbaikan bug";
+"settings.language" = "Bahasa";
+"settings.theme" = "Mode Tema";
+"settings.profile" = "Profil";
+"settings.profile_email_format" = "Email: %@";
+"settings.profile_email_placeholder" = "Belum masuk";
+"settings.sync" = "Sinkronisasi Data Kesehatan";
+"settings.permission" = "Pengelolaan Izin";
+"settings.version" = "Versi Aplikasi";
+"settings.version_with_number" = "Versi Aplikasi: %@";
+"settings.reset" = "Reset Pabrik";
+"settings.show_onboarding" = "Tampilkan Panduan Lagi";
+
+// Language and Theme Selection
+"settings.language_title" = "Bahasa";
+"settings.select_language" = "Pilih Bahasa";
+"settings.select_theme" = "Pilih Mode Tema";
+
+// Reset Confirmation
+"settings.reset_confirm_title" = "Konfirmasi Reset Pabrik?";
+"settings.reset_confirm_message" = "Reset pabrik akan mengembalikan semua pengaturan ke default. Harap pilih opsi ini dengan hati-hati.";
+"settings.reset_done_message" = "Reset pabrik telah dipicu (demo)";
+"settings.reset_cancel" = "Batal";
+"settings.reset_confirm" = "Konfirmasi";
+
+// Version Check
+"settings.version_checking" = "Memeriksa pembaruan...";
+"settings.version_latest_title" = "Sudah Versi Terbaru";
+"settings.version_latest_message" = "Anda menggunakan versi terbaru %@";
+"settings.version_update_title" = "Pembaruan Tersedia";
+"settings.version_update_message" = "Versi baru %@ tersedia. Versi saat ini: %@";
+"settings.version_update_button" = "Perbarui";
+"settings.version_check_failed" = "Gagal memeriksa pembaruan";
+
+// Sync Health Data
+"settings.sync_no_device_title" = "Tidak Ada Perangkat Terhubung";
+"settings.sync_no_device_message" = "Harap hubungkan ke perangkat di halaman \"Hubungkan\" sebelum mencoba menyinkronkan.";
+"settings.syncing" = "Menyinkronkan...";
+"settings.sync_success_title" = "Sinkronisasi Berhasil";
+"settings.sync_success_message" = "Sekelompok contoh data kesehatan telah dikirim.";
+
+// MARK: - Device Management
+"device_manage.status.connected" = "Terhubung";
+"device_manage.status.not_connected" = "Tidak Terhubung";
+
+// MARK: - Device Scan (iOS Bluetooth-style scan & multi-bind page)
+"device_scan.title" = "Perangkat";
+"device_scan.hint" = "Jika tidak ada perangkat yang muncul, aktifkan izin Jaringan Lokal dan Bluetooth di Pengaturan.";
+"device_scan.open_settings" = "Buka Pengaturan";
+"device_scan.section.my_devices" = "PERANGKAT SAYA";
+"device_scan.section.empty_footer" = "Pastikan Mindora Anda menyala, dan ponsel Anda berada di jaringan Wi-Fi yang sama. Bluetooth dapat berfungsi sebagai cadangan.";
+"device_scan.searching" = "Mencari perangkat...";
+"device_scan.no_devices_found" = "Tidak ada perangkat ditemukan";
+"device_scan.tap_to_retry" = "Ketuk untuk coba lagi";
+"device_scan.status.not_connected" = "Tidak Terhubung";
+"device_scan.status.connected" = "Terhubung";
+
+// MARK: - Device Detail (tap ⓘ on the scan list)
+"device_detail.section.name" = "Nama";
+"device_detail.section.model" = "Model";
+"device_detail.section.device_id" = "ID Perangkat";
+"device_detail.value.unknown" = "Tidak Diketahui";
+"device_detail.disconnect" = "Putuskan";
+"device_detail.connect" = "Hubungkan";
+"device_manage.button.connect" = "Cari Perangkat";
+"device_manage.button.connect_other" = "Cari Perangkat";
+"device_manage.button.disconnect" = "Putuskan";
+"device_manage.button.connect_device" = "Hubungkan";
+"device_manage.button.connect_other_device" = "Hubungkan Perangkat Lain";
+"device_manage.button.search_device" = "Cari Perangkat";
+"device_manage.subtitle" = "Informasi masuk Anda disimpan selama 30 hari. Setelah itu, Anda perlu memasangkan ulang.\nKetuk gambar perangkat di bawah untuk melihat detail";
+"device_manage.default_name" = "Mindora";
+"device_manage.empty.title" = "Tidak ada perangkat terhubung";
+"device_manage.empty.message" = "Ketuk tombol di bawah untuk memasangkan Mindora Anda.";
+"device_manage.action.disconnect" = "Putuskan perangkat";
+"device_manage.action.disconnect_confirm" = "Putuskan";
+"device_manage.action.disconnect_message" = "Anda dapat memasangkan kembali kapan saja. Data Anda tetap di ponsel ini.";
+"device_manage.button.delete_device" = "Hapus perangkat ini";
+"device_manage.delete.confirm_title" = "Hapus perangkat \"%@\"?";
+
+"settings.sync_error_title" = "Sinkronisasi Gagal";
+
+// MARK: - Settings Sections
+"settings.section.personalization" = "Personalisasi";
+"settings.section.data_account" = "Data & Akun";
+"settings.section.other" = "Lainnya";
+"settings.section.about" = "Tentang";
+
+// MARK: - Side Menu
+"sidemenu.title" = "Akun Saya";
+"sidemenu.user.name" = "Nama Pengguna";
+"sidemenu.subscription" = "Langganan";
+"sidemenu.upgrade" = "Tingkatkan ke Pro";
+"sidemenu.device" = "Perangkat";
+"sidemenu.notifications" = "Notifikasi";
+"sidemenu.health_link" = "Tautan Data Kesehatan";
+"sidemenu.language" = "Bahasa";
+"sidemenu.help" = "Bantuan";
+"sidemenu.logout" = "Keluar";
+"sidemenu.terms" = "Ketentuan Penggunaan";
+"sidemenu.privacy_policy" = "Kebijakan Privasi";
+"sidemenu.not_logged_in" = "Belum masuk";
+
+// MARK: - User Profile
+"user_profile.user_id" = "ID Pengguna";
+"user_profile.nickname" = "Nama Panggilan";
+"user_profile.gender" = "Jenis Kelamin";
+"user_profile.gender.male" = "Laki-laki";
+"user_profile.gender.female" = "Perempuan";
+"user_profile.gender.other" = "Lainnya";
+"user_profile.age" = "Usia";
+"user_profile.birthday" = "Tanggal Lahir";
+"user_profile.weight_height" = "Berat / Tinggi";
+"user_profile.weight_unit" = "Berat / kg";
+"user_profile.height_unit" = "Tinggi / cm";
+"user_profile.weight_height_invalid" = "Masukkan nilai yang valid: berat 20–300 kg, tinggi 50–250 cm.";
+"user_profile.email" = "Email";
+"user_profile.phone" = "Telepon";
+"user_profile.address" = "Alamat";
+"user_profile.update" = "Perbarui Profil";
+"user_profile.username_default" = "Nama Pengguna";
+"user_profile.take_photo" = "Ambil Foto";
+"user_profile.choose_from_album" = "Pilih dari Album";
+"user_profile.cancel" = "Batal";
+"user_profile.email_locked_title" = "Tidak Dapat Mengedit Email";
+"user_profile.email_locked_message" = "Pengguna yang masuk dengan akun sosial atau SSO tidak dapat memperbarui email secara langsung.\nButuh bantuan? Hubungi kami: %@";
+"user_profile.email_locked_contact" = "Hubungi Kami";
+
+// MARK: - Help Cards
+"help.title" = "Bantuan Koneksi";
+"help.done" = "Selesai";
+"help.connect_01_title" = "Bagaimana menghubungkan Mindora? 01";
+"help.connect_01_content" = "Pastikan Bluetooth diaktifkan dan dekatkan ponsel Anda ke Mindora.";
+"help.connect_02_title" = "Bagaimana menghubungkan Mindora? 02";
+"help.connect_02_content" = "Ketuk tombol hubungkan di aplikasi, atau temukan pengaturan Bluetooth di pengaturan sistem.";
+"help.connect_03_title" = "Bagaimana menghubungkan Mindora? 03";
+"help.connect_03_content" = "Pilih Mindora S1 MTL-01 dari perangkat Bluetooth yang tersedia untuk terhubung dengan sukses.";
+"help.connect_04_title" = "Bagaimana menghubungkan Mindora? 04";
+"help.connect_04_content" = "Jika Mindora sudah terhubung ke ponsel atau perangkat lain, putuskan koneksi Bluetooth di ponsel sebelumnya.";
+"help.connect_05_title" = "Bagaimana menghubungkan Mindora? 05";
+"help.connect_05_content" = "Jika Anda tidak dapat membuat koneksi, silakan kunjungi situs web dukungan kami untuk bantuan lebih lanjut.";
+
+// MARK: - Common UI Elements
+"common.ok" = "OK";
+"common.confirm" = "Konfirmasi";
+"common.retry" = "Coba Lagi";
+"common.saved_to_photos" = "Disimpan ke Foto";
+"common.save_success" = "Berhasil Disimpan";
+"common.share_success" = "Berhasil Dibagikan";
+"common.copy_success" = "Disalin";
+
+// MARK: - Onboarding
+"onboarding.start" = "Mulai";
+"onboarding.no_device" = "Tidak punya Mindora?";
+"onboarding.connect_mindora" = "Hubungkan Mindora";
+"onboarding.page3.health_card_text" = "Konfigurasikan akses data kesehatan Mindora di aplikasi Kesehatan";
+"onboarding.page3.bluetooth_card_text" = "Bluetooth tidak aktif\nKetuk untuk mengaktifkan pengaturan Bluetooth";
+"onboarding.page3.bluetooth_card_text_authorized" = "Izin Bluetooth diaktifkan\nPerangkat dapat terhubung secara normal";
+"onboarding.page4.scanning_title" = "Memindai Perangkat Terdekat";
+"onboarding.page4.searching" = "Terus mencari";
+"onboarding.page4.device_found" = "%@ Ditemukan";
+"onboarding.page4.no_device_found" = "Tidak ada perangkat ditemukan";
+"onboarding.page4.description" = "Pastikan Mindora Anda menyala, dan ponsel Anda berada di jaringan Wi-Fi yang sama. Bluetooth dapat berfungsi sebagai cadangan.";
+"onboarding.page4.multiple_found" = "Ditemukan %d perangkat, silakan pilih satu";
+"onboarding.page5.success_title" = "Mindora Berhasil Terhubung";
+"onboarding.page5.complete" = "Selesai";
+
+// MARK: - Help Manual
+"help_manual.page1.title" = "Bagaimana menghubungkan Mindora?";
+"help_manual.page1.description" = "Pastikan Bluetooth diaktifkan dan dekatkan ponsel Anda ke Mindora.";
+"help_manual.page2.title" = "Bagaimana menghubungkan Mindora?";
+"help_manual.page2.description" = "Ketuk tombol hubungkan di aplikasi, atau temukan pengaturan Bluetooth di pengaturan sistem.";
+"help_manual.page3.title" = "Bagaimana menghubungkan Mindora?";
+"help_manual.page3.description" = "Pilih Mindora dari perangkat Bluetooth yang tersedia untuk terhubung dengan sukses.";
+"help_manual.page4.title" = "Bagaimana menghubungkan Mindora?";
+"help_manual.page4.description" = "Jika Mindora sudah terhubung ke ponsel atau perangkat lain, putuskan koneksi Bluetooth di ponsel sebelumnya.";
+"help_manual.page5.title" = "Bagaimana menghubungkan Mindora?";
+"help_manual.page5.description" = "Jika Anda tidak dapat membuat koneksi, silakan kunjungi situs web dukungan kami untuk bantuan lebih lanjut.";
+
+// MARK: - Health Sync Settings
+"health.sync.title" = "Sinkronisasi Kesehatan";
+"health.sync.enable" = "Aktifkan Sinkronisasi";
+"health.sync.interval" = "Interval Sinkronisasi";
+"health.sync.metrics" = "Metrik";
+"health.sync.manual" = "Sinkronkan Sekarang";
+"health.sync.interval.6s" = "6d";
+"health.sync.interval.12s" = "12d";
+"health.sync.interval.30s" = "30d";
+"health.sync.status.disabled" = "Sinkronisasi dinonaktifkan";
+"health.sync.status.no_run" = "Belum ada sinkronisasi yang berjalan";
+"health.sync.status.last_success_format" = "Berhasil terakhir %@ · %d grup metrik";
+"health.sync.status.last_fail_format" = "Gagal terakhir %@ · %@";
+"health.sync.status.interval_format" = "Interval: %dd";
+"health.sync.status.metrics_format" = "Aktif: %@";
+"health.sync.section.basic" = "Dasar";
+"health.sync.section.metrics" = "Metrik";
+"health.sync.section.action" = "Tindakan";
+"health.sync.section.status" = "Status";
+
+// Sync Metrics Names
+"health.sync.metric.heart_rate" = "Detak Jantung";
+"health.sync.metric.hrv" = "HRV";
+"health.sync.metric.spo2" = "Oksigen Darah";
+"health.sync.metric.blood_pressure" = "Tekanan Darah";
+"health.sync.metric.sleep" = "Tidur";
+"health.sync.metric.all" = "Pilih Semua";
+"health.sync.metric.none" = "Batalkan Semua";
+
+// MARK: - Permission Management
+"permission.title" = "Pengelolaan Izin";
+
+// Network Permissions
+"permission.bluetooth" = "Bluetooth";
+"permission.local_network" = "Jaringan Lokal";
+"permission.cellular_data" = "Data Seluler";
+"permission.section.network" = "Izin Jaringan";
+
+// Health Permissions
+"permission.health.status" = "Data Kesehatan";
+"permission.section.health" = "Izin Data Kesehatan";
+"permission.section.healthkit_footer_line1" = "Jika akses terbatas, silakan buka";
+"permission.section.healthkit_footer_line2" = "*Pengaturan > Privasi & Keamanan > Kesehatan > Mindora.\n*Buka aplikasi Kesehatan > Berbagi > Aplikasi > Mindora untuk mengaktifkan jenis data yang Anda butuhkan.";
+
+// Permission Status
+"permission.status.authorized" = "Diizinkan";
+"permission.status.partial" = "Sebagian Diizinkan";
+"permission.status.not_determined" = "Tidak Diizinkan";
+"permission.status.unavailable" = "Tidak Tersedia";
+
+// Permission Reminders
+"permission.health.reminder_title" = "Perlu Izin Data Kesehatan";
+"permission.health.reminder_message" = "Untuk memberikan analisis data kesehatan yang lebih baik, aplikasi perlu mengakses data kesehatan Anda.";
+"permission.bluetooth.reminder_title" = "Perlu Izin Bluetooth";
+"permission.bluetooth.reminder_message" = "Untuk terhubung ke perangkat Mindora Anda, aplikasi memerlukan izin Bluetooth.";
+"permission.request_authorization" = "Izinkan Akses";
+"permission.open_settings" = "Buka Pengaturan";
+"permission.open_health_app" = "Buka Kesehatan";
+"permission.later" = "Nanti";
+"permission.authorization_success" = "Otorisasi Berhasil";
+"permission.authorization_failed" = "Otorisasi Gagal";
+
+// Health Permission Actions
+"permission.health.action_title" = "Izin Data Kesehatan";
+"permission.health.action_message" = "Pilih cara Anda ingin mengelola izin";
+"permission.open_settings_hint" = "Buka Pengaturan > Mindora dan aktifkan akses Jaringan Lokal dan Data Seluler.";
+
+// Health Settings Guide
+"permission.health.settings_title" = "Pengaturan Privasi Kesehatan";
+"permission.health.settings_message" = "Buka Pengaturan > Privasi & Keamanan > Kesehatan, temukan Mindora, dan aktifkan jenis data yang Anda butuhkan.";
+"permission.health.guide_title" = "Cara Mengatur Izin Data Kesehatan";
+"permission.health.guide_message" = "Buka Aplikasi Kesehatan\nKetuk Berbagi di bagian bawah\nPilih 'Aplikasi'\nPilih Mindora\nAktifkan jenis data yang Anda butuhkan";
+
+// Health Permission CTA (avoid misleading status)
+"permission.health.confirm" = "Pengaturan";
+
+// Local Network Permission CTA (cannot be accurately detected, prompt user to confirm in settings)
+"permission.local_network.confirm" = "Silakan konfirmasi di Pengaturan";
+
+// Local Network Permission Denied
+"permission.local_network.denied_title" = "Tidak Dapat Mencari Perangkat";
+"permission.local_network.denied_message" = "Akses jaringan lokal diperlukan untuk mencari perangkat Mindora terdekat. Silakan aktifkan akses jaringan lokal di Pengaturan.";
+"permission.cellular.denied_title" = "Data Seluler Dinonaktifkan";
+"permission.cellular.denied_message" = "Mindora tidak diizinkan menggunakan data seluler, sehingga skor tidur dan konten online lainnya tidak dapat dimuat. Izinkan data seluler untuk Mindora di Pengaturan, atau sambungkan ke Wi-Fi.";
+
+// Bluetooth Permission Denied
+"permission.bluetooth.denied_title" = "Tidak Dapat Memindai via Bluetooth";
+"permission.bluetooth.denied_message" = "Akses Bluetooth diperlukan untuk menemukan perangkat Mindora saat Wi-Fi tidak tersedia. Silakan aktifkan Bluetooth untuk Mindora di Pengaturan.";
+
+// MARK: - Login
+"login.email_placeholder" = "Masukkan email Anda";
+"login.get_code" = "Verifikasi Email";
+"login.toast.enter_email" = "Silakan masukkan email Anda";
+"login.toast.invalid_email" = "Format email tidak valid";
+"login.toast.network_error_prefix" = "Kesalahan jaringan: ";
+"login.toast.no_data" = "Tidak ada data diterima";
+"login.toast.send_code_failed" = "Gagal mengirim kode";
+"login.toast.invalid_response" = "Respons tidak valid";
+"login.toast.login_failed" = "Login gagal";
+"login.verify_alert.title" = "Verifikasi Email";
+
+// Login Success
+"login.success.title" = "Login Berhasil";
+"login.success.message" = "Email %@ berhasil diverifikasi";
+"login.verify_alert.message_format" = "Masukkan kode yang dikirim ke %@";
+"login.verify_alert.code_placeholder" = "Kode Verifikasi";
+"login.verify_alert.login_action" = "Login";
+"login.code_sent_title" = "Kode Verifikasi Terkirim";
+"login.code_sent_message" = "Kode verifikasi telah dikirim ke email Anda: %@. Silakan periksa kotak masuk Anda.";
+
+// MARK: - User Profile
+"user_profile.title" = "Profil Pengguna";
+"user_profile.change_avatar" = "Ubah Avatar";
+"user_profile.email_title" = "Email";
+"user_profile.logout" = "Keluar";
+"user_profile.logout_confirm_title" = "Keluar?";
+"user_profile.logout_confirm_message" = "Keluar akan menghapus data lokal.";
+"user_profile.logout_success" = "Berhasil keluar";
+"user_profile.delete" = "Hapus Akun";
+"user_profile.delete_confirm_title" = "Hapus akun?";
+"user_profile.delete_confirm_message" = "Tindakan ini menghapus akun dan data Anda secara permanen dan tidak dapat dibatalkan. Kami akan mengirim kode verifikasi ke email atau ponsel Anda untuk konfirmasi.";
+"user_profile.delete_success" = "Akun dihapus";
+"user_profile.delete_failed" = "Gagal menghapus akun";
+"user_profile.delete_confirm_send" = "Kirim Kode";
+"user_profile.delete_code_sent" = "Kode verifikasi terkirim";
+"user_profile.delete_code_prompt_title" = "Masukkan kode verifikasi";
+"user_profile.delete_code_prompt_message" = "Masukkan kode yang dikirim ke email atau ponsel Anda untuk menghapus akun secara permanen. Tindakan ini tidak dapat dibatalkan.";
+"user_profile.delete_confirm_message_email" = "Tindakan ini menghapus akun dan data Anda secara permanen dan tidak dapat dibatalkan. Kami akan mengirim kode verifikasi ke email %@ Anda untuk konfirmasi.";
+"user_profile.delete_confirm_message_phone" = "Tindakan ini menghapus akun dan data Anda secara permanen dan tidak dapat dibatalkan. Kami akan mengirim kode verifikasi ke nomor ponsel %@ Anda untuk konfirmasi.";
+"user_profile.delete_code_prompt_message_email" = "Masukkan kode yang dikirim ke email %@ Anda untuk menghapus akun secara permanen. Tindakan ini tidak dapat dibatalkan.";
+"user_profile.delete_code_prompt_message_phone" = "Masukkan kode yang dikirim ke nomor ponsel %@ Anda untuk menghapus akun secara permanen. Tindakan ini tidak dapat dibatalkan.";
+"user_profile.delete_code_placeholder" = "Kode verifikasi";
+"user_profile.delete_code_empty" = "Masukkan kode verifikasi";
+"user_profile.delete_submit" = "Hapus Akun";
+"user_profile.delete_err_no_contact" = "Akun Anda tidak memiliki email atau nomor ponsel, sehingga kode tidak dapat dikirim.";
+"user_profile.delete_err_send_failed" = "Tidak dapat mengirim kode. Coba lagi nanti.";
+"user_profile.delete_err_bad_code" = "Kode verifikasi salah atau kedaluwarsa.";
+"user_profile.delete_err_user_gone" = "Akun ini tidak ada atau sudah dihapus.";
+"user_profile.token_missing" = "Silakan login terlebih dahulu";
+"user_profile.photo_unavailable" = "Akses Foto tidak tersedia";
+"user_profile.update_success" = "Profil diperbarui";
+"user_profile.update_failed" = "Gagal memperbarui profil";
+
+// MARK: - Login Start
+"login_start.tagline" = "Wawasan pribadi\nuntuk memberdayakan\nkeseharian Anda.";
+"login_start.button.start" = "Mulai";
+"login_start.button.no_device" = "Belum punya Mindora?";
+
+
+// MARK: - Register P1
+"register.welcome" = "Selamat datang!";
+"register.email_label" = "Alamat email";
+"register.email_placeholder" = "Alamat email";
+"register.info.create" = "Silakan masukkan alamat email Anda untuk membuat akun.";
+"register.info.signin" = "Jika Anda sudah menjadi anggota, masukkan email akun Mindora Anda untuk masuk.";
+"register.button.continue" = "Lanjutkan";
+
+// MARK: - Register P3
+"register.p3.title" = "Ketentuan Penggunaan dan Kebijakan Privasi";
+"register.p3.subtitle" = "Harap tinjau hal berikut untuk melanjutkan:";
+"register.p3.agree_prefix" = "Saya telah membaca dan menyetujui ";
+"register.p3.terms" = "Ketentuan Penggunaan";
+"register.p3.and" = " dan ";
+"register.p3.privacy" = "Kebijakan Privasi Mindora.";
+"register.p3.marketing" = "Terima edukasi kesehatan eksklusif, tips, dan penawaran khusus untuk memaksimalkan pengalaman Mindora Anda.";
+"register.p3.button.save" = "Simpan dan lanjutkan";
+
+// MARK: - Register P2
+"register.p2.title" = "Masukkan kode konfirmasi";
+"register.p2.subtitle" = "Kode 4 digit telah dikirim ke";
+"register.p2.resend" = "Kirim ulang kode";
+
+"register.p2.resend_countdown" = "Anda dapat meminta kode baru dalam %d detik.";
+// MARK: - Common Alerts
+"common.error" = "Kesalahan";
+"common.notice" = "Pemberitahuan";
+"register.verification_code_sent" = "Kode verifikasi terkirim";
+
+// MARK: - Auth Errors
+"auth.error.invalid_url" = "URL tidak valid";
+"auth.error.serialization_error" = "Kesalahan Serialisasi";
+"auth.error.no_data" = "Tidak Ada Data Diterima";
+"auth.error.api_error_default" = "Kesalahan API: %d";
+"auth.error.invalid_response" = "Respons Tidak Valid";
+"auth.error.missing_data" = "Data Hilang dalam Respons";
+"auth.error.network" = "Jaringan tidak tersedia. Silakan periksa koneksi Anda dan coba lagi.";
+"auth.error.timeout" = "Permintaan habis waktu. Silakan coba lagi.";
+"auth.error.server" = "Layanan sementara tidak tersedia. Silakan coba lagi nanti.";
+"auth.error.send_failed" = "Tidak dapat mengirim kode verifikasi. Silakan coba lagi.";
+"auth.error.verify_failed" = "Verifikasi gagal. Silakan coba lagi.";
+"auth.error.code_invalid" = "Kode verifikasi salah. Silakan coba lagi.";
+"auth.error.code_expired" = "Kode verifikasi telah kedaluwarsa. Silakan minta yang baru.";
+
+// MARK: - Subscription
+
+// MARK: - Explore
+"explore.greeting.hi" = "Hai,";
+
+
+
+
+"explore.fluctuation.resp_range" = "Fluktuasi pernapasan";
+
+
+
+
+"explore.quote.open" = "“";
+"explore.quote.close" = "”";
+
+
+"explore.placeholder.number" = "- -";
+"explore.placeholder.hr" = "- - bpm";
+"explore.placeholder.resp" = "- - napas/mnt";
+"explore.placeholder.duration" = "- - mnt";
+"explore.placeholder.count" = "- - kali";
+"explore.placeholder.text" = "- -";
+"explore.placeholder.hr_fluctuation" = "- - bpm";
+"explore.placeholder.percent" = "- -%";
+
+"explore.value.count_format" = "%@ kali";
+"explore.value.duration_format" = "%@ mnt";
+"explore.value.resp_rate_format" = "%@ napas/mnt";
+"explore.value.hr_format" = "%@ bpm";
+"explore.value.hr_range_format" = "%@ bpm";
+
+
+"explore.empty.score" = "0";
+"explore.empty.title" = "Skor Tidur";
+"explore.empty.message" = "Setelah sesi pemantauan pertama Anda,\nAnda akan menerima analisis yang lebih mendalam tentang kualitas tidur Anda di sini.\nMari mulai pemantauan tidur pertama Anda.";
+
+"explore.empty.intro" = "Saat Anda tertidur, terbangun di malam hari, dan kembali ke tidur nyenyak, Mindora mengikuti ritme tidur Anda dan menyesuaikan cara mendampingi sesuai kondisi Anda.\nWawasan ini bukan sekadar perubahan data. Wawasan ini berasal dari skenario yang Anda gunakan, ritme suara, dan respons tubuh Anda.";
+"explore.empty.intro_detail" = "Gulir ke bawah untuk melihat apa yang terjadi semalam, apa yang paling membantu Anda, dan apa yang disesuaikan Mindora.";
+"explore.empty.desc.efficiency" = "Bagian ini menunjukkan bagaimana Anda tertidur. Mindora melihat kapan Anda tertidur, berapa lama waktunya, serta perubahan detak jantung dan napas sebelumnya untuk membantu Anda memahami bagaimana tidur Anda dimulai secara alami.";
+"explore.empty.desc.structure" = "Bagian ini menunjukkan sebaran tahap tidur Anda sepanjang malam. Anda dapat melihat proporsi dan kesinambungan tidur ringan, nyenyak, dan REM untuk lebih memahami struktur tidur Anda tanpa menilainya baik atau buruk.";
+"explore.empty.desc.fluctuation" = "Bagian ini menunjukkan perubahan tidur Anda di malam hari, respons tubuh Anda, dan kapan Mindora turun tangan. Saat terjadi perubahan, Mindora menggunakan sinyal fisiologis Anda untuk menilai kondisi, menyesuaikan pendampingan, dan turun tangan bila perlu untuk menjaga ritme tidur Anda.";
+"explore.empty.desc.preference" = "Bagian ini merangkum jenis suara dan skenario yang Anda sukai, sehingga Anda tahu pengalaman mana yang paling membantu tidur Anda. Mindora belajar dari kebiasaan tidur dan preferensi suara Anda untuk merekomendasikan pendampingan tidur yang lebih personal.";
+"explore.empty.desc.advice" = "Mindora mengikuti perubahan tidur dan sinyal fisiologis Anda sepanjang malam. Bila perlu, penyesuaian berbasis AI akan turun tangan untuk mendukung tidur yang lebih berkesinambungan dan nyenyak.\nSetelah Anda mulai menggunakan Mindora, bagian ini akan menampilkan wawasan tidur yang lebih mendalam, termasuk cara Anda tertidur, struktur tidur, perubahan di malam hari, dan lanskap suara yang direkomendasikan.";
+// MARK: - Subscription
+"subscription.nav.title" = "Keanggotaan";
+"subscription.my_midora" = "My Mindora";
+"subscription.not_member" = "Anda belum menjadi anggota";
+"subscription.not_member_desc" = "Berlangganan paket yang Anda butuhkan dan nikmati manfaat eksklusif";
+"subscription.section.title" = "Langganan Keanggotaan";
+"subscription.my.title" = "Langganan Saya";
+"subscription.monthly" = "Bulanan";
+"subscription.yearly" = "Tahunan";
+"subscription.price.monthly" = "/bulan";
+"subscription.price.yearly" = "/tahun";
+"subscription.action.subscribe" = "Berlangganan";
+"subscription.action.cancel" = "Batalkan";
+"subscription.action.switch" = "Ganti Paket";
+"subscription.desc.monthly.prefix" = "Diperpanjang seharga ";
+"subscription.desc.monthly.suffix" = "/bulan satu hari sebelum kedaluwarsa. Batalkan kapan saja sebelum pemotongan.";
+"subscription.desc.yearly" = "Nikmati layanan setahun penuh. Batalkan kapan saja sebelum perpanjangan berikutnya.";
+"subscription.auto_renew" = "Waktu perpanjangan otomatis: ";
+"subscription.desc.cancelled" = "Manfaat Anda akan tetap aktif hingga langganan kedaluwarsa. Harap perpanjang tepat waktu.";
+"subscription.exclusive" = "Eksklusif Anggota";
+"subscription.feature.1" = "Analisis tidur 360° menyeluruh, basis data tidur pribadi Anda";
+"subscription.feature.2" = "Wawasan tidur cerdas, dari data hingga solusi";
+"subscription.feature.3" = "Rencana bantuan tidur eksklusif, peningkatan tidur yang personal";
+"subscription.help.faq" = "FAQ";
+"subscription.help.message" = "Pusat Pesan";
+"subscription.help.renewal" = "Kelola Langganan";
+"subscription.help.restore" = "Pulihkan Pembelian";
+"subscription.help.community" = "Gabung Komunitas";
+"subscription.help.contact" = "Hubungi Kami";
+"subscription.giftcard.entry" = "Kartu Hadiah & Kode Penukaran";
+
+// Redeem Code
+"redeem.placeholder" = "Masukkan kode penukaran";
+"redeem.action" = "Tukar Sekarang";
+"redeem.rules.entry" = "Aturan Penggunaan";
+"redeem.submitted" = "Kode penukaran dikirim";
+"redeem.success" = "Berhasil ditukar. Keanggotaan diaktifkan.";
+"redeem.success.title" = "Berhasil Ditukar";
+"redeem.success.detail" = "Keanggotaan %1$@ ditukar. Berlaku hingga %2$@.";
+"redeem.success.detail.no_date" = "Keanggotaan %1$@ ditukar.";
+"redeem.success.detail.generic" = "Keanggotaan ditukar. Berlaku hingga %1$@.";
+"redeem.period.yearly" = "Tahunan";
+"redeem.period.monthly" = "Bulanan";
+"redeem.error.generic" = "Penukaran gagal. Silakan coba lagi nanti.";
+"redeem.error.not_logged_in" = "Silakan masuk sebelum menukar.";
+"redeem.rules.title" = "Aturan Penggunaan";
+"redeem.rules.ok" = "OK";
+"redeem.rules.body" = "1. Kode penukaran Mindora dapat diperoleh dengan membeli kartu hadiah keanggotaan di situs web resmi, atau dengan berpartisipasi dalam kegiatan Mindora atau mitra.\n\n2. Manfaat keanggotaan yang diperoleh dengan mengikat kode penukaran Mindora sama dengan yang dibeli.\n\n3. Dalam hal aktivitas tidak normal yang disebabkan oleh keadaan kahar, masalah jaringan, kecurangan, atau faktor non-Mindora lainnya, Mindora berhak menyesuaikan atau menangguhkan layanan keanggotaan.\n\n4. Mindora memiliki hak interpretasi akhir atas aturan ini dalam ruang lingkup hukum. Untuk pertanyaan, hubungi: support@mindora316.com";
+
+// Subscription Email
+"subscription.email.subject" = "Dukungan Mindora";
+"subscription.email.app_version" = "Versi Aplikasi";
+"subscription.email.ios_version" = "Versi iOS";
+"subscription.email.device" = "Perangkat";
+"subscription.email.error.title" = "Kesalahan Email";
+"subscription.email.error.message" = "Email tidak dikonfigurasi di perangkat ini.";
+
+// Subscription Status
+"subscription.tide_days" = "Hari Mindora";
+"subscription.active.plan_prefix" = "Aktif · ";
+"subscription.active.plan_suffix" = " Langganan";
+"subscription.plan_name.monthly" = "Bulanan";
+"subscription.plan_name.yearly" = "Tahunan";
+"subscription.expires_prefix" = "Kedaluwarsa pada ";
+
+// MARK: - Notifications
+"notifications.title" = "Notifikasi";
+"notifications.empty" = "Belum ada pesan";
+"notifications.history.divider" = "Pesan riwayat di bawah";
+"notifications.delete" = "Hapus";
+"notifications.permission.title" = "Izinkan Notifikasi";
+"notifications.permission.desc" = "Aktifkan notifikasi sistem untuk menerima pesan tepat waktu";
+"notifications.permission.status" = "Anda telah menonaktifkan notifikasi Mindora di pengaturan sistem";
+"notifications.permission.keep" = "Pertahankan";
+"notifications.permission.open" = "Buka Pengaturan";
+"notifications.mock.system" = "Pesan Sistem";
+"notifications.mock.title" = "Pengingat Keanggotaan";
+"notifications.mock.body" = "Langganan Anda kedaluwarsa dalam 7 hari. Harap perpanjang tepat waktu untuk menghindari gangguan.";
+"notifications.mock.action" = "Lihat Halaman Keanggotaan";
+
+// 消息通知 · 动态生成
+"notifications.source.membership" = "Pesan Keanggotaan";
+"notifications.source.system" = "Pesan Sistem";
+"notifications.source.health" = "Pengingat Tidur";
+"notifications.subscription.expiring.title" = "Keanggotaan Segera Kedaluwarsa";
+"notifications.subscription.expiring.body" = "Keanggotaan Anda akan kedaluwarsa dalam %1$d hari. Perpanjang tepat waktu agar manfaat Anda tetap aktif.";
+"notifications.subscription.expiring.action" = "Lihat Halaman Keanggotaan";
+"notifications.subscription.expired.title" = "Keanggotaan Telah Kedaluwarsa";
+"notifications.subscription.expired.body" = "Keanggotaan Anda telah kedaluwarsa. Perpanjang sekarang untuk memulihkan semua manfaat.";
+"notifications.subscription.expired.action" = "Perpanjang Sekarang";
+"notifications.subscription.activated.title" = "Keanggotaan Telah Diaktifkan";
+"notifications.subscription.activated.body" = "Terima kasih telah berlangganan! Manfaat Anda aktif hingga %1$@.";
+"notifications.subscription.activated.action" = "Lihat Manfaat";
+"notifications.subscription.renewed.title" = "Keanggotaan Telah Diperpanjang";
+"notifications.subscription.renewed.body" = "Perpanjangan berhasil. Keanggotaan Anda kini berlaku hingga %1$@.";
+"notifications.subscription.renewed.action" = "Lihat Manfaat";
+"notifications.redeem.title" = "Berhasil Ditukar";
+"notifications.redeem.body" = "Berhasil ditukar. Keanggotaan Anda aktif hingga %1$@.";
+"notifications.redeem.body_days" = "Berhasil ditukar. %1$d hari keanggotaan ditambahkan, berlaku hingga %2$@.";
+"notifications.redeem.action" = "Lihat Manfaat";
+"notifications.permission.off.title" = "Notifikasi Dinonaktifkan";
+"notifications.permission.off.body" = "Anda telah menonaktifkan notifikasi Mindora di Pengaturan, sehingga Anda mungkin melewatkan pengingat tentang keanggotaan dan laporan tidur.";
+"notifications.permission.off.action" = "Buka Pengaturan";
+"notifications.sleep.low.title" = "Skor Tidur Rendah";
+"notifications.sleep.low.body" = "Skor tidur terakhir Anda adalah %1$d. Ketuk untuk melihat apa yang memengaruhi tidur Anda.";
+"notifications.sleep.low.action" = "Lihat Detail Tidur";
+"notifications.weargap.title" = "Tidak Ada Data Tidur Selama %1$d Hari";
+"notifications.weargap.body" = "Kami belum menerima data tidur selama %1$d hari. Kenakan perangkat Anda saat tidur untuk terus mendapatkan analisis.";
+"notifications.weargap.action" = "Lihat Detail Tidur";
+
+
+// MARK: - Terms & Privacy
+
+
+// MARK: - Help Page
+"help.page.title" = "Bantuan";
+"help.page.description" = "Jika Anda memiliki pertanyaan tentang produk,\nAnda dapat menghubungi kami dengan memindai kode QR resmi di atas atau melalui email.";
+"help.page.email" = "support@mindora316.com";
+
+// MARK: - Logout Alert
+"logout.alert.title" = "Keluar";
+"logout.alert.message" = "Apakah Anda yakin ingin keluar? Anda harus masuk lagi untuk menggunakan aplikasi.";
+"logout.alert.cancel" = "Batal";
+"logout.alert.confirm" = "Keluar";
+
+// MARK: - Health Link Alert
+"health_link.alert.title" = "Akan beralih ke asosiasi data Apple Health";
+"health_link.alert.cancel" = "Batal";
+"health_link.alert.confirm" = "Konfirmasi";
+"common.save" = "Simpan";
+"user_profile.label_date" = "Tanggal";
+
+// MARK: - Address
+
+// MARK: - Address
+"address.title" = "Alamat Saya";
+"address.empty" = "Belum ada alamat ditambahkan";
+"address.add_new" = "Tambah Alamat Baru";
+"address.paste_tip" = "Tempel teks untuk pengenalan cerdas";
+"address.paste" = "Tempel";
+"address.name" = "Nama";
+"address.name_placeholder" = "Silakan masukkan nama";
+"address.phone" = "Telepon";
+"address.phone_placeholder" = "Silakan masukkan nomor telepon";
+"address.phone_invalid" = "Masukkan nomor telepon yang valid";
+"address.name_invalid" = "Nama tidak boleh mengandung angka";
+"address.region" = "Wilayah";
+"address.region_placeholder" = "Pilih Wilayah";
+"address.locate" = "Lokasikan";
+"address.detail" = "Alamat Lengkap";
+"address.detail_placeholder" = "Jalan, No. Rumah, dll.";
+"address.country" = "Negara/Wilayah";
+"address.phone_country" = "Negara nomor telepon";
+"address.state" = "Negara Bagian/Provinsi";
+"address.state_placeholder" = "Masukkan negara bagian/provinsi";
+"address.city" = "Kota";
+"address.district" = "Distrik";
+"address.city_placeholder" = "Kota";
+"address.street1" = "Baris alamat 1";
+"address.street1_placeholder" = "Alamat jalan atau kotak pos";
+"address.street2" = "Baris alamat 2";
+"address.street2_placeholder" = "Apartemen, unit, gedung, lantai";
+"address.zip" = "Kode Pos";
+"address.state_only" = "Negara Bagian";
+"address.province" = "Provinsi";
+"address.prefecture" = "Prefektur";
+"address.zip_only" = "Kode ZIP";
+"address.postal_code" = "Kode Pos";
+"address.zip_placeholder" = "Masukkan kode pos";
+"address.select" = "Pilih";
+"address.locate_fill" = "Gunakan lokasi saat ini";
+"address.picker_search" = "Cari";
+"address.name_required" = "Masukkan nama penerima";
+"address.state_required" = "Pilih negara bagian/provinsi";
+"address.city_required" = "Masukkan kota";
+"address.street_required" = "Masukkan alamat jalan";
+"address.zip_invalid" = "Masukkan kode pos yang valid";
+"address.set_default" = "Jadikan Alamat Default";
+"address.confirm" = "Konfirmasi";
+"address.default_tag" = "Default";
+"address.delete" = "Hapus";
+"permission.location_needed" = "Mindora memerlukan akses lokasi untuk membantu mengisi alamat Anda. Silakan aktifkan di Pengaturan.";
+"common.tips" = "Tips";
+"common.settings" = "Pengaturan";
+"common.cancel" = "Batal";
+"address.select_title" = "Pilih Alamat";
+"address.search_placeholder" = "Cari Tempat";
+"address.current_location" = "[Lokasi Saat Ini]";
+
+// Subscription Restore
+"subscription.restore.loading" = "Memulihkan...";
+"subscription.restore.success" = "Pemulihan Berhasil";
+"subscription.restore.no_purchases" = "Tidak ada langganan aktif ditemukan.";
+"subscription.bound_to_another" = "Langganan ini tertaut ke akun lain. Silakan masuk dengan akun tersebut untuk menggunakannya.";
+
+// Renewal Management
+"renewal.title" = "Kelola Langganan";
+"renewal.your_subscription" = "Langganan Anda";
+"renewal.product_name" = "My Mindora";
+"renewal.plan" = "Paket";
+"renewal.plan.monthly" = "Langganan Bulanan";
+"renewal.renewal_date" = "Tanggal Perpanjangan";
+"renewal.amount" = "Jumlah";
+"renewal.manage" = "Kelola";
+"renewal.plan.yearly" = "Langganan Tahunan";
+"renewal.plan.none" = "Anda tidak memiliki langganan";
+
+
+// MARK: - FAQ
+"subscription.renewal_management" = "Pengelolaan Langganan";
+"faq.title" = "FAQ Mindora";
+"faq.subtitle" = "Mindora adalah perangkat bantuan tidur cerdas yang dirancang untuk meningkatkan kualitas tidur melalui sinergi multi-sensorik dan AI. Ini bukan perangkat medis. Berikut adalah beberapa jawaban untuk pertanyaan umum.";
+"faq.footer.prefix" = "Untuk pertanyaan lain, kunjungi ";
+"faq.footer.link" = "Pusat Bantuan";
+"faq.footer.suffix" = " di situs web Mindora.";
+
+"faq.q1" = "Bagaimana saya memilih paket langganan?";
+"faq.a1" = "Langganan bulanan: $2,99/bulan.\n\nLangganan tahunan: $29,99/tahun, menghemat sekitar 2 bulan biaya.\n\nHarga sebenarnya dapat sedikit berbeda tergantung negara atau wilayah Anda dan pajak yang berlaku—harap periksa jumlah akhir di halaman langganan.\n\nJika Anda membeli perangkat dari toko online Mindora, Anda juga dapat menambahkan paket keanggotaan tahunan prabayar ke pesanan Anda.\n\nAnggota baru yang membeli perangkat sebelum 25 Desember 2026 menerima tahun pertama keanggotaan Mindora secara gratis. Setelah periode gratis ini, keanggotaan harus dibeli secara terpisah.\n\nKeanggotaan Mindora terkait dengan akun Mindora Anda, bukan perangkat fisik Mindora Anda. Jika Anda membeli perangkat tambahan dengan akun Mindora yang sudah ada, Anda tidak akan menerima bulan keanggotaan gratis lagi.";
+
+"faq.q2" = "Bagaimana saya mengaktifkan keanggotaan saya?";
+"faq.a2" = "Jika Anda membeli bundel perangkat keras yang mencakup periode keanggotaan, keanggotaan gratis diaktifkan secara otomatis saat pertama kali Anda berhasil menghubungkan perangkat dan masuk ke aplikasi.\n\nJika Anda membeli keanggotaan secara terpisah, cukup ketuk “Tingkatkan Akun” atau “Berlangganan” di aplikasi Mindora, pilih paket, dan selesaikan pembayaran untuk segera mengaktifkannya.";
+
+"faq.q3" = "Sistem ponsel mana yang kompatibel dengan aplikasi Mindora?";
+"faq.a3" = "Aplikasi Mindora mendukung iPhone yang menjalankan iOS 15 atau lebih baru, dan ponsel Android yang menjalankan Android 11 atau lebih baru dengan dukungan Bluetooth 5.0.";
+
+"faq.q4" = "Apakah saya perlu menjaga Bluetooth ponsel tetap menyala setiap saat?";
+"faq.a4" = "Ya. Untuk menjaga perangkat dan aplikasi tetap sinkron serta mengaktifkan kontrol jarak jauh, Bluetooth perlu menyala. Namun, perangkat itu sendiri dapat menjalankan program tidur prasetelnya secara mandiri.";
+
+"faq.q5" = "Bagaimana saya menghubungkan/memasangkan perangkat?";
+"faq.a5" = "Nyalakan Bluetooth ponsel Anda, buka aplikasi Mindora, ketuk “Tambah Perangkat” di layar beranda, dan ikuti instruksi di layar. Untuk panduan langkah demi langkah yang detail, lihat [tautan ke artikel bantuan tertentu].";
+
+"faq.q6" = "Dapatkah Mindora menyinkronkan data dengan aplikasi kesehatan lain (seperti Apple Health atau Google Fit)?";
+"faq.a6" = "Ya. Di aplikasi Mindora pada “Pengaturan” > “Aplikasi & Layanan,” Anda dapat mengizinkan sinkronisasi data tidur Anda ke platform seperti Apple Health atau Google Fit.";
+
+"faq.q7" = "Apakah saya memerlukan langganan berbayar untuk menggunakan semua fitur?";
+"faq.a7" = "Fitur inti bantuan tidur Mindora (seperti suara dasar, suasana cahaya, dan difusi aroma) serta pemantauan tidur AI tersedia setelah Anda membeli perangkat keras. Keanggotaan premium (jika berlaku) membuka perpustakaan suara yang lebih kaya, laporan analisis tidur yang dipersonalisasi, kursus tidur lanjutan, konten ASMR eksklusif, algoritma AI yang lebih halus dan personal, dan lainnya.";
+
+"faq.q8" = "Bagaimana saya mengelola atau membatalkan langganan saya?";
+"faq.a8" = "Anda dapat mengelola langganan kapan saja di “Pengaturan Akun” dalam aplikasi Mindora. Untuk pembelian yang dilakukan melalui iOS App Store atau Google Play Store, Anda juga perlu mengelolanya di halaman langganan toko terkait.";
+
+"faq.q9" = "Apakah data tidur saya aman? Bagaimana Mindora melindungi privasi saya?";
+"faq.a9" = "Keamanan data Anda adalah yang terpenting. Kami menggunakan enkripsi standar industri untuk melindungi data saat transit dan saat disimpan. Anda dapat meninjau Kebijakan Privasi Mindora lengkap untuk mempelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda.";
+
+"faq.q10" = "Dapatkah saya menghapus akun dan data saya?";
+"faq.a10" = "Ya. Anda dapat menemukan opsi “Hapus Akun” di “Pengaturan Akun” dalam aplikasi Mindora, atau hubungi dukungan pelanggan kami untuk memintanya. Setelah dihapus, data pribadi Anda akan dihapus dari server aktif kami.";
+
+"faq.q11" = "Di mana saya dapat mengelola atau membatalkan keanggotaan Mindora saya?";
+"faq.a11" = "Pengelolaan dalam aplikasi: Di “Pengaturan Akun” > “Langganan Saya” dalam aplikasi Mindora, Anda dapat memeriksa tanggal perpanjangan berikutnya, mengubah metode pembayaran, atau membatalkan perpanjangan otomatis kapan saja.\n\nPengelolaan toko aplikasi: Jika Anda berlangganan melalui toko aplikasi iOS atau Android, Anda juga perlu membatalkan di halaman pengelolaan langganan toko terkait. Pembatalan berlaku pada akhir siklus penagihan saat ini.";
+
+
+// MARK: - Health Refactor
+"health.segment.day" = "Hari";
+"health.segment.week" = "Minggu";
+"health.segment.month" = "Bulan";
+"health.sleep.efficiency" = "Efisiensi Tidur";
+"health.sleep.performance" = "Performa Tidur";
+"health.sleep.time_in_bed" = "Waktu di Tempat Tidur";
+"health.sleep.resting_heart_rate" = "Detak Jantung Istirahat";
+"health.sleep.sleep_heart_rate" = "Detak Jantung Tidur";
+"health.sleep.overnight_vitals" = "Tanda Vital Sepanjang Malam";
+"health.sleep.respiratory_rate" = "Laju Pernapasan";
+"health.sleep.body_temperature" = "Suhu Tubuh";
+"health.sleep.scenarios" = "Skenario Tidur";
+"health.sleep.onset" = "Awal Tidur";
+"health.sleep.awake_time" = "Waktu Terjaga";
+
+
+// MARK: - Health Month View
+"health.month.trends_title" = "Tren Tidur";
+"health.month.trends_subtitle" = "Berdasarkan analisis data tidur Anda";
+"health.month.trends_body" = "Bulan ini, Anda mempertahankan jumlah tidur yang konsisten dengan sangat sedikit terbangun di malam hari.";
+"health.month.trends_desc" = "Selama 30 hari terakhir, tidur nyenyak mencakup 29,8% dari total tidur Anda, di atas tingkat standar. \nWaktu tidur Anda bergeser lebih awal rata-rata 32 menit. \nTeruslah menjaga jadwal tidur yang teratur.";
+"health.month.best_title" = "Efisiensi Awal Tidur";
+"health.month.best_subtitle" = "Dirancang untuk memberi Anda tidur terbaik";
+"health.month.best_desc" = "Bulan ini, \"Ketenangan Batu Merah Sedona\" adalah skenario tidur yang paling sering Anda gunakan dan menunjukkan performa awal tidur terbaik. \"Hanyutan Cahaya Bulan Pulau Cocoa\" menonjol dalam menjaga tidur yang stabil……";
+"health.month.avg_heart_rate" = "Rata-rata detak jantung";
+"health.month.total_sleep" = "Total tidur";
+"health.month.days_tracked" = "Hari Terlacak";
+
+"subscription.view_content_hint" = "Berlangganan untuk melihat";
+"subscription.go_to_subscribe" = "Berlangganan";
+
+// MARK: - Explore
+"explore.title" = "Jelajahi";
+"explore.greeting" = "Hai, %@";
+"explore.intro.data" = "Hai, tadi malam tubuh Anda memasuki kondisi tidur yang stabil, rileks, dan sangat pulih. Dari ritme awal tidur hingga struktur sepanjang malam, banyak indikator kunci lebih baik dari rata-rata Anda akhir-akhir ini. Ini bukan malam yang beruntung—ini adalah malam yang terkoordinasi baik antara sistem saraf dan arsitektur tidur Anda.";
+"explore.section.efficiency" = "Efisiensi Awal Tidur";
+"explore.status.health_range" = "Rentang Sehat";
+"explore.metric.onset_time" = "Waktu Awal Tidur: %@ mnt";
+"explore.section.structure" = "Struktur Tidur";
+"explore.status.average" = "Tingkat Rata-rata";
+"explore.metric.continuous_sleep" = "Tidur Berkelanjutan: %@ mnt";
+"explore.section.fluctuation" = "Fluktuasi Malam";
+"explore.status.fluctuation_high" = "Fluktuasi Tinggi";
+"explore.metric.smart_intervention" = "Intervensi Cerdas: %@";
+"explore.section.preference" = "Preferensi Skenario";
+"explore.section.advice" = "Saran Tidur";
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.time" = "- - mnt";
+"explore.placeholder.label" = "Rentang Status";
+"explore.efficiency.first_sleep" = "Waktu Awal Tidur";
+"explore.efficiency.pre_hr" = "Detak Jantung Sebelum Tidur";
+"explore.efficiency.pre_resp" = "Pernapasan Sebelum Tidur";
+"explore.structure.rem" = "Tidur REM";
+"explore.structure.deep" = "Tidur Nyenyak";
+"explore.structure.light" = "Tidur Ringan";
+"explore.fluctuation.awake_count" = "Terbangun";
+"explore.fluctuation.awake_duration" = "Durasi";
+"explore.fluctuation.awake_type" = "Tipe";
+"explore.fluctuation.hr_range" = "Rentang Detak Jantung";
+"explore.preference.recent" = "Baru Digunakan";
+"explore.preference.cocos_island.title" = "Hanyutan Cahaya Bulan Pulau Cocoa";
+"explore.preference.cocos_island.subtitle" = "Profil suara: laut / derau merah muda / derau cokelat";
+"explore.quote.text" = "Mindora tidak hanya mencatat tidur Anda. Setelah memahami kondisi Anda, ia memilih cara yang lebih sesuai untuk membantu Anda terus tidur.";
+"explore.article.1.title" = "Judul Artikel";
+"explore.article.1.subtitle" = "Ringkasan artikel ringkasan artikel ringkasan artikel ringkasan artikel";
+"explore.article.2.title" = "Judul Artikel";
+"explore.article.2.subtitle" = "Ringkasan artikel ringkasan artikel ringkasan artikel ringkasan artikel";
+"explore.article.3.title" = "Judul Artikel";
+"explore.article.3.subtitle" = "Ringkasan artikel ringkasan artikel ringkasan artikel ringkasan artikel…";
+"explore.article.4.title" = "Judul Artikel";
+"explore.article.4.subtitle" = "Ringkasan artikel ringkasan artikel ringkasan artikel ringkasan artikel";
+
+"explore.mock.efficiency_desc" = "Tren detak jantung dan pernapasan keduanya 'stabil', menunjukkan bahwa sistem saraf parasimpatis telah mengambil alih. Tubuh berada dalam kondisi relaksasi alami, dan otak tidak memerlukan 'perlambatan' ekstra untuk tertidur.\n\nMempertahankan detak jantung dan pernapasan yang relatif stabil atau menurun perlahan dalam 30 menit sebelum tidur berkorelasi dengan latensi tidur yang lebih pendek. Ini juga merupakan salah satu sinyal fisiologis umum dalam kedokteran tidur untuk menilai 'kesiapan untuk tidur'.";
+"explore.mock.structure_desc" = "Data ini tidak menunjukkan 'kelainan struktural'. Tidak ada tahap tidur yang hilang tadi malam, tetapi segmen tidur kunci terfragmentasi. Ini khas dari: gangguan malam yang sering di mana 'Tidur Nyenyak dan REM terkompresi'.\n\nIni adalah salah satu pola paling umum dan dapat dipulihkan yang terlihat selama malam-malam penuh tekanan.";
+"explore.mock.fluctuation_desc" = "Sinyal-sinyal ini menunjukkan sistem saraf nokturnal berada dalam kondisi respons tinggi, sensitif terhadap rangsangan eksternal maupun kecemasan internal. Pada pukul 03:25, Mindora mendeteksi fluktuasi detak jantung/pernapasan, dan terbangun berlangsung melampaui ambang penyesuaian fisiologis. Mindora kemudian memulai intervensi 15 menit menggunakan 'Angin Sepoi Pantai Amalfi'—suasana suara laut berfrekuensi rendah, ritmis, dan berkelanjutan—membantu sistem saraf beralih kembali ke dominasi parasimpatis, memungkinkan Anda kembali tidur 15 menit setelah terbangun.";
+"explore.mock.preference_desc" = "Tadi malam, Anda tertidur dalam suasana “Hanyutan Cahaya Bulan Pulau Cocoa”. Bidang suara ini didominasi oleh suasana selimut laut dengan derau merah muda/cokelat.\n\nStrukturnya dipimpin oleh ombak laut berfrekuensi rendah dan berkelanjutan. Ritme keseluruhan stabil, tanpa lonjakan tajam—sebuah lingkungan yang tidak secara aktif menarik perhatian namun tetap hadir.\n\nPenelitian menunjukkan suasana suara alam berfrekuensi rendah dan berkelanjutan mengurangi kewaspadaan terhadap perubahan lingkungan dan mengurangi pemeriksaan keamanan sebelum tidur. Ritme ombak yang lambat juga dapat selaras dengan pernapasan, membantu sistem saraf beralih ke mode istirahat.";
+"explore.mock.advice_desc" = "Mengamati data beberapa malam, kondisi tidur Anda secara keseluruhan cukup stabil. Jika Anda ingin mengurangi fluktuasi malam lebih lanjut, cobalah menurunkan rangsangan eksternal 1 jam sebelum tidur atau mengakhiri pemutaran suara lebih awal pada malam-malam mendatang.\n\nTidur bukanlah garis lurus—ia adalah sistem yang dapat terganggu dan memperbaiki diri. Mencatat perubahan ini bukan untuk menilai seberapa baik Anda tidur; ini tentang menemukan cara paling hemat usaha dan paling stabil bagi Anda untuk tidur.\n\nTadi malam, tubuh Anda melakukan hal itu.";
+"explore.mock.intervention" = "Intervensi Suasana";
+"explore.mock.awake_type" = "Tipe Kecemasan";
+
+// MARK: - Store
+"store.coming_soon" = "Toko Segera Hadir";
+"store.banner.title" = "Pilih Campuran & Kombinasi\nFavorit Anda";
+"store.banner.discount_prefix" = "3 Item ";
+"store.banner.discount_value" = "9.5";
+"store.banner.discount_suffix" = " DISKON";
+"store.banner.learn_more" = "Pelajari Lebih Lanjut";
+"store.section.member_exclusive" = "Eksklusif Anggota";
+"store.section.new_arrivals" = "Kedatangan Baru";
+"store.badge.hot" = "Populer";
+"store.badge.new" = "Baru";
+"store.product.combo_oil" = "Kombinasi Minyak Esensial";
+"store.product.frankincense_oil" = "Minyak Kemenyan";
+"store.product.calming_oil" = "Minyak Penenang Tumbuhan";
+"store.product.silk_pajama" = "Set Piama Sutra";
+"store.product.gift_set" = "Hadiah Tidur Sutra...";
+"store.search.placeholder" = "Cari produk";
+"store.search.cancel" = "Batal";
+"store.search.history" = "Riwayat Pencarian";
+
+"auth.session_expired" = "Sesi kedaluwarsa. Silakan masuk lagi.";
+
+/* MARK: - Home Popup (activity / ad / survey invite) */
+"popup.badge.survey" = "Survei";
+"popup.action.detail" = "Lihat Detail";
+"popup.mock.survey.title" = "Bantu Kami Menjadi Lebih Baik";
+"popup.mock.survey.subtitle" = "Selesaikan survei tidur 3 menit dan dapatkan poin keanggotaan setelah mengirim.";
+
+/* MARK: - Survey */
+"survey.title" = "Survei Pengalaman Tidur";
+"survey.next" = "Berikutnya";
+"survey.submit" = "Kirim";
+"survey.submit.note" = "Dengan mengirim, Anda setuju jawaban Anda digunakan untuk meningkatkan pengalaman produk.";
+"survey.choice.hint" = "Pilih jawaban yang paling sesuai dengan perasaan Anda";
+"survey.q1.title" = "Dalam 7 hari terakhir, seberapa puas Anda dengan tidur Anda secara keseluruhan?";
+"survey.q2.title" = "Dalam 7 hari terakhir, seberapa puas Anda dengan Mindora secara keseluruhan?";
+"survey.q3.title" = "Apakah Anda punya saran untuk meningkatkan Mindora?";
+"survey.q3.hint" = "Bagikan saran Anda";
+"survey.q3.placeholder" = "Ketik di sini…";
+"survey.scale.very_satisfied" = "Sangat Puas";
+"survey.scale.satisfied" = "Puas";
+"survey.scale.neutral" = "Netral";
+"survey.scale.dissatisfied" = "Tidak Puas";
+"survey.scale.very_dissatisfied" = "Sangat Tidak Puas";
+"survey.validation.choose" = "Silakan pilih jawaban";
+"survey.validation.input" = "Silakan masukkan saran Anda";
+"survey.error.generic" = "Terjadi kesalahan. Silakan coba lagi.";
+"survey.already_submitted" = "Survei ini sudah dikirim. Terima kasih!";
+"survey.completed" = "Selesai";
+"survey.reward.title" = "Hadiah Survei";
+"survey.reward.desc" = "Hadiah akan dikirim dalam 10 hari kerja dan kami akan memberi tahu Anda melalui email.";
+"survey.success.title" = "Terkirim";
+"survey.success.line1" = "Terima kasih atas masukan jujur Anda";
+"survey.success.line2" = "Hadiah akan dikirim dalam 10 hari kerja";
+"survey.success.line3" = "Kami akan memberi tahu Anda melalui email";
+"survey.success.back_home" = "Kembali ke Beranda";
+
+/* MARK: - Notifications: survey invite */
+"notifications.source.survey" = "Survei";
+"notifications.source.promo" = "Aktivitas";
+"notifications.promo.action" = "Lihat Detail";
+"notifications.survey.title" = "Bantu Kami Menjadi Lebih Baik";
+"notifications.survey.valid_until" = "Berlaku hingga %@";
+"notifications.survey.action" = "Isi Survei";
+
+/* MARK: - Companion Footprint */
+"footprint.title" = "Jejak Pendampingan";
+"footprint.explain" = "Info";
+"footprint.stat.companion" = "Pendamping Tidur";
+"footprint.stat.app_active" = "App Aktif";
+"footprint.stat.continuous" = "Penggunaan Berturut-turut";
+"footprint.stat.month_total" = "Bulan ini";
+"footprint.stat.year_total" = "Tahun ini";
+"footprint.unit.day" = "hari";
+"footprint.milestones.title" = "Pencapaian";
+"footprint.milestones.empty" = "Belum ada pencapaian";
+"footprint.milestone.sleep_plan" = "Rencana Tidur";
+"footprint.milestone.days_completed" = "Target tidur %d hari · Selesai";
+"footprint.legend.app_active" = "App Aktif";
+"footprint.legend.companion" = "Pendamping Tidur";
+"footprint.legend.plan" = "Rencana / Rentetan";
+"footprint.weekday.sun" = "Min";
+"footprint.weekday.mon" = "Sen";
+"footprint.weekday.tue" = "Sel";
+"footprint.weekday.wed" = "Rab";
+"footprint.weekday.thu" = "Kam";
+"footprint.weekday.fri" = "Jum";
+"footprint.weekday.sat" = "Sab";
+"footprint.weekday.full.mon" = "Sen";
+"footprint.weekday.full.tue" = "Sel";
+"footprint.weekday.full.wed" = "Rab";
+"footprint.weekday.full.thu" = "Kam";
+"footprint.weekday.full.fri" = "Jum";
+"footprint.weekday.full.sat" = "Sab";
+"footprint.weekday.full.sun" = "Min";
+"footprint.month_selector" = "%d/%d";
+"footprint.month_label" = "%d";
+"footprint.anchor_date" = "%d-%d-%d · %@";
+"footprint.annual.title" = "Jejak Pendampingan %d";
+"footprint.info.title" = "Panduan Metrik";
+"footprint.info.companion.desc" = "Perangkat dan App digunakan secara efektif pada saat bersamaan; dihitung maksimal sekali per hari kalender. Menampilkan total bulanan.";
+"footprint.info.app_active.desc" = "Membuka App pada suatu hari dihitung sebagai 1 hari; membukanya lagi di hari yang sama tidak dihitung ulang. Menampilkan total bulanan.";
+"footprint.info.continuous.desc" = "Hari kalender dengan catatan penggunaan yang terkumpul dalam tahun kalender ini, sejak unduhan atau penggunaan pertama.";
+"footprint.info.marks.title" = "Tanda Kalender";
+"footprint.picker.title" = "Pilih Bulan";
+"footprint.picker.annual" = "Sepanjang Tahun";
+"footprint.picker.confirm" = "Konfirmasi";
+
+"notifications.survey.body" = "Kami mengundang Anda mengisi survei pengalaman tidur 3 menit dan mendapatkan hadiah merek setelah mengirim.";
+
+/* MARK: - Gift Claim */
+"gift.title" = "Klaim Hadiah";
+"gift.confirm" = "Konfirmasi";
+"gift.physical.desc" = "Kami akan mengirim 「%@」 ke alamat tersimpan Anda:";
+"gift.physical.change_hint" = "Untuk mengubah alamat, hubungi dukungan pelanggan.";
+"gift.virtual.desc" = "Kami akan mengirim 「%@」 ke email tersimpan Anda. Untuk mengubahnya, masukkan lagi di bawah.";
+"gift.email.placeholder" = "Masukkan email";
+"gift.validation.email" = "Masukkan email yang valid";
+"gift.no_address" = "Belum ada alamat tersimpan. Tambahkan di profil Anda.";
+"gift.no_address.title" = "Maaf, kami tidak dapat menemukan alamat Anda";
+"gift.no_address.hint" = "Silakan isi alamat pengiriman Anda";
+"gift.fill_address" = "Isi Alamat";
+"gift.address.title" = "Isi Alamat";
+"survey.reward.demo_gift" = "Hadiah Tidur Merek";
+
+"device_scan.stale_pairing.title" = "Lupakan Perangkat di Pengaturan";
+"device_scan.stale_pairing.message" = "Informasi pemasangan Bluetooth yang tersimpan di iPhone ini sudah tidak valid, sehingga tidak dapat terhubung ke “%@”. Buka Pengaturan → Bluetooth, ketuk ⓘ di samping perangkat, pilih “Lupakan Perangkat Ini”, lalu coba lagi.";
+"settings.follow_system" = "Ikuti sistem";
+
+// MARK: - Sleep Plan（睡眠计划 Tab，2026-08-12）
+"tab.plan" = "Rencana";
+"common.got_it" = "Mengerti";
+"subscription.section.title.premium" = "Keanggotaan Premium";
+"subscription.action.upgrade" = "Tingkatkan";
+"subscription.desc.premium.monthly.prefix" = "Sehari sebelum berakhir, akan diperpanjang dengan ";
+"subscription.desc.premium.monthly.suffix" = "/bulan. Anda dapat membatalkan kapan saja sebelum penagihan.";
+"subscription.desc.premium.yearly" = "Nikmati Premium selama satu tahun penuh sejak tanggal aktivasi. Batalkan kapan saja sebelum perpanjangan berikutnya.";
+"renewal.tier" = "Tingkat Keanggotaan";
+"renewal.tier.basic" = "Anggota Dasar";
+"renewal.tier.premium" = "Anggota Premium";
+"renewal.tier.none" = "Tidak ada";
+"renewal.environment" = "Lingkungan";
+"renewal.environment.sandbox" = "Uji coba (tanpa biaya)";
+"sleepplan.title" = "Rencana Tidur";
+"sleepplan.intro" = "Tetapkan target tidur — aplikasi dan perangkat Anda akan mengingatkan dan bekerja sama untuk mewujudkannya. Jadikan tidur yang lebih baik sebagai rencana yang bisa dijalankan.";
+"sleepplan.section.training" = "Pelatihan Tidur";
+"sleepplan.section.training.subtitle" = "Rencana penyesuaian tidur berbasis sains. Pilih salah satu untuk mulai dengan cepat.";
+"sleepplan.section.my_plans" = "Rencana Tidur Saya";
+"sleepplan.my_plans.empty" = "Belum ada rencana tidur";
+"sleepplan.my_plans.quota" = "%@ · %d/%d";
+"sleepplan.kind.custom.default_name" = "Rencana Tidur Baru 01";
+"sleepplan.kind.habit_formation.name" = "Membangun Kebiasaan Tidur";
+"sleepplan.kind.habit_formation.summary" = "Pelatihan kebiasaan 21 hari";
+"sleepplan.kind.habit_formation.description" = "Bangun kebiasaan tidur yang stabil dan berkelanjutan dalam 21 hari. Rutinitas teratur membantu menstabilkan ritme tidur dan meningkatkan kualitas tidur.";
+"sleepplan.kind.jet_lag.name" = "Koreksi Jet Lag";
+"sleepplan.kind.jet_lag.summary" = "Penyesuaian tidur 7 hari";
+"sleepplan.kind.jet_lag.description" = "Sesuaikan waktu tidur dan bangun secara bertahap selama 7 hari untuk cepat beradaptasi dengan zona waktu baru.";
+"sleepplan.kind.anxiety_relief.name" = "Pemulihan Kecemasan";
+"sleepplan.kind.anxiety_relief.summary" = "Relaksasi 14 hari sebelum tidur";
+"sleepplan.kind.anxiety_relief.description" = "Program relaksasi 14 hari sebelum tidur untuk meredakan kecemasan sebelum tidur dan membantu Anda lebih mudah rileks.";
+"sleepplan.status.active" = "Aktif";
+"sleepplan.status.not_enabled" = "Belum diaktifkan";
+"sleepplan.status.completed" = "Selesai";
+"sleepplan.status.stopped" = "Dihentikan";
+"sleepplan.list.target_sleep_time" = "Target tidur %@";
+"sleepplan.tier.basic" = "Anggota Dasar";
+"sleepplan.tier.premium" = "Anggota Premium";
+"sleepplan.action.create_plan" = "Rencana Baru +";
+"sleepplan.action.edit" = "Edit";
+"sleepplan.action.plan_detail" = "Detail rencana →";
+"sleepplan.action.save" = "Simpan Pengaturan";
+"sleepplan.action.discard" = "Buang Perubahan";
+"sleepplan.action.keep_editing" = "Lanjutkan Edit";
+"sleepplan.action.tap_to_set" = "Ketuk untuk mengatur";
+"sleepplan.action.upgrade_premium" = "Tingkatkan ke Premium";
+"sleepplan.alert.locked_tonight.title" = "Rencana malam ini sudah dimulai";
+"sleepplan.alert.locked_tonight.message" = "Belum bisa dinonaktifkan sekarang, coba lagi besok.";
+"sleepplan.alert.plan_full.title" = "Slot rencana tidur sudah penuh";
+"sleepplan.alert.plan_full.message" = "Jumlah rencana tidur yang tersimpan telah mencapai batas maksimum. Hapus rencana yang ada lalu coba lagi.";
+"sleepplan.alert.plan_full.basic_message" = "Anggota Basic hanya dapat menyimpan atau mengaktifkan 1 rencana tidur. Hapus rencana Anda saat ini lalu coba lagi.";
+"sleepplan.alert.premium_required.title" = "Fitur Premium";
+"sleepplan.alert.premium_required.message" = "Setelah upgrade ke Premium, Anda dapat menyesuaikan waktu pengingat tidur dan suara alarm untuk pelatihan tidur resmi.";
+"sleepplan.alert.custom_plan_required.message" = "Anggota Basic hanya dapat menyimpan atau mengaktifkan 1 rencana tidur. Setelah upgrade ke Premium, Anda dapat membuat rencana khusus dan memulihkan semua rencana di daftar.";
+"sleepplan.alert.switch_plan.title" = "Ganti rencana tidur?";
+"sleepplan.alert.switch_plan.message" = "Ini akan menghentikan \"%@\" dan mengaktifkan rencana ini. Lanjutkan?";
+"sleepplan.alert.exit_new.title" = "Keluar dari pembuatan rencana baru?";
+"sleepplan.alert.exit_new.message" = "Rencana saat ini belum disimpan. Jika Anda keluar, semua yang telah diatur akan hilang.";
+"sleepplan.alert.unsaved_edit.title" = "Perubahan belum disimpan";
+"sleepplan.alert.unsaved_edit.message" = "Jika kembali, perubahan ini tidak akan disimpan.";
+"sleepplan.editor.name_hint" = "Ketuk nama rencana untuk mengubahnya agar lebih mudah dikelola.";
+"sleepplan.editor.sleep_goal" = "Target Tidur";
+"sleepplan.editor.sleep_goal_hint" = "Seret salah satu ujung batang untuk mengatur waktu tidur atau bangun, atau ketuk angka waktu untuk mengedit secara presisi.";
+"sleepplan.editor.sleep_time" = "Waktu Tidur";
+"sleepplan.editor.wake_time" = "Waktu Bangun";
+"sleepplan.editor.options" = "Opsi Rencana";
+"sleepplan.editor.cycle" = "Siklus";
+"sleepplan.editor.cycle.hint" = "Durasi siklus ditetapkan oleh sistem dan dapat dimulai ulang setelah selesai.";
+"sleepplan.editor.reminder" = "Pengingat Tidur";
+"sleepplan.editor.reminder.hint" = "Dapatkan pengingat lebih awal untuk bersiap tidur, dengan lampu suasana dan diffuser untuk menciptakan suasana.";
+"sleepplan.editor.sleep_aid" = "Bantuan Tidur";
+"sleepplan.editor.sleep_aid.hint" = "Berdasarkan data tidur Anda, skenario yang cocok dicocokkan secara cerdas setiap malam.";
+"sleepplan.editor.alarm" = "Suara Alarm";
+"sleepplan.editor.alarm.hint" = "Suara yang diputar saat bangun untuk membantu Anda bangun lebih alami.";
+"sleepplan.editor.save_hint" = "Lengkapi semua kolom wajib sebelum menyimpan. Rencana akan ditambahkan ke daftar Anda tetapi tidak langsung diaktifkan.";
+"sleepplan.editor.save_hint.edit" = "Rencana yang disimpan akan muncul di daftar dalam status nonaktif. Rencana yang sedang aktif tidak akan terpengaruh.";
+"sleepplan.editor.save_hint.official" = "Setelah disimpan, rencana akan muncul di daftar “Rencana Tidur Saya”, tetapi tidak langsung aktif.\nKembali ke beranda Rencana untuk mengaktifkannya.";
+"sleepplan.sheet.reminder.title" = "Pengingat Tidur";
+"sleepplan.sheet.reminder.minutes_before" = "%d menit sebelumnya";
+"sleepplan.sheet.alarm_sound.title" = "Suara Alarm";
+"sleepplan.sheet.sleep_aid.title" = "Bantuan Tidur";
+"sleepplan.sheet.sleep_aid.readonly_title" = "Bantuan Tidur Cerdas";
+"sleepplan.sheet.sleep_aid.readonly_message" = "Berdasarkan sains tidur dan data tidur Anda, AI secara cerdas mencocokkan skenario tidur yang sesuai setiap malam. Rencana ini dikonfigurasi oleh sistem dan tidak dapat diubah secara manual.";
+"sleepplan.sheet.cycle.title" = "Siklus";
+"sleepplan.sheet.cycle.instruction" = "Pilih hari untuk menjalankan rencana ini";
+"sleepplan.sheet.cycle.repeat_weekly" = "Ulangi setiap minggu";
+"sleepplan.sheet.cycle.repeat_hint" = "Jika nonaktif, rencana hanya berjalan satu putaran pada hari yang dipilih.";
+"sleepplan.sheet.cycle.warning" = "Pilih setidaknya 3 hari berturut-turut agar rencana tidur Anda tetap berkelanjutan.";
+"sleepplan.sheet.cycle.hint" = "Pilih setidaknya 3 hari berturut-turut; tidak boleh ada jeda. Sabtu, Minggu, dan Senin dianggap berturut-turut. Jika diaktifkan, rencana hanya dijalankan pada hari yang dipilih setiap minggu.";
+"sleepplan.sheet.cycle.readonly_message" = "Siklus ini ditetapkan %d hari, berjalan setiap hari. Dapat dimulai ulang setelah selesai.";
+"sleepplan.sheet.goal.title" = "Pengaturan Target Tidur";
+"sleepplan.sheet.goal.duration" = "Durasi Target Tidur";
+"sleepplan.sheet.goal.sleep_time" = "Waktu Tidur";
+"sleepplan.sheet.goal.wake_time" = "Waktu Bangun";
+"sleepplan.sheet.goal.too_short" = "Durasi tidur terlalu singkat, atur setidaknya 1 jam.";
+"sleepplan.sheet.rename.title" = "Ubah Nama Rencana";
+"sleepplan.sheet.rename.hint" = "Maksimal 10 karakter";
+"sleepplan.cycle.fixed_daily" = "%d hari · setiap hari";
+"sleepplan.cycle.repeats_weekly" = "Berulang setiap minggu";
+"sleepplan.cycle.once" = "Sekali";
+"sleepplan.duration.hours" = "%d jam";
+"sleepplan.duration.hours_half" = "%d,5 jam";
+"sleepplan.duration.hours_minutes" = "%d jam %d mnt";
+"sleepplan.unit.hour" = "jam";
+"sleepplan.unit.minute" = "mnt";
+"sleepplan.duration.hours_short" = "%d jam";
+"sleepplan.reminder.minutes_before_short" = "%d menit sebelumnya";
+"sleepplan.reminder.off" = "Nonaktif";
+"sleepplan.reminder.notification_title" = "Waktunya bersiap tidur";
+"sleepplan.reminder.notification_body" = "Waktu tidur untuk \"%@\" akan segera tiba — mulai bersiap untuk rileks.";
+"sleepplan.sound.temple_bell" = "Lonceng Pagi Kuil";
+"sleepplan.sound.sunlit_coast" = "Pantai Bermandikan Matahari";
+"sleepplan.sound.rainforest_mist" = "Kabut Hutan Hujan";
+"sleepplan.sleep_aid.smart.name" = "Rekomendasi Cerdas";
+"sleepplan.sleep_aid.smart.desc" = "Mencocokkan skenario yang sesuai secara cerdas setiap malam berdasarkan data tidur Anda.";
+"sleepplan.sleep_aid.preference.name" = "Berdasarkan Preferensi";
+"sleepplan.sleep_aid.preference.desc" = "Merekomendasikan skenario berdasarkan pilihan Anda sebelumnya.";
+"sleepplan.sleep_aid.trending.name" = "Sedang Tren";
+"sleepplan.sleep_aid.trending.desc" = "Merekomendasikan skenario berdasarkan penggunaan dan masukan dari sebagian besar pengguna.";
+"weekday.mon" = "Sen";
+/* List separator used to join items such as weekday names. */
+"common.list_separator" = ", ";
+
+"weekday.short.1" = "Sen";
+"weekday.tue" = "Sel";
+"weekday.short.2" = "Sel";
+"weekday.wed" = "Rab";
+"weekday.short.3" = "Rab";
+"weekday.thu" = "Kam";
+"weekday.short.4" = "Kam";
+"weekday.fri" = "Jum";
+"weekday.short.5" = "Jum";
+"weekday.sat" = "Sab";
+"weekday.short.6" = "Sab";
+"weekday.sun" = "Min";
+"weekday.short.7" = "Min";
+"sleepplan.action.confirm_exit" = "Konfirmasi Keluar";
+
+/* 健康周/月视图：服务端分析缺失时的兜底文案（原为硬编码英文） */
+"health.chart.tooltip.duration" = "%1$@ jam %2$@ mnt";
+
+/* 会员订阅卡（20260818 设计）*/
+"subscription.plan.subheader" = "Pilih tingkat keanggotaan dan siklus pembayaran";
+"subscription.plan.tier.basic" = "Anggota Biasa";
+"subscription.plan.tier.premium" = "AI Premium";
+"subscription.plan.monthly.note" = "Ditagih bulanan, batalkan kapan saja";
+"subscription.plan.yearly.note" = "Perpanjangan otomatis tiap tahun";
+"subscription.plan.monthly.tag" = "Fleksibel";
+"subscription.plan.yearly.tag" = "Hemat 16-17%";
+"subscription.plan.cta.basic" = "Langganan Basic · %@";
+"subscription.plan.cta.premium" = "Langganan AI Premium · %@";
+"subscription.plan.current" = "Paket saat ini";
+"subscription.plan.footnote" = "Diperpanjang otomatis, bisa dibatalkan kapan saja. Jumlah akhir mengikuti App Store.";
+"subscription.benefit.basic.1.title" = "Data tidur lengkap";
+"subscription.benefit.basic.1.desc" = "Lihat riwayat dan skor tidur, serta pantau perubahan pola tidurmu";
+"subscription.benefit.basic.2.title" = "Model tidur pribadi";
+"subscription.benefit.basic.2.desc" = "Terus belajar dari data tidur jangka panjangmu";
+"subscription.benefit.basic.3.title" = "Pemantauan AI";
+"subscription.benefit.basic.3.desc" = "Menyesuaikan dengan kondisi tidurmu dan memberi saran yang bisa langsung dijalankan";
+"subscription.benefit.basic.4.title" = "Rencana tidur";
+"subscription.benefit.basic.4.desc" = "Simpan dan jalankan 1 rencana";
+"subscription.benefit.premium.1.title" = "Semua fitur Basic";
+"subscription.benefit.premium.1.desc" = "Data lengkap, analisis tren, dan model tidur pribadi";
+"subscription.benefit.premium.2.title" = "Rutinitas tidur dari AI";
+"subscription.benefit.premium.2.desc" = "Menyusun rencana personal sesuai kondisimu hari itu";
+"subscription.benefit.premium.3.title" = "Wawasan tidur mendalam";
+"subscription.benefit.premium.3.desc" = "Menemukan masalah tidur jangka panjang dan faktor utamanya";
+"subscription.benefit.premium.4.title" = "Rencana tidur";
+"subscription.benefit.premium.4.desc" = "Simpan dan jalankan hingga 5 rencana";
+
+/* 订阅卡：已订阅态与套餐切换 */
+"subscription.plan.cta.switch" = "Ubah ke %@";
+"subscription.plan.cta.upgrade" = "Naik ke AI Premium · %@";
+"subscription.plan.cta.downgrade" = "Ubah ke Anggota Biasa · %@";
+"subscription.plan.cta.scheduled" = "Terjadwal";
+"subscription.plan.status.current" = "Saat ini: %1$@ · %2$@";
+"subscription.plan.period.redeemed" = "Kode penukaran";
+"subscription.plan.status.renew" = "Diperpanjang %@";
+"subscription.plan.status.expire" = "Berakhir %@";
+"subscription.plan.status.pending" = "Diubah ke %1$@, berlaku %2$@";
+"subscription.plan.manage" = "Kelola";
+
+/* 资料卡会员状态行（带等级）*/
+"subscription.status.active" = "Aktif · %1$@ · %2$@";
+"subscription.status.trial" = "Masa coba · %@";
+"subscription.status.granted" = "Aktif · %@";
+
+/* 订阅日期行标题：随续订状态变 */
+"subscription.date.next_billing" = "Penagihan berikutnya";
+"subscription.date.expiry" = "Berakhir pada";
+"subscription.date.grace" = "Perbarui metode pembayaran";
+"subscription.date.retry" = "Mencoba penagihan ulang";
+"subscription.date.expired" = "Kedaluwarsa";
+
+/* 设计校对表（2026-10）新增：英文按设计稿，其他语言沿用原显示 */
+"sleepplan.editor.options.custom" = "Opsi Rencana";
+"sleepplan.editor.cycle.custom" = "Siklus";
+"sleepplan.editor.cycle.hint.custom" = "Durasi siklus ditetapkan oleh sistem dan dapat dimulai ulang setelah selesai.";
+"sleepplan.sheet.cycle.readonly_title" = "Siklus";
+"subscription.prompt.title" = "Anda belum menjadi anggota";
+"explore.gate.title" = "Anda belum menjadi anggota";
+"explore.gate.hint" = "Berlangganan untuk melihat";
+"explore.gate.action" = "Berlangganan";
+"survey.progress" = "%1$d / %2$d";
+"unit.duration.hr_min" = "%1$dh %2$dmin";
+"unit.duration.hr" = "%dh";
+"unit.duration.min" = "%dmin";
+"unit.duration.under_1_min" = "<1min";
+"unit.bpm" = "%dbpm";
+"unit.bpm_range" = "%1$d-%2$dbpm";
+"unit.breaths_per_min" = "%d napas/mnt";
+"unit.days_tracked" = "%1$d/%2$ddays";
+"unit.duration.compact.hr_min" = "%1$dh%2$dmin";
+"unit.duration.compact.hr" = "%dh";
+"health.sleep.stage_card.rem" = "REM";
+"health.sleep.stage_card.core" = "Inti";
+"health.sleep.stage_card.deep" = "Nyenyak";
+"sleepplan.cycle.range" = "%1$@–%2$@";

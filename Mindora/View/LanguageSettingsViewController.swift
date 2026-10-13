@@ -56,6 +56,17 @@ class LanguageSettingsViewController: UIViewController {
     
     // MARK: - Data
     
+    /// 列表项：第一项是「跟随系统」，其余是具体语言。
+    ///
+    /// 没有这一项的话，用户一旦点过任意语言就再也回不到跟随系统的状态 ——
+    /// 之后在 iOS 设置里怎么改都被 App 内的覆盖压着，只能手动点回对应语言。
+    private enum Item {
+        case followSystem
+        case language(SupportedLanguage)
+    }
+
+    private var items: [Item] { [.followSystem] + languages.map { Item.language($0) } }
+
     private let languages: [SupportedLanguage] = [
         .chinese,           // 简体中文
         .traditionalChinese, // 繁體中文
@@ -63,7 +74,10 @@ class LanguageSettingsViewController: UIViewController {
         .indonesian,        // Bahasa Indonesia
         .korean,            // 한국어
         .japanese,          // 日本語
-        .italian            // Italiano
+        .italian,           // Italiano
+        .german,            // Deutsch
+        .spanish,           // Español
+        .french             // Français
     ]
     
     // MARK: - Lifecycle
@@ -130,9 +144,18 @@ class LanguageSettingsViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    /// 回到跟随系统：清掉 App 内覆盖。即使解析出的语言与当前相同也要执行，
+    /// 因为「模式」变了 —— 之后用户在 iOS 设置里改语言，App 才会跟着走。
+    private func followSystem() {
+        let manager = LocalizationManager.shared
+        guard !manager.isFollowingSystem else { return }
+        manager.followSystemLanguage()
+        tableView.reloadData()
+    }
+
     private func updateLanguage(to language: SupportedLanguage) {
         let previousLanguage = LocalizationManager.shared.currentLanguage
-        if previousLanguage != language {
+        if previousLanguage != language || LocalizationManager.shared.isFollowingSystem {
             LocalizationManager.shared.currentLanguage = language
             tableView.reloadData()
             
@@ -149,20 +172,32 @@ class LanguageSettingsViewController: UIViewController {
 
 extension LanguageSettingsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return languages.count
+        return items.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "LanguageCell", for: indexPath) as! LanguageCell
-        let lang = languages[indexPath.row]
-        let isSelected = lang == LocalizationManager.shared.currentLanguage
-        cell.configure(text: lang.nativeDisplayName, isSelected: isSelected)
+        let manager = LocalizationManager.shared
+        switch items[indexPath.row] {
+        case .followSystem:
+            // 跟着写上系统当前解析到的语言，用户点之前就知道会变成什么
+            let text = L("settings.follow_system") + "（\(manager.systemResolvedLanguage.nativeDisplayName)）"
+            cell.configure(text: text, isSelected: manager.isFollowingSystem)
+        case .language(let lang):
+            // 跟随系统时不给具体语言打勾，否则两行同时打勾，看不出当前是哪种模式
+            let isSelected = !manager.isFollowingSystem && lang == manager.currentLanguage
+            cell.configure(text: lang.nativeDisplayName, isSelected: isSelected)
+        }
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let lang = languages[indexPath.row]
-        updateLanguage(to: lang)
+        switch items[indexPath.row] {
+        case .followSystem:
+            followSystem()
+        case .language(let lang):
+            updateLanguage(to: lang)
+        }
     }
 }
 

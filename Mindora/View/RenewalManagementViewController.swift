@@ -203,28 +203,34 @@ class RenewalManagementViewController: UIViewController {
             planText = L("renewal.plan.none")
         }
         addDetailRow(title: L("renewal.plan"), value: planText)
-        
+
         addSpacer(height: 15)
         addSeparator()
         addSpacer(height: 15)
-        
-        // 3. Renewal Date
+
+        // 2.5 Membership Tier（睡眠计划分级会员：普通/高级）
+        let tierText: String
+        switch manager.membershipTier {
+        case .premium: tierText = L("renewal.tier.premium")
+        case .basic: tierText = L("renewal.tier.basic")
+        case .free: tierText = L("renewal.tier.none")
+        }
+        addDetailRow(title: L("renewal.tier"), value: tierText)
+
+        addSpacer(height: 15)
+        addSeparator()
+        addSpacer(height: 15)
+
+        // 3. 日期行：标题随续订状态变（下次扣费日 / 到期日 / 需更新付款方式 …），值永远是日期。
+        //    原来固定写「续期时间」，用户关掉自动续订后含义正好相反；宽限期和扣费重试期
+        //    最该提醒的时候也被显示成一切正常。
         let dateString: String
         if manager.isSubscribed {
-            let dateFormatter = DateFormatter()
-            // If system locale is Chinese, force Chinese format like "2026年2月15日"
-            // else use medium date style
-            if Locale.current.identifier.hasPrefix("zh") {
-                dateFormatter.dateFormat = "yyyy年M月d日"
-            } else {
-                dateFormatter.dateStyle = .medium
-                dateFormatter.timeStyle = .none
-            }
-            dateString = dateFormatter.string(from: manager.expiryDate)
+            dateString = manager.expiryDisplayText()
         } else {
             dateString = "-"
         }
-        addDetailRow(title: L("renewal.renewal_date"), value: dateString)
+        addDetailRow(title: L(manager.expiryRowTitleKey()), value: dateString)
         
         addSpacer(height: 15)
         addSeparator()
@@ -233,14 +239,11 @@ class RenewalManagementViewController: UIViewController {
         // 4. Amount (Deduction Amount)
         // Find product price
         let amountText: String
-        if let product = manager.products.first(where: {
-            if manager.currentPlan == .monthly {
-                return $0.id == Constants.Subscription.monthlyProductID
-            } else if manager.currentPlan == .yearly {
-                return $0.id == Constants.Subscription.yearlyProductID
-            }
-            return false
-        }) {
+        // 直接按「当前持有的那个产品」取价，而不是拿 currentPlan 反推普通档的产品 ID ——
+        // 后者只列了 basic 的月/年，高级会员($6.99/$69.99)永远匹配不上，这一行会显示 "-"。
+        // 下期已排期换档时(升/降级)，扣款金额应按下期实际生效的产品显示。
+        if let productID = manager.pendingRenewalProductID ?? manager.activeProductID,
+           let product = manager.products.first(where: { $0.id == productID }) {
             amountText = product.displayPrice
         } else {
              // Fallback if products not loaded or free
@@ -252,6 +255,16 @@ class RenewalManagementViewController: UIViewController {
         addSpacer(height: 15)
         addSeparator()
         addSpacer(height: 15)
+
+        // 4.5 环境：TestFlight / Xcode 下订阅走 Apple 沙盒，不真实扣费、系统「设置 › 订阅」里也查不到，
+        //     直接在卡片上标明，免得测试用户误会。正式环境不显示这一行。
+        if manager.isTestStoreEnvironment {
+            addDetailRow(title: L("renewal.environment"), value: L("renewal.environment.sandbox"))
+
+            addSpacer(height: 15)
+            addSeparator()
+            addSpacer(height: 15)
+        }
         
         // 5. Manage Button
         let manageButtonContainer = UIView()
@@ -340,9 +353,8 @@ class RenewalManagementViewController: UIViewController {
     }
     
     @objc private func handleManage() {
-        // Handle manage subscription action (e.g. open App Store)
-        if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
-            UIApplication.shared.open(url)
-        }
+        // 和付费墙的「管理」走同一个系统内嵌面板：它按当前环境(沙盒/正式)取订阅，
+        // 而 apps.apple.com/account/subscriptions 只认正式环境，TestFlight 下永远是空的。
+        SubscriptionManager.shared.openSubscriptionManagement()
     }
 }

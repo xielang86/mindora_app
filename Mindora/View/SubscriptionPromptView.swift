@@ -39,9 +39,27 @@ class SubscriptionPromptView: UIView {
         return button
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    /// 文案组：睡眠周/月、睡眠计划用通用版；洞察页设计稿单独一套。
+    enum Copy {
+        case generic
+        case insights
+
+        var titleKey: String { self == .insights ? "explore.gate.title" : "subscription.prompt.title" }
+        var hintKey: String { self == .insights ? "explore.gate.hint" : "subscription.view_content_hint" }
+        var actionKey: String { self == .insights ? "explore.gate.action" : "subscription.go_to_subscribe" }
+    }
+
+    private let copy: Copy
+
+    init(copy: Copy = .generic) {
+        self.copy = copy
+        super.init(frame: .zero)
         setupUI()
+    }
+
+    override convenience init(frame: CGRect) {
+        self.init(copy: .generic)
+        self.frame = frame
     }
     
     required init?(coder: NSCoder) {
@@ -61,7 +79,7 @@ class SubscriptionPromptView: UIView {
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         
         // Populate text
-        let hintText = "\(L("subscription.not_member"))\n\(L("subscription.view_content_hint"))"
+        let hintText = "\(L(copy.titleKey))\n\(L(copy.hintKey))"
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineHeightMultiple = 1.25 // adjusting for line-height 18pt with 12pt font (1.5x)
         paragraphStyle.alignment = .center
@@ -72,7 +90,7 @@ class SubscriptionPromptView: UIView {
         ])
         hintLabel.attributedText = attributedString
         
-        actionButton.setTitle(L("subscription.go_to_subscribe"), for: .normal)
+        actionButton.setTitle(L(copy.actionKey), for: .normal)
         actionButton.addTarget(self, action: #selector(handleTap), for: .touchUpInside)
         
         // CSS Padding: 48px 68px 30px 68px -> 24pt, 34pt, 15pt, 34pt

@@ -268,6 +268,7 @@ final class SleepGraphView: UIView {
         
         let calendar = Calendar.current
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = LocalizationManager.shared.currentLocale
         dateFormatter.dateFormat = "HH:mm"
         
         // 获取容器宽度用于计算位置

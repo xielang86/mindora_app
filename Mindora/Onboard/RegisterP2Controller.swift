@@ -12,6 +12,10 @@ final class RegisterP2Controller: UIViewController {
     // MARK: - Public Properties
     var email: String = "example@example.com"
 
+    /// 由 RegisterP1Controller 透传过来。true 表示这是 token 过期的 re-auth 流程：
+    /// loginWithCode 成功后跳过 P3/P4，直接把 root 换成 MainTabBar，保留用户已有数据。
+    var isReauthMode: Bool = false
+
     // MARK: - Private Properties
     private var code: String = "" {
         didSet {
@@ -86,6 +90,22 @@ final class RegisterP2Controller: UIViewController {
         return button
     }()
     
+    // .text-group_3：验证码框下方的重发倒计时，24px→12pt，居中（设计图上是灰字）
+    private let countdownLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor(white: 1.0, alpha: 0.6)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    /// 进入本页时的重发倒计时秒数：上一页发码成功时服务端给的 retry_after。
+    var resendCooldown = AuthService.defaultResendSeconds
+    private var resendAvailableAt: Date?
+    private var countdownTimer: Timer?
+
     private let continueButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitle(L("register.button.continue"), for: .normal)
@@ -107,11 +127,29 @@ final class RegisterP2Controller: UIViewController {
 
     // MARK: - Lifecycle
     
+    // 左上返回按钮：返回上一步（输入邮箱页）重新输入。与其它页统一：EnlargedHitAreaButton + sub_back。
+    private let backButton: EnlargedHitAreaButton = {
+        let btn = EnlargedHitAreaButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setImage(UIImage(named: "sub_back"), for: .normal)
+        return btn
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupActions()
         updateSubtitle()
+        // 进入本页前上一页刚发过验证码，从这一刻开始倒计时
+        startResendCountdown(seconds: resendCooldown)
+    }
+
+    deinit {
+        countdownTimer?.invalidate()
+    }
+
+    @objc private func handleBack() {
+        navigationController?.popViewController(animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -129,15 +167,41 @@ final class RegisterP2Controller: UIViewController {
         view.addSubview(subtitleLabel)
         view.addSubview(codeTextField)
         view.addSubview(codeStackView)
+        view.addSubview(countdownLabel)
         view.addSubview(resendButton)
         view.addSubview(continueButton)
         continueButton.addSubview(activityIndicator)
-        
+
+        view.addSubview(backButton)
+        backButton.addTarget(self, action: #selector(handleBack), for: .touchUpInside)
+        NSLayoutConstraint.activate([
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            backButton.widthAnchor.constraint(equalToConstant: 44),
+            backButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+
         setupDigitViews()
+        addTopBannerFadeIfNeeded()
         setupFontsAndCornerRadii()
         setupConstraints()
     }
-    
+
+    /// iPad 上给顶部横幅图底部补一层淡出到背景色的渐变，掩盖 .scaleAspectFill 裁掉的
+    /// 烘焙渐变（详见 BottomFadeView）。iPhone 不加，保持原样。
+    private func addTopBannerFadeIfNeeded() {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        let fade = BottomFadeView(color: UIColor(red: 24/255.0, green: 24/255.0, blue: 24/255.0, alpha: 1.0))
+        fade.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(fade, aboveSubview: backgroundImageView)
+        NSLayoutConstraint.activate([
+            fade.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor),
+            fade.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor),
+            fade.bottomAnchor.constraint(equalTo: backgroundImageView.bottomAnchor),
+            fade.heightAnchor.constraint(equalTo: backgroundImageView.heightAnchor, multiplier: 0.55)
+        ])
+    }
+
     private func setupDigitViews() {
         for _ in 0..<4 {
             let digitView = DigitView()
@@ -155,6 +219,9 @@ final class RegisterP2Controller: UIViewController {
         let subtitleSize = scale(32, basedOn: view.bounds.height, designDimension: designHeight)
         subtitleLabel.font = subtitleLabel.font.withSize(subtitleSize)
         
+        let countdownSize = scale(24, basedOn: view.bounds.height, designDimension: designHeight)
+        countdownLabel.font = UIFont(name: "HKGrotesk-Regular", size: countdownSize) ?? .systemFont(ofSize: countdownSize)
+
         let resendSize = scale(28, basedOn: view.bounds.height, designDimension: designHeight)
         resendButton.titleLabel?.font = resendButton.titleLabel?.font.withSize(resendSize)
         
@@ -229,6 +296,13 @@ final class RegisterP2Controller: UIViewController {
             codeStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             codeStackView.heightAnchor.constraint(equalToConstant: digitWidth),
             
+            // 倒计时落在验证码框与「重新发送」之间原有的空白里（box_38 余 6px + margin 20px），不挤动下方按钮
+            countdownLabel.topAnchor.constraint(equalTo: codeStackView.bottomAnchor,
+                                                constant: scale(26, basedOn: view.bounds.height, designDimension: designHeight)),
+            countdownLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            countdownLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 20),
+            countdownLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -20),
+
             resendButton.topAnchor.constraint(equalTo: codeStackView.bottomAnchor, constant: resendTop),
             resendButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
@@ -302,7 +376,8 @@ final class RegisterP2Controller: UIViewController {
             AuthService.shared.sendVerifyCode(email: self.email) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
-                    case .success:
+                    case .success(let retryAfter):
+                        self?.startResendCountdown(seconds: retryAfter)
                         let alert = CustomAlertViewController(
                             title: L("common.notice"),
                             description: L("register.verification_code_sent"),
@@ -311,6 +386,8 @@ final class RegisterP2Controller: UIViewController {
                         self?.present(alert, animated: true)
                         
                     case .failure(let error):
+                        // 服务端说还要等：倒计时对齐到服务端剩余秒数
+                        if let retryAfter = error.retryAfter { self?.startResendCountdown(seconds: retryAfter) }
                         let alert = CustomAlertViewController(
                             title: L("common.error"),
                             description: error.localizedDescription,
@@ -323,6 +400,34 @@ final class RegisterP2Controller: UIViewController {
         }
     }
     
+    // MARK: - 重发倒计时
+
+    private func startResendCountdown(seconds: Int) {
+        resendAvailableAt = Date().addingTimeInterval(TimeInterval(max(0, seconds)))
+        countdownTimer?.invalidate()
+        // 按截止时刻算剩余秒数，App 切到后台再回来也不会走慢
+        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in self?.updateResendCountdown() }
+        RunLoop.main.add(timer, forMode: .common)
+        countdownTimer = timer
+        updateResendCountdown()
+    }
+
+    private func updateResendCountdown() {
+        let remaining = Int(ceil(resendAvailableAt?.timeIntervalSinceNow ?? 0))
+        guard remaining > 0 else {
+            countdownTimer?.invalidate()
+            countdownTimer = nil
+            countdownLabel.isHidden = true
+            resendButton.isEnabled = true
+            resendButton.alpha = 1
+            return
+        }
+        countdownLabel.text = String(format: L("register.p2.resend_countdown"), remaining)
+        countdownLabel.isHidden = false
+        resendButton.isEnabled = false
+        resendButton.alpha = 0.5
+    }
+
     @objc private func continueTapped() {
         self.continueButton.animateButtonTap { [weak self] in
             guard let self = self else { return }
@@ -346,22 +451,20 @@ final class RegisterP2Controller: UIViewController {
                     token: "debug_token",
                     expireDays: 365
                 )
-                let vc = RegisterP3Controller()
-                self.navigationController?.pushViewController(vc, animated: true)
+                self.proceedAfterLoginSuccess()
                 return
             }
-            
+
             AuthService.shared.loginWithCode(email: self.email, code: self.code) { [weak self] result in
                 DispatchQueue.main.async {
                     self?.continueButton.setTitle(originalTitle, for: .normal)
                     self?.activityIndicator.stopAnimating()
                     self?.validateCode()
-                    
+
                     switch result {
                     case .success:
-                        let vc = RegisterP3Controller()
-                        self?.navigationController?.pushViewController(vc, animated: true)
-                        
+                        self?.proceedAfterLoginSuccess()
+
                     case .failure(let error):
                         let alert = CustomAlertViewController(
                             title: L("common.error"),
@@ -377,6 +480,28 @@ final class RegisterP2Controller: UIViewController {
     
     @objc private func viewTapped() {
         codeTextField.becomeFirstResponder()
+    }
+
+    /// loginWithCode 成功后的分流：
+    /// - 第一次注册 → 继续 P3 收集昵称
+    /// - re-auth (token 过期) → 跳过 P3/P4，把 root 直接切回 MainTabBar，保留本地数据
+    private func proceedAfterLoginSuccess() {
+        Log.info("RegisterP2", "loginWithCode success, isReauthMode=\(isReauthMode)")
+        if isReauthMode {
+            let mainVC = MainTabBarController()
+            if let window = view.window {
+                UIView.transition(with: window, duration: 0.4, options: .transitionCrossDissolve, animations: {
+                    window.rootViewController = mainVC
+                }, completion: nil)
+            } else {
+                mainVC.modalPresentationStyle = .fullScreen
+                present(mainVC, animated: true)
+            }
+            return
+        }
+
+        let vc = RegisterP3Controller()
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func updateCodeViews() {
@@ -404,7 +529,8 @@ final class RegisterP2Controller: UIViewController {
     
     // MARK: - Helper Scale
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
 }
 

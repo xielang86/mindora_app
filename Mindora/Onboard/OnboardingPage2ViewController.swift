@@ -39,7 +39,8 @@ final class OnboardingPage2ViewController: UIViewController {
     
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - UI Components
@@ -205,12 +206,17 @@ final class OnboardingPage2ViewController: UIViewController {
     
     @objc private func connectAreaTapped() {
         self.bottomContainerView.animateButtonTap { [weak self] in
-            // 跳转到引导页3
             print("Connect Mindora tapped - Navigate to Page 3")
             let page3VC = OnboardingPage3ViewController()
-            page3VC.modalPresentationStyle = .fullScreen
-            page3VC.modalTransitionStyle = .crossDissolve
-            self?.present(page3VC, animated: true)
+            // 优先 push 进已有的 nav，避免叠出模态栈——最后换 root 时
+            // 遗留的模态会让新 MainTab 无法正确 attach 到 window。
+            if let nav = self?.navigationController {
+                nav.pushViewController(page3VC, animated: true)
+            } else {
+                page3VC.modalPresentationStyle = .fullScreen
+                page3VC.modalTransitionStyle = .crossDissolve
+                self?.present(page3VC, animated: true)
+            }
         }
     }
 }

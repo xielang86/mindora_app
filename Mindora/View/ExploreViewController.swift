@@ -24,11 +24,24 @@ final class ExploreViewController: UIViewController {
         return button
     }()
     private let logoImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "logo"))
+        let iv = UIImageView(image: UIImage(named: "logo_dream"))
         iv.contentMode = .scaleAspectFit
         return iv
     }()
-    
+
+    // 右上角消息通知入口（红点跟随全局未读状态）
+    private let notificationButton = NotificationBellButton()
+
+    // 未开通会员遮罩：非订阅用户在洞察页看到「您还不是会员 / 前往订阅」（设计稿 洞察-未开通会员）
+    private let subscriptionGate: SubscriptionPromptView = {
+        let v = SubscriptionPromptView(copy: .insights)
+        v.isHidden = true
+        return v
+    }()
+
+    // 会员磨砂遮罩（非会员时盖在数据区之上，与睡眠周/月一致）。
+    private var overlayMaskView: UIView?
+
     private let scrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.showsVerticalScrollIndicator = false
@@ -110,8 +123,31 @@ final class ExploreViewController: UIViewController {
             name: .userProfileDidUpdate,
             object: nil
         )
-        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleHealthAuthorizationChanged),
+            name: HealthDataManager.authorizationDidChangeNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAppWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+        // 订阅状态变化时刷新（订阅成功后遮罩消失、展示内容）
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSubscriptionStatusChanged),
+            name: NSNotification.Name("SubscriptionStatusChanged"),
+            object: nil
+        )
+
         setupDebugInteractions()
+        fetchData()
+    }
+
+    @objc private func handleSubscriptionStatusChanged() {
         fetchData()
     }
     
@@ -126,10 +162,21 @@ final class ExploreViewController: UIViewController {
     @objc private func handleProfileChange() {
         updateGreetingLabels()
     }
+
+    @objc private func handleHealthAuthorizationChanged() {
+        fetchData()
+    }
+
+    @objc private func handleAppWillEnterForeground() {
+        fetchData()
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        // 立即按当前会员状态上/撤遮罩，不等数据/StoreKit 解析，避免非会员开 App 后迟迟看不到订阅遮罩。
+        updateGreetingLabels()
+        updateMembershipOverlay(gated: SubscriptionManager.shared.shouldGatePremiumContent)
         fetchData()
     }
     
@@ -190,8 +237,15 @@ final class ExploreViewController: UIViewController {
             introDetailLabel.attributedText = attributedText
         }
         
+        // 数据区始终正常渲染；未开通会员时由磨砂遮罩盖住 + 居中订阅弹窗浮于其上
+        // （与睡眠「周/月」的 setupNonMemberOverlay 一致，不再隐藏数据区/内嵌卡片）。
+        // 遮罩开/关由 shouldGatePremiumContent 决定：非会员立即上遮罩（不等 StoreKit 异步解析），
+        // 老会员靠 lastKnownSubscribed 不闪遮罩，解析完成会经 SubscriptionStatusChanged 再刷新一次。
+        [efficiencyCard, structureCard, fluctuationCard, preferenceView, adviceView, articlesView]
+            .forEach { $0.isHidden = false }
+
         let allGradients = [ExploreGradients.efficiency, ExploreGradients.structure, ExploreGradients.fluctuation]
-        
+
         if data.hasData {
             scoreHeaderView.isHidden = false
 
@@ -282,6 +336,62 @@ final class ExploreViewController: UIViewController {
             isHidden: data.hasData,
             ringGradients: [ExploreGradients.efficiency, ExploreGradients.structure, ExploreGradients.fluctuation]
         )
+
+        // 会员遮罩：深色磨砂层 + 居中订阅弹窗（与睡眠周/月一致；权益解析完成前不遮罩）。
+        updateMembershipOverlay(gated: SubscriptionManager.shared.shouldGatePremiumContent)
+    }
+
+    // MARK: - 会员磨砂遮罩（与睡眠周/月 setupNonMemberOverlay 一致）
+
+    private func updateMembershipOverlay(gated: Bool) {
+        if gated {
+            setupNonMemberOverlay()
+            scrollView.isScrollEnabled = false
+        } else {
+            removeNonMemberOverlay()
+            scrollView.isScrollEnabled = true
+        }
+    }
+
+    private func setupNonMemberOverlay() {
+        guard overlayMaskView == nil else { return }
+        view.layoutIfNeeded()
+
+        // 深色磨砂玻璃遮罩（与睡眠周/月 setupNonMemberOverlay 完全一致：UIBlurEffect(.dark) + alpha 0.9）。
+        let mask = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        mask.alpha = 0.9
+        mask.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(mask)
+        overlayMaskView = mask
+
+        // 订阅弹窗：宽 214，居中浮于磨砂层之上（与睡眠一致：textStack/greeting 底部下方 47pt）。
+        subscriptionGate.translatesAutoresizingMaskIntoConstraints = false
+        subscriptionGate.isHidden = false
+        view.addSubview(subscriptionGate)
+
+        NSLayoutConstraint.activate([
+            // 磨砂层从问候/简介底部下方 10pt 起，铺满到屏幕底部与左右边缘
+            mask.topAnchor.constraint(equalTo: greetingContainer.bottomAnchor, constant: 10),
+            mask.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            mask.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            mask.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
+            // 弹窗位置（与睡眠周/月一致：greeting 底部下方 47pt）
+            subscriptionGate.topAnchor.constraint(equalTo: greetingContainer.bottomAnchor, constant: 47),
+            subscriptionGate.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            subscriptionGate.widthAnchor.constraint(equalToConstant: 214)
+        ])
+
+        view.bringSubviewToFront(mask)
+        view.bringSubviewToFront(subscriptionGate)
+    }
+
+    private func removeNonMemberOverlay() {
+        overlayMaskView?.removeFromSuperview()
+        overlayMaskView = nil
+        if subscriptionGate.superview != nil {
+            subscriptionGate.removeFromSuperview()
+        }
     }
 
     private func updateGreetingLabels() {
@@ -352,27 +462,41 @@ final class ExploreViewController: UIViewController {
         headerView.translatesAutoresizingMaskIntoConstraints = false
         headerView.addSubview(sideBarButton)
         headerView.addSubview(logoImageView)
+        headerView.addSubview(notificationButton)
         sideBarButton.translatesAutoresizingMaskIntoConstraints = false
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        
+        notificationButton.translatesAutoresizingMaskIntoConstraints = false
+
         sideBarButton.addTarget(self, action: #selector(handleSideBarBtnTapped), for: .touchUpInside)
-        
+        notificationButton.addTarget(self, action: #selector(handleNotificationTapped), for: .touchUpInside)
+
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 60),
-            
+
             sideBarButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
             sideBarButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
             sideBarButton.widthAnchor.constraint(equalToConstant: 24),
             sideBarButton.heightAnchor.constraint(equalToConstant: 24),
-            
+
             logoImageView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             logoImageView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
             logoImageView.heightAnchor.constraint(equalToConstant: 30),
-            logoImageView.widthAnchor.constraint(lessThanOrEqualToConstant: 200)
+            logoImageView.widthAnchor.constraint(lessThanOrEqualToConstant: 153),
+
+            notificationButton.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -20),
+            notificationButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            notificationButton.widthAnchor.constraint(equalToConstant: 28),
+            notificationButton.heightAnchor.constraint(equalToConstant: 28)
         ])
+    }
+
+    @objc private func handleNotificationTapped() {
+        let vc = NotificationsViewController()
+        vc.modalPresentationStyle = .fullScreen
+        self.present(vc, animated: true, completion: nil)
     }
     
     private func setupScrollView() {
@@ -388,7 +512,7 @@ final class ExploreViewController: UIViewController {
         
         scrollView.addSubview(contentStack)
         contentStack.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             contentStack.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20),
             contentStack.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
@@ -415,33 +539,62 @@ final class ExploreViewController: UIViewController {
         greetingNameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         greetingNameLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         
+        // Fill the greeting container's width by default (iPhone always satisfies this,
+        // since it's narrower than maxTextWidth below). On iPad, the required max-width
+        // constraint wins instead, keeping these two paragraphs at a readable line length —
+        // left-aligned under the "Hi, name" line — rather than stretching edge-to-edge
+        // across the whole screen. Only these text labels are capped; greetingContainer
+        // itself (and therefore contentStack and the full-width cards below it) is untouched.
+        let introTrailingFill = introLabel.trailingAnchor.constraint(equalTo: greetingContainer.trailingAnchor)
+        let introDetailTrailingFill = introDetailLabel.trailingAnchor.constraint(equalTo: greetingContainer.trailingAnchor)
+        introTrailingFill.priority = .defaultHigh
+        introDetailTrailingFill.priority = .defaultHigh
+        let maxTextWidth: CGFloat = 700
+
         NSLayoutConstraint.activate([
             greetingPrefixLabel.topAnchor.constraint(equalTo: greetingContainer.topAnchor),
             greetingPrefixLabel.leadingAnchor.constraint(equalTo: greetingContainer.leadingAnchor),
-            
+
             greetingNameLabel.firstBaselineAnchor.constraint(equalTo: greetingPrefixLabel.firstBaselineAnchor),
             greetingNameLabel.leadingAnchor.constraint(equalTo: greetingPrefixLabel.trailingAnchor, constant: 4),
             greetingNameLabel.trailingAnchor.constraint(lessThanOrEqualTo: greetingContainer.trailingAnchor),
-            
+
             introLabel.topAnchor.constraint(equalTo: greetingPrefixLabel.bottomAnchor, constant: 16),
             introLabel.leadingAnchor.constraint(equalTo: greetingContainer.leadingAnchor),
-            introLabel.trailingAnchor.constraint(equalTo: greetingContainer.trailingAnchor),
-            
+            introTrailingFill,
+            // 填满约束与标签的抗压缩同为 750，长段落时会把标签撑出屏幕；右边界必须是硬约束
+            introLabel.trailingAnchor.constraint(lessThanOrEqualTo: greetingContainer.trailingAnchor),
+            introLabel.widthAnchor.constraint(lessThanOrEqualToConstant: maxTextWidth),
+
             introDetailLabel.topAnchor.constraint(equalTo: introLabel.bottomAnchor, constant: 12),
             introDetailLabel.leadingAnchor.constraint(equalTo: greetingContainer.leadingAnchor),
-            introDetailLabel.trailingAnchor.constraint(equalTo: greetingContainer.trailingAnchor),
+            introDetailTrailingFill,
+            introDetailLabel.trailingAnchor.constraint(lessThanOrEqualTo: greetingContainer.trailingAnchor),
+            introDetailLabel.widthAnchor.constraint(lessThanOrEqualToConstant: maxTextWidth),
             introDetailLabel.bottomAnchor.constraint(equalTo: greetingContainer.bottomAnchor)
         ])
         
         contentStack.addArrangedSubview(greetingContainer)
+        // subscriptionGate 不再内嵌进流式布局：改为非会员时作为浮层弹窗叠加在磨砂遮罩之上
+        // （见 setupNonMemberOverlay，对齐睡眠周/月设计）。
         contentStack.addArrangedSubview(scoreHeaderView)
         contentStack.addArrangedSubview(emptyStateView)
+        subscriptionGate.onSubscribeTap = { [weak self] in
+            let vc = SubscriptionViewController()
+            if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                vc.modalPresentationStyle = .fullScreen
+                self?.present(vc, animated: true)
+            }
+        }
         contentStack.addArrangedSubview(efficiencyCard)
         contentStack.addArrangedSubview(structureCard)
         contentStack.addArrangedSubview(fluctuationCard)
         contentStack.addArrangedSubview(preferenceView)
         contentStack.addArrangedSubview(adviceView)
-        contentStack.addArrangedSubview(articlesView)
+        // 文章推荐卡片暂时隐藏（不加入布局）。需要恢复时取消注释本行即可。
+        // contentStack.addArrangedSubview(articlesView)
     }
 
     @objc private func handleSideBarBtnTapped() {
@@ -712,9 +865,18 @@ class ExploreDetailedCardView: UIView {
         titleLbl.translatesAutoresizingMaskIntoConstraints = false
         valueLbl.translatesAutoresizingMaskIntoConstraints = false
         
+        // 英文标签较长（如 "Respiratory Rate Before Sleep"），左列放不下时折行而不是截断；
+        // 单行时行高仍是 20pt，与原设计一致。
+        titleLbl.numberOfLines = 0
+        let singleLineHeight = view.heightAnchor.constraint(equalToConstant: 20) // Reduced height from 24
+        singleLineHeight.priority = .defaultLow
+
         NSLayoutConstraint.activate([
-            view.heightAnchor.constraint(equalToConstant: 20), // Reduced height from 24
-            
+            singleLineHeight,
+            view.heightAnchor.constraint(greaterThanOrEqualToConstant: 20),
+            titleLbl.topAnchor.constraint(greaterThanOrEqualTo: view.topAnchor),
+            titleLbl.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor),
+
             titleLbl.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             titleLbl.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             titleLbl.trailingAnchor.constraint(lessThanOrEqualTo: valueLbl.leadingAnchor, constant: -10),
@@ -1218,7 +1380,10 @@ final class ExploreEmptyStateView: UIView {
 
     private let scoreLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "HKGrotesk-SemiBold", size: 60) ?? UIFont.systemFont(ofSize: 60, weight: .semibold)
+        // 39 而非设计稿的 60：总分压在圆环 270° 缺口那一象限里，满环时末端的百分比标签
+        // 必然转到这里来，两者只能靠字号让位 —— 标签要留在轨道上顺着圆环，不能沿半径躲。
+        // 实测 100% 那圈（字号每减 1pt 约让出 1.2pt）：60 时被压 25.8pt，44 时只差 2.9pt。
+        label.font = UIFont(name: "HKGrotesk-SemiBold", size: 39) ?? UIFont.systemFont(ofSize: 39, weight: .semibold)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -1229,6 +1394,14 @@ final class ExploreEmptyStateView: UIView {
         label.font = UIFont(name: "PingFangSC-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .medium)
         label.textColor = UIColor(white: 0.7, alpha: 1.0)
         label.textAlignment = .center
+        // 这行字右对齐在圆环右缘，左边缘由文案长度决定：中文「睡眠评分」56pt 富余，
+        // 但 Sleep Score 79.7 / Schlafbewertung 111.4 / Puntuación de sueño 139.7pt
+        // 会一路顶到圆环起点图标上。**必须保持一行**，靠下面的约束让路：
+        // 先整体右移出圆环（环右侧到内容区边缘还有空白），实在不够再缩字号。
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.7
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return label
     }()
 
@@ -1254,6 +1427,12 @@ final class ExploreEmptyStateView: UIView {
         ringView.translatesAutoresizingMaskIntoConstraints = false
         scoreLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        // 「贴齐圆环右缘 8pt」是常态排版，但它得给长文案让路：降一级优先级，
+        // 顶不住时由 Auto Layout 打破它、把整行右移出圆环，而不是折行。
+        let titleRightInset = titleLabel.trailingAnchor.constraint(
+            equalTo: ringView.trailingAnchor, constant: -8)
+        titleRightInset.priority = .required - 1
 
         NSLayoutConstraint.activate([
             tipCardView.topAnchor.constraint(equalTo: topAnchor),
@@ -1286,7 +1465,14 @@ final class ExploreEmptyStateView: UIView {
             // "Bottom and Arc Bottom Tangent Aligned" -> titleLabel.bottom = ringView.bottom
             // "Right and Arc Right Tangent Distance 8pt" -> titleLabel.trailing = ringView.trailing - 8
             titleLabel.bottomAnchor.constraint(equalTo: ringView.bottomAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: ringView.trailingAnchor, constant: -8),
+            titleRightInset,
+            // 左边界不许越过起点图标：图标右缘在圆心 +24.5pt，再留 8pt 呼吸。
+            // 中文用不到这条（天然还差 18pt），只有拉丁语系的长文案会被它拦下来。
+            titleLabel.leadingAnchor.constraint(
+                greaterThanOrEqualTo: ringView.centerXAnchor, constant: 32.5),
+            // 让路的去处：圆环右侧到内容区边缘还有空白，长文案先整体右移出圆环，
+            // 顶到这条才轮到 adjustsFontSizeToFitWidth 缩字号 —— 任何情况都不折行。
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: scoreContainer.trailingAnchor),
 
             // Score Label Position:
             // "Above Title, Vertically Centered Aligned" -> centerX aligned, stacked
@@ -1330,16 +1516,47 @@ final class ExploreScoreRingView: UIView {
     
     private let defaultRingColor = UIColor(red: 44/255.0, green: 44/255.0, blue: 44/255.0, alpha: 1.0).cgColor
 
+    /// 三圈起点旁的说明图标，由外到内依次是 入睡效率 / 睡眠结构 / 夜间波动，
+    /// 顺序必须和 values 一致（configure 传进来的就是这个顺序）。
+    private static let segmentIconNames = ["explore_ring_efficiency", "explore_ring_structure", "explore_ring_fluctuation"]
+    /// 设计稿 24×24px @2x
+    private static let segmentIconSize: CGFloat = 12
+    /// 图标左边缘与圆环外沿的空隙，设计稿 13px
+    private static let segmentIconGap: CGFloat = 6.5
+
+    /// 圆环几何：三条轨道共用，addLabel 摆百分比标签时也要用同一套数
+    private static let trackLineWidth: CGFloat = 12
+    private static let trackSpacing: CGFloat = 20
+    /// 从正下方起画
+    private static let trackStartAngle: CGFloat = .pi / 2
+    /// 共 270°，缺口落在右下象限（总分就摆在那儿）
+    private static let trackMaxAngle: CGFloat = .pi * 1.5
+
+    // 上次渲染签名（尺寸 + 数值 + 渐变）。仅在真正变化时重建图层——否则每次 layoutSubviews
+    // 都销毁重建 CAShape/CAGradient 图层并增删 label 子视图，而增删子视图又会再次触发布局，
+    // 反复重建过程中图层被释放却仍被引用 → OS_dispatch_queue sublayers 崩溃。
+    private var lastRenderKey: String?
+
     override func layoutSubviews() {
         super.layoutSubviews()
-        // Remove existing sublayers and subviews (labels)
-        layer.sublayers?.forEach { $0.removeFromSuperlayer() }
-        subviews.forEach { $0.removeFromSuperview() }
 
-        let lineWidth: CGFloat = 12 
-        let spacing: CGFloat = 20   
-        let startAngle: CGFloat = .pi / 2
-        let maxAngle: CGFloat = .pi * 1.5 // Total 270 degrees
+        let gradientKey = (segmentGradients ?? []).map { seg in seg.map { $0.hashValue }.map(String.init).joined(separator: ",") }.joined(separator: ";")
+        let renderKey = "\(bounds.size.width)x\(bounds.size.height)|\(values)|\(gradientKey)"
+        if renderKey == lastRenderKey { return }
+        lastRenderKey = renderKey
+
+        // 清理顺序不能反：子视图（% 标签、起点图标）的 backing layer 也在 layer.sublayers 里，
+        // 先把 sublayers 全摘掉，再 removeFromSuperview 时 UIKit 会去读那个已经悬空的 layer，
+        // 直接 EXC_BAD_ACCESS（CALayerGetSuperlayer 崩在 0x8）。
+        // 必须先让 UIKit 按正规流程移除子视图（它会连带摘掉自己的 layer），
+        // 剩下的 sublayers 才只有本方法自己 addSublayer 上去的 CAShape/CAGradient。
+        subviews.forEach { $0.removeFromSuperview() }
+        layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+
+        let lineWidth = Self.trackLineWidth
+        let spacing = Self.trackSpacing
+        let startAngle = Self.trackStartAngle
+        let maxAngle = Self.trackMaxAngle
         
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
         let maxDiameter = min(bounds.width, bounds.height)
@@ -1367,6 +1584,11 @@ final class ExploreScoreRingView: UIView {
             bgLayer.lineCap = .round
             layer.addSublayer(bgLayer)
             
+            // 起点图标：环从正下方（startAngle = π/2）起画，那里的切线是水平的，
+            // 所以图标就沿切线往右平移，和 cap 保持同一水平线——设计稿就是这么放的，
+            // 不能按角度绕着圆挪，那样会比 cap 高出一截。
+            addSegmentIcon(index: i, radius: currentRadius, lineWidth: lineWidth, center: center)
+
             // 2. Draw Progress Track (Gradient)
             // Ensure value is between 0 and 1
             let rawValue = i < values.count ? values[i] : 0
@@ -1409,6 +1631,20 @@ final class ExploreScoreRingView: UIView {
         }
     }
     
+    private func addSegmentIcon(index: Int, radius: CGFloat, lineWidth: CGFloat, center: CGPoint) {
+        guard index < Self.segmentIconNames.count,
+              let image = UIImage(named: Self.segmentIconNames[index]) else { return }
+        let size = Self.segmentIconSize
+        let iconView = UIImageView(image: image)
+        iconView.contentMode = .scaleAspectFit
+        iconView.bounds = CGRect(x: 0, y: 0, width: size, height: size)
+        iconView.center = CGPoint(
+            x: center.x + lineWidth / 2.0 + Self.segmentIconGap + size / 2.0,
+            y: center.y + radius
+        )
+        addSubview(iconView)
+    }
+
     private func addLabel(at angle: CGFloat, radius: CGFloat, center: CGPoint, value: Int) {
         let label = UILabel()
         label.text = "\(value)%"
@@ -1419,13 +1655,23 @@ final class ExploreScoreRingView: UIView {
         // Position: On the ring track, extending beyond the end of the colored arc
         // Calculate angular offset to create a gap between arc end and text
         // Arc length = r * theta -> theta = arc / r
-        // We want about 16pt gap + half label width (increased gap)
-        let gap: CGFloat = 16.0
+        //
+        // gap 是从**弧线末端的角度**量起的，而末端的圆头 cap 还要再往外鼓 lineWidth/2 = 6pt，
+        // 所以肉眼看到的间隙是 gap − 6，这里 10 即视觉 4pt。
+        // 原来是 16（视觉 10pt），在 100% 时会出事：满环的末端正好收在 3 点钟，
+        // 再顺时针偏就转进右下缺口象限，一头扎进总分数字里。
+        // 每放宽 1pt，满环时标签就沿弧线往总分那边多转约 1pt —— 这个数和下面
+        // scoreLabel 的字号是绑在一起定的，不能单独调。
+        let gap: CGFloat = 10.0
         let labelHalfWidth = label.bounds.width / 2.0
         let angleOffset = (gap + labelHalfWidth) / radius
         
+        // 标签**必须留在自己那条轨道上**，按切线方向旋转 —— 顺着圆环走是这个组件的基本观感。
+        // 曾经试过满环时把它沿半径让进两条轨道之间的空档来躲总分，结果就是「缩到两个圆环
+        // 中间」，一眼就不对。不要再走这条路：满环时它必然转进右下缺口象限（总分就摆在
+        // 那儿），只能靠缩小末端间隙 + 收总分字号腾地方，见上面的 gap 与 scoreLabel 字号。
         let labelAngle = angle + angleOffset
-        
+
         let x = center.x + radius * cos(labelAngle)
         let y = center.y + radius * sin(labelAngle)
         label.center = CGPoint(x: x, y: y)
@@ -1521,14 +1767,10 @@ class ExploreAdviceView: UIView {
     func configure(text: String, hasData: Bool) {
         titleLabel.text = L("explore.section.advice")
         
-        let displayText: String
-        if hasData {
-            displayText = text
-            backgroundImageView.isHidden = false
-        } else {
-            displayText = L("explore.bottom.description")
-            backgroundImageView.isHidden = true
-        }
+        // 文案一律用服务端下发的那份（ExploreManager 已把「服务端返回空」统一成 "--"），
+        // 这里不再按 hasData 换成本地介绍文案。背景图仍跟着 hasData 走。
+        let displayText = text
+        backgroundImageView.isHidden = !hasData
 
         let trimmed = displayText.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
@@ -1603,7 +1845,10 @@ class ExploreScoreHeaderView: UIView {
     private let ringView = ExploreScoreRingView()
     private let scoreLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "HKGrotesk-SemiBold", size: 60) ?? UIFont.systemFont(ofSize: 60, weight: .semibold)
+        // 39 而非设计稿的 60：总分压在圆环 270° 缺口那一象限里，满环时末端的百分比标签
+        // 必然转到这里来，两者只能靠字号让位 —— 标签要留在轨道上顺着圆环，不能沿半径躲。
+        // 实测 100% 那圈（字号每减 1pt 约让出 1.2pt）：60 时被压 25.8pt，44 时只差 2.9pt。
+        label.font = UIFont(name: "HKGrotesk-SemiBold", size: 39) ?? UIFont.systemFont(ofSize: 39, weight: .semibold)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -1613,6 +1858,12 @@ class ExploreScoreHeaderView: UIView {
         label.font = UIFont(name: "PingFangSC-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .medium)
         label.textColor = UIColor(white: 0.7, alpha: 1.0)
         label.textAlignment = .center
+        // 同空态：右对齐在圆环右缘的一行字，长语言会顶到起点图标上，
+        // **必须保持一行**，先右移出圆环再缩字号。
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.7
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return label
     }()
     
@@ -1634,6 +1885,12 @@ class ExploreScoreHeaderView: UIView {
         scoreLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
+        // 「贴齐圆环右缘 8pt」是常态排版，但它得给长文案让路：降一级优先级，
+        // 顶不住时由 Auto Layout 打破它、把整行右移出圆环，而不是折行。
+        let titleRightInset = titleLabel.trailingAnchor.constraint(
+            equalTo: ringView.trailingAnchor, constant: -8)
+        titleRightInset.priority = .required - 1
+
         NSLayoutConstraint.activate([
             scoreContainer.topAnchor.constraint(equalTo: topAnchor),
             scoreContainer.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -1651,7 +1908,14 @@ class ExploreScoreHeaderView: UIView {
             // "Bottom and Arc Bottom Tangent Aligned" -> titleLabel.bottom = ringView.bottom
             // "Right and Arc Right Tangent Distance 8pt" -> titleLabel.trailing = ringView.trailing - 8
             titleLabel.bottomAnchor.constraint(equalTo: ringView.bottomAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: ringView.trailingAnchor, constant: -8),
+            titleRightInset,
+            // 左边界不许越过起点图标：图标右缘在圆心 +24.5pt，再留 8pt 呼吸。
+            // 中文用不到这条（天然还差 18pt），只有拉丁语系的长文案会被它拦下来。
+            titleLabel.leadingAnchor.constraint(
+                greaterThanOrEqualTo: ringView.centerXAnchor, constant: 32.5),
+            // 让路的去处：圆环右侧到内容区边缘还有空白，长文案先整体右移出圆环，
+            // 顶到这条才轮到 adjustsFontSizeToFitWidth 缩字号 —— 任何情况都不折行。
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: scoreContainer.trailingAnchor),
 
             // Score Label Position:
             // "Above Title, Vertically Centered Aligned" -> centerX aligned, stacked

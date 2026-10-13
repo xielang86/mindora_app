@@ -213,6 +213,7 @@
 				"zh-Hans",
 				"zh-Hant",
 				ko,
+				id,
 			);
 			mainGroup = CC234A912E7BE89300CEE237;
 			minimizedProjectReferenceProxies = 1;
@@ -291,69 +292,79 @@
 
 /* Begin XCBuildConfiguration section */
 		CC234AC42E7BE89600CEE237 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = mindora/mindora.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = mindora/Info.plist;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "用于在局域网内发现并连接 Mindora 设备";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mindora316.mindora1;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_APPICON_NAME" = AppIcon;
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"CODE_SIGN_ENTITLEMENTS" = "mindora/mindora.entitlements";
+		"CODE_SIGN_IDENTITY" = "Apple Development";
+		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 8;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3P69B8MV37;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_FILE" = "mindora/Info.plist";
+		"INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription" = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+		"INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription" = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+		"INFOPLIST_KEY_NSHealthShareUsageDescription" = "This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.";
+		"INFOPLIST_KEY_NSLocalNetworkUsageDescription" = "\U7528\U4e8e\U5728\U5c40\U57df\U7f51\U5185\U53d1\U73b0\U5e76\U8fde\U63a5 Mindora \U8bbe\U5907";
+		"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents" = YES;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations" = UIInterfaceOrientationPortrait;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+		"IPHONEOS_DEPLOYMENT_TARGET" = "15.0";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+		);
+		"MARKETING_VERSION" = "1.3.1";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "com.mindora316.mindora";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Mindora Development";
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+	};
+	isa = XCBuildConfiguration;
+	name = Debug;
+};
 		CC234AC52E7BE89600CEE237 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = mindora/mindora.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = mindora/Info.plist;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "用于在局域网内发现并连接 Mindora 设备";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mindora316.mindora1;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_APPICON_NAME" = AppIcon;
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"CODE_SIGN_ENTITLEMENTS" = "mindora/mindora.entitlements";
+		"CODE_SIGN_IDENTITY" = "Apple Distribution";
+		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 8;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3P69B8MV37;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_FILE" = "mindora/Info.plist";
+		"INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription" = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+		"INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription" = "This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.";
+		"INFOPLIST_KEY_NSHealthShareUsageDescription" = "This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.";
+		"INFOPLIST_KEY_NSLocalNetworkUsageDescription" = "\U7528\U4e8e\U5728\U5c40\U57df\U7f51\U5185\U53d1\U73b0\U5e76\U8fde\U63a5 Mindora \U8bbe\U5907";
+		"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents" = YES;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations" = UIInterfaceOrientationPortrait;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+		"IPHONEOS_DEPLOYMENT_TARGET" = "15.0";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+		);
+		"MARKETING_VERSION" = "1.3.1";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "com.mindora316.mindora";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Mindora AppStore";
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+	};
+	isa = XCBuildConfiguration;
+	name = Release;
+};
 		CC234AC62E7BE89600CEE237 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -390,7 +401,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				DEVELOPMENT_TEAM = 3P69B8MV37;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -456,7 +467,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
+				DEVELOPMENT_TEAM = 3P69B8MV37;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -480,77 +491,77 @@
 			name = Release;
 		};
 		CC234AC92E7BE89600CEE237 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mindora.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mindora";
-			};
-			name = Debug;
-		};
+	buildSettings = {
+		"BUNDLE_LOADER" = "$(TEST_HOST)";
+		"CODE_SIGN_STYLE" = Automatic;
+		"CURRENT_PROJECT_VERSION" = 1;
+		"DEVELOPMENT_TEAM" = 3P69B8MV37;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"IPHONEOS_DEPLOYMENT_TARGET" = "18.5";
+		"MARKETING_VERSION" = "1.3.1";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "com.mindora316.mindoraTests";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"SWIFT_EMIT_LOC_STRINGS" = NO;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+		"TEST_HOST" = "$(BUILT_PRODUCTS_DIR)/Mindora.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mindora";
+	};
+	isa = XCBuildConfiguration;
+	name = Debug;
+};
 		CC234ACA2E7BE89600CEE237 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mindora.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mindora";
-			};
-			name = Release;
-		};
+	buildSettings = {
+		"BUNDLE_LOADER" = "$(TEST_HOST)";
+		"CODE_SIGN_STYLE" = Automatic;
+		"CURRENT_PROJECT_VERSION" = 1;
+		"DEVELOPMENT_TEAM" = 3P69B8MV37;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"IPHONEOS_DEPLOYMENT_TARGET" = "18.5";
+		"MARKETING_VERSION" = "1.3.1";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "com.mindora316.mindoraTests";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"SWIFT_EMIT_LOC_STRINGS" = NO;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+		"TEST_HOST" = "$(BUILT_PRODUCTS_DIR)/Mindora.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mindora";
+	};
+	isa = XCBuildConfiguration;
+	name = Release;
+};
 		CC234ACC2E7BE89600CEE237 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = mindora;
-			};
-			name = Debug;
-		};
+	buildSettings = {
+		"CODE_SIGN_STYLE" = Automatic;
+		"CURRENT_PROJECT_VERSION" = 1;
+		"DEVELOPMENT_TEAM" = 3P69B8MV37;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"MARKETING_VERSION" = "1.3.1";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "com.mindora316.mindoraUITests";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"SWIFT_EMIT_LOC_STRINGS" = NO;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+		"TEST_TARGET_NAME" = mindora;
+	};
+	isa = XCBuildConfiguration;
+	name = Debug;
+};
 		CC234ACD2E7BE89600CEE237 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PMAUZ24QT5;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.simpleduo.mindoraUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = mindora;
-			};
-			name = Release;
-		};
+	buildSettings = {
+		"CODE_SIGN_STYLE" = Automatic;
+		"CURRENT_PROJECT_VERSION" = 1;
+		"DEVELOPMENT_TEAM" = 3P69B8MV37;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"MARKETING_VERSION" = "1.3.1";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "com.mindora316.mindoraUITests";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"SWIFT_EMIT_LOC_STRINGS" = NO;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+		"TEST_TARGET_NAME" = mindora;
+	};
+	isa = XCBuildConfiguration;
+	name = Release;
+};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */

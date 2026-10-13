@@ -1,15 +1,17 @@
-// (Removed duplicate sync metrics block)
-/* 
+/*
   Localizable.strings
   mindora
 
   Created by gao chao on 2025/9/18.
-  
+
 */
 
 // MARK: - Tab Bar Titles
 "tab.home" = "Startseite";
 "tab.health" = "Gesundheit";
+"tab.sleep" = "Schlaf";
+"tab.explore" = "Entdecken";
+"tab.store" = "Shops";
 "tab.settings" = "Einstellungen";
 
 // MARK: - Theme Modes
@@ -17,8 +19,18 @@
 "theme.light" = "Heller Modus";
 "theme.dark" = "Dunkler Modus";
 
+// MARK: - Register P3
+
+// MARK: - Register P4
+"register.p4.title" = "Verbinden Sie Ihr Mindora";
+"register.p4.subtitle" = "Verbinden Sie Ihr Mindora mit dem Ladegerät und fahren Sie mit dem nächsten Schritt fort. Bitte stellen Sie sicher, dass Bluetooth auf Ihrem Telefon aktiviert ist.";
+"register.p4.button.set_mindor" = "Mindora einrichten";
+"register.p4.no_mindora" = "Noch kein Mindora?";
+
 // MARK: - Home Screen
 "home.title" = "Startseite";
+"home.device.status.connected" = "Verbunden";
+"home.device.status.offline" = "Offline";
 "home.nearby_devices" = "Geräte in der Nähe";
 "home.scan" = "Scannen";
 "home.scanning" = "Scannen nach Geräten in der Nähe…";
@@ -35,6 +47,19 @@
 "home.search_finished_one" = "1 Gerät gefunden";
 "home.search_finished_many" = "%d Geräte gefunden";
 
+// MARK: - Home Dashboard
+"home.metric.sleep_onset" = "Einschlafzeit";
+"home.metric.deep_sleep" = "Tiefschlaf";
+"home.tab.sleep" = "Schlaf";
+"home.tab.overall_score" = "Gesamtbewertung";
+"home.tab.activity" = "Aktivität";
+"home.insights.title" = "Schlaf-Einblicke";
+"home.insights.subtitle" = "Basierend auf der Analyse Ihrer Schlafdaten";
+"home.best.title" = "Wöchentliche Bestleistung";
+"home.best.subtitle" = "Entwickelt, um Ihnen den besten Schlaf zu bringen";
+"home.best.used_times" = "Nutzungen";
+"home.best.score" = "Bewertung";
+
 // MARK: - Health Screen
 "health.title" = "Gesundheit";
 "health.page_title" = "Alle Gesundheitsdaten";
@@ -42,6 +67,7 @@
 "health.time.past_7_days" = "Letzte 7 Tage";
 "health.time.past_12_months" = "Letzte 12 Monate";
 "health.time.earlier" = "Früher";
+
 // MARK: - Health Metrics
 "health.status.initial" = "Health-Zugriff wird angefordert";
 "health.status.loading" = "Gesundheitsdaten werden geladen";
@@ -95,6 +121,42 @@
 "health.weekday.fri" = "Fr";
 "health.weekday.sat" = "Sa";
 
+// MARK: - Health Week View
+"health.week.avg_score" = "Durchschn. Schlafbewertung";
+"health.week.good" = "Gut";
+"health.week.insights" = "Schlaf-Einblicke";
+"health.week.insights_sub" = "Basierend auf der Analyse Ihrer Schlafdaten";
+"health.week.insights_title" = "Schlaftrends";
+"health.week.insights.body" = "Hervorragende Tiefschlaf-\nLeistung";
+"health.week.insights.desc" = "Ihr Tiefschlaf macht 29,8 % Ihres \nGesamtschlafs aus, über dem Standardniveau. \nBehalten Sie weiterhin einen regelmäßigen Schlafrhythmus bei.";
+
+"health.week.best" = "Wöchentliche Bestleistung";
+"health.week.best_title" = "Einschlafeffizienz";
+"health.week.best_sub" = "Entwickelt, um Ihnen den besten Schlaf zu bringen";
+"health.week.best.used_times" = "Nutzungen";
+"health.week.best.score" = "Bewertung";
+"health.week.sedona" = "Sedona Desert Calm";
+"health.week.respiratory_rate" = "Atemfrequenz";
+"health.week.avg_heart_rate" = "Durchschn. Herzfrequenz";
+"health.week.avg_wrist_temp" = "Handgelenktemperatur";
+"health.week.avg_awake" = "Durchschn. Wachzeit";
+"health.week.avg_rem" = "Durchschn. REM";
+"health.week.avg_core" = "Durchschn. Kernschlaf";
+"health.week.avg_deep" = "Durchschn. Tiefschlaf";
+"health.week.days_tracked" = "Erfasste Tage";
+"health.week.avg_total" = "Durchschn. Gesamtschlaf";
+"health.week.avg_onset" = "Durchschn. Einschlafzeit";
+
+// MARK: - Health Week Expanded Headers
+"health.week.header.heart_rate" = "Durchschn. Herzfrequenz";
+"health.week.header.total_sleep" = "Gesamtschlaf";
+"health.week.header.time_in_bed" = "Durchschn. Zeit im Bett";
+"health.week.metric.from_baseline" = "(vom Ausgangswert)";
+
+// MARK: - Health Month View
+"health.month.optimal" = "Optimal";
+
+
 // MARK: - Settings Screen
 "settings.title" = "Einstellungen";
 "settings.subtitle" = "Mindora personalisieren";
@@ -105,6 +167,8 @@
 "settings.language" = "Sprache";
 "settings.theme" = "Design-Modus";
 "settings.profile" = "Profil bearbeiten";
+"settings.profile_email_format" = "E-Mail: %@";
+"settings.profile_email_placeholder" = "Nicht angemeldet";
 "settings.sync" = "Gesundheitsdaten synchronisieren";
 "settings.permission" = "Berechtigungsverwaltung";
 "settings.version" = "App-Version";
@@ -113,6 +177,7 @@
 "settings.show_onboarding" = "Anleitungsseite erneut anzeigen";
 
 // Language and Theme Selection
+"settings.language_title" = "Sprache";
 "settings.select_language" = "Sprache auswählen";
 "settings.select_theme" = "Design-Modus auswählen";
 
@@ -138,6 +203,46 @@
 "settings.syncing" = "Synchronisierung...";
 "settings.sync_success_title" = "Synchronisierung erfolgreich";
 "settings.sync_success_message" = "Ein Batch von Beispiel-Gesundheitsdaten wurde gesendet.";
+
+// MARK: - Device Management
+"device_manage.status.connected" = "Verbunden";
+"device_manage.status.not_connected" = "Nicht verbunden";
+
+// MARK: - Device Scan (iOS Bluetooth-style scan & multi-bind page)
+"device_scan.title" = "Geräte";
+"device_scan.hint" = "Wenn keine Geräte angezeigt werden, aktivieren Sie bitte die Berechtigungen für lokales Netzwerk und Bluetooth in den Einstellungen.";
+"device_scan.open_settings" = "Einstellungen öffnen";
+"device_scan.section.my_devices" = "MEINE GERÄTE";
+"device_scan.section.empty_footer" = "Stellen Sie sicher, dass Ihr Mindora eingeschaltet ist und sich Ihr Telefon im selben WLAN befindet. Bluetooth kann als Backup dienen.";
+"device_scan.searching" = "Suche nach Geräten...";
+"device_scan.no_devices_found" = "Keine Geräte gefunden";
+"device_scan.tap_to_retry" = "Zum Wiederholen tippen";
+"device_scan.status.not_connected" = "Nicht verbunden";
+"device_scan.status.connected" = "Verbunden";
+
+// MARK: - Device Detail (tap ⓘ on the scan list)
+"device_detail.section.name" = "Name";
+"device_detail.section.model" = "Modell";
+"device_detail.section.device_id" = "Geräte-ID";
+"device_detail.value.unknown" = "Unbekannt";
+"device_detail.disconnect" = "Trennen";
+"device_detail.connect" = "Verbinden";
+"device_manage.button.connect" = "Nach Geräten suchen";
+"device_manage.button.connect_other" = "Nach Geräten suchen";
+"device_manage.button.disconnect" = "Trennen";
+"device_manage.button.connect_device" = "Verbinden";
+"device_manage.button.connect_other_device" = "Anderes Gerät verbinden";
+"device_manage.button.search_device" = "Nach Geräten suchen";
+"device_manage.subtitle" = "Ihre Anmeldedaten werden 30 Tage lang gespeichert. Danach ist eine erneute Kopplung erforderlich.\nTippen Sie auf das Gerätebild unten, um Details anzuzeigen";
+"device_manage.default_name" = "Mindora";
+"device_manage.empty.title" = "Kein Gerät verbunden";
+"device_manage.empty.message" = "Tippen Sie auf die Schaltfläche unten, um Ihr Mindora zu koppeln.";
+"device_manage.action.disconnect" = "Gerät trennen";
+"device_manage.action.disconnect_confirm" = "Trennen";
+"device_manage.action.disconnect_message" = "Sie können jederzeit erneut koppeln. Ihre Daten bleiben auf diesem Telefon.";
+"device_manage.button.delete_device" = "Dieses Gerät löschen";
+"device_manage.delete.confirm_title" = "Gerät „%@“ löschen?";
+
 "settings.sync_error_title" = "Synchronisierung fehlgeschlagen";
 
 // MARK: - Settings Sections
@@ -146,8 +251,45 @@
 "settings.section.other" = "Sonstiges";
 "settings.section.about" = "Über";
 
-// MARK: - Device Selection
-"device_selection.title" = "Bitte wählen Sie das Mindora-Gerät aus, mit dem Sie sich verbinden möchten";
+// MARK: - Side Menu
+"sidemenu.title" = "Mein Konto";
+"sidemenu.user.name" = "Benutzername";
+"sidemenu.subscription" = "Abonnement";
+"sidemenu.upgrade" = "Auf Pro upgraden";
+"sidemenu.device" = "Geräte";
+"sidemenu.notifications" = "Benachrichtigungen";
+"sidemenu.health_link" = "Gesundheitsdaten-Verknüpfung";
+"sidemenu.language" = "Sprache";
+"sidemenu.help" = "Hilfe";
+"sidemenu.logout" = "Abmelden";
+"sidemenu.terms" = "Nutzungsbedingungen";
+"sidemenu.privacy_policy" = "Datenschutzrichtlinie";
+"sidemenu.not_logged_in" = "Nicht angemeldet";
+
+// MARK: - User Profile
+"user_profile.user_id" = "Benutzer-ID";
+"user_profile.nickname" = "Spitzname";
+"user_profile.gender" = "Geschlecht";
+"user_profile.gender.male" = "Männlich";
+"user_profile.gender.female" = "Weiblich";
+"user_profile.gender.other" = "Andere";
+"user_profile.age" = "Alter";
+"user_profile.birthday" = "Geburtstag";
+"user_profile.weight_height" = "Gewicht / Größe";
+"user_profile.weight_unit" = "Gewicht / kg";
+"user_profile.height_unit" = "Größe / cm";
+"user_profile.weight_height_invalid" = "Bitte gültige Werte eingeben: Gewicht 20–300 kg, Größe 50–250 cm.";
+"user_profile.email" = "E-Mail";
+"user_profile.phone" = "Telefon";
+"user_profile.address" = "Adresse";
+"user_profile.update" = "Profil aktualisieren";
+"user_profile.username_default" = "Benutzername";
+"user_profile.take_photo" = "Foto aufnehmen";
+"user_profile.choose_from_album" = "Aus Album auswählen";
+"user_profile.cancel" = "Abbrechen";
+"user_profile.email_locked_title" = "E-Mail kann nicht bearbeitet werden";
+"user_profile.email_locked_message" = "Nutzer, die sich über ein soziales Konto oder SSO angemeldet haben, können ihre E-Mail-Adresse nicht direkt ändern.\nBrauchst du Hilfe? Kontakt: %@";
+"user_profile.email_locked_contact" = "Kontakt aufnehmen";
 
 // MARK: - Help Cards
 "help.title" = "Verbindungshilfe";
@@ -165,9 +307,12 @@
 
 // MARK: - Common UI Elements
 "common.ok" = "OK";
-"common.cancel" = "Abbrechen";
 "common.confirm" = "Bestätigen";
 "common.retry" = "Wiederholen";
+"common.saved_to_photos" = "In Fotos gespeichert";
+"common.save_success" = "Erfolgreich gespeichert";
+"common.share_success" = "Erfolgreich geteilt";
+"common.copy_success" = "Kopiert";
 
 // MARK: - Onboarding
 "onboarding.start" = "Starten";
@@ -178,9 +323,10 @@
 "onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth-Berechtigung ist aktiviert\nGerät kann normal verbunden werden";
 "onboarding.page4.scanning_title" = "Geräte in der Nähe scannen";
 "onboarding.page4.searching" = "Kontinuierliche automatische Suche";
-"onboarding.page4.device_found" = "Mindora gefunden";
+"onboarding.page4.device_found" = "%@ gefunden";
 "onboarding.page4.no_device_found" = "Keine Geräte gefunden";
 "onboarding.page4.description" = "Bitte wählen Sie das Mindora-Gerät aus, mit dem Sie sich verbinden möchten. Stellen Sie sicher, dass Bluetooth aktiviert ist.";
+"onboarding.page4.multiple_found" = "%d Geräte gefunden, bitte wählen Sie eines aus";
 "onboarding.page5.success_title" = "Mindora erfolgreich verbunden";
 "onboarding.page5.complete" = "Fertig";
 
@@ -215,6 +361,8 @@
 "health.sync.section.metrics" = "Metriken";
 "health.sync.section.action" = "Aktion";
 "health.sync.section.status" = "Status";
+
+// Sync Metrics Names
 "health.sync.metric.heart_rate" = "Herzfrequenz";
 "health.sync.metric.hrv" = "Herzfrequenzvariabilität";
 "health.sync.metric.spo2" = "Blutsauerstoff";
@@ -237,6 +385,7 @@
 "permission.section.health" = "Gesundheitsdatenberechtigungen";
 "permission.section.healthkit_footer_line1" = "Falls der Zugriff eingeschränkt ist, gehen Sie zu";
 "permission.section.healthkit_footer_line2" = "*Einstellungen > Datenschutz & Sicherheit > Gesundheit > Mindora.\n*Öffnen Sie die Health-App > Teilen > Apps > Mindora und aktivieren Sie die benötigten Datentypen.";
+
 // Permission Status
 "permission.status.authorized" = "Autorisiert";
 "permission.status.partial" = "Teilweise autorisiert";
@@ -258,7 +407,7 @@
 // Health Permission Actions
 "permission.health.action_title" = "Gesundheitsdatenberechtigung";
 "permission.health.action_message" = "Bitte wählen Sie eine Aktion";
-"permission.open_settings_hint" = "Sie können diese Berechtigung in den iOS-Einstellungen für Mindora anpassen.";
+"permission.open_settings_hint" = "Gehen Sie zu Einstellungen > Mindora und aktivieren Sie den Zugriff auf das lokale Netzwerk und die Mobilfunkdaten.";
 
 // Health Settings Guide
 "permission.health.settings_title" = "Datenschutz für Gesundheit";
@@ -269,9 +418,842 @@
 // Health Permission CTA (avoid misleading status)
 "permission.health.confirm" = "Einstellungen";
 
-// Local Network Permission CTA
+// Local Network Permission CTA (cannot be accurately detected, prompt user to confirm in settings)
 "permission.local_network.confirm" = "Bitte in Einstellungen bestätigen";
 
 // Local Network Permission Denied
 "permission.local_network.denied_title" = "Geräte können nicht gesucht werden";
 "permission.local_network.denied_message" = "Für die Suche nach Mindora-Geräten in der Nähe ist der Zugriff auf das lokale Netzwerk erforderlich. Bitte aktivieren Sie den lokalen Netzwerkzugriff in den Einstellungen.";
+"permission.cellular.denied_title" = "Mobile Daten deaktiviert";
+"permission.cellular.denied_message" = "Mindora darf keine mobilen Daten verwenden, daher können Schlaf-Scores und andere Online-Inhalte nicht geladen werden. Bitte erlauben Sie Mindora in den Einstellungen die Nutzung mobiler Daten oder verbinden Sie sich mit einem WLAN.";
+
+// Bluetooth Permission Denied
+"permission.bluetooth.denied_title" = "Scannen über Bluetooth nicht möglich";
+"permission.bluetooth.denied_message" = "Bluetooth-Zugriff ist erforderlich, um Mindora-Geräte zu finden, wenn WLAN nicht verfügbar ist. Bitte aktivieren Sie Bluetooth für Mindora in den Einstellungen.";
+
+// MARK: - Login
+"login.email_placeholder" = "Geben Sie Ihre E-Mail ein";
+"login.get_code" = "E-Mail verifizieren";
+"login.toast.enter_email" = "Bitte geben Sie Ihre E-Mail ein";
+"login.toast.invalid_email" = "Ungültiges E-Mail-Format";
+"login.toast.network_error_prefix" = "Netzwerkfehler: ";
+"login.toast.no_data" = "Keine Daten empfangen";
+"login.toast.send_code_failed" = "Code konnte nicht gesendet werden";
+"login.toast.invalid_response" = "Ungültige Antwort";
+"login.toast.login_failed" = "Anmeldung fehlgeschlagen";
+"login.verify_alert.title" = "E-Mail verifizieren";
+
+// Login Success
+"login.success.title" = "Anmeldung erfolgreich";
+"login.success.message" = "E-Mail %@ erfolgreich verifiziert";
+"login.verify_alert.message_format" = "Geben Sie den an %@ gesendeten Code ein";
+"login.verify_alert.code_placeholder" = "Bestätigungscode";
+"login.verify_alert.login_action" = "Anmelden";
+"login.code_sent_title" = "Bestätigungscode gesendet";
+"login.code_sent_message" = "Der Bestätigungscode wurde an Ihre E-Mail gesendet: %@. Bitte überprüfen Sie Ihren Posteingang.";
+
+// MARK: - User Profile
+"user_profile.title" = "Benutzerprofil";
+"user_profile.change_avatar" = "Avatar ändern";
+"user_profile.email_title" = "E-Mail";
+"user_profile.logout" = "Abmelden";
+"user_profile.logout_confirm_title" = "Abmelden?";
+"user_profile.logout_confirm_message" = "Beim Abmelden werden lokale Daten gelöscht.";
+"user_profile.logout_success" = "Abgemeldet";
+"user_profile.delete" = "Konto löschen";
+"user_profile.delete_confirm_title" = "Konto löschen?";
+"user_profile.delete_confirm_message" = "Dadurch werden dein Konto und deine Daten dauerhaft gelöscht und können nicht wiederhergestellt werden. Wir senden dir zur Bestätigung einen Code an deine E-Mail oder Telefonnummer.";
+"user_profile.delete_success" = "Konto gelöscht";
+"user_profile.delete_failed" = "Konto konnte nicht gelöscht werden";
+"user_profile.delete_confirm_send" = "Code senden";
+"user_profile.delete_code_sent" = "Bestätigungscode gesendet";
+"user_profile.delete_code_prompt_title" = "Bestätigungscode eingeben";
+"user_profile.delete_code_prompt_message" = "Gib den an deine E-Mail oder Telefonnummer gesendeten Code ein, um dein Konto dauerhaft zu löschen. Dies kann nicht rückgängig gemacht werden.";
+"user_profile.delete_confirm_message_email" = "Dadurch werden dein Konto und deine Daten dauerhaft gelöscht und können nicht wiederhergestellt werden. Wir senden dir zur Bestätigung einen Code an deine E-Mail %@.";
+"user_profile.delete_confirm_message_phone" = "Dadurch werden dein Konto und deine Daten dauerhaft gelöscht und können nicht wiederhergestellt werden. Wir senden dir zur Bestätigung einen Code an deine Telefonnummer %@.";
+"user_profile.delete_code_prompt_message_email" = "Gib den an deine E-Mail %@ gesendeten Code ein, um dein Konto dauerhaft zu löschen. Dies kann nicht rückgängig gemacht werden.";
+"user_profile.delete_code_prompt_message_phone" = "Gib den an deine Telefonnummer %@ gesendeten Code ein, um dein Konto dauerhaft zu löschen. Dies kann nicht rückgängig gemacht werden.";
+"user_profile.delete_code_placeholder" = "Bestätigungscode";
+"user_profile.delete_code_empty" = "Bitte gib den Bestätigungscode ein";
+"user_profile.delete_submit" = "Konto löschen";
+"user_profile.delete_err_no_contact" = "Deinem Konto ist keine E-Mail oder Telefonnummer zugeordnet, daher kann kein Code gesendet werden.";
+"user_profile.delete_err_send_failed" = "Der Code konnte nicht gesendet werden. Bitte versuche es später erneut.";
+"user_profile.delete_err_bad_code" = "Bestätigungscode ist falsch oder abgelaufen.";
+"user_profile.delete_err_user_gone" = "Dieses Konto existiert nicht oder wurde bereits gelöscht.";
+"user_profile.token_missing" = "Bitte zuerst anmelden";
+"user_profile.photo_unavailable" = "Zugriff auf Fotos nicht verfügbar";
+"user_profile.update_success" = "Profil aktualisiert";
+"user_profile.update_failed" = "Profil konnte nicht aktualisiert werden";
+
+// MARK: - Login Start
+"login_start.tagline" = "Persönliche Einblicke,\ndie Ihren Alltag\nstärken.";
+"login_start.button.start" = "Starten";
+"login_start.button.no_device" = "Noch kein Mindora?";
+
+
+// MARK: - Register P1
+"register.welcome" = "Willkommen!";
+"register.email_label" = "E-Mail-Adresse";
+"register.email_placeholder" = "E-Mail-Adresse";
+"register.info.create" = "Bitte geben Sie Ihre E-Mail-Adresse ein, um ein Konto zu erstellen.";
+"register.info.signin" = "Wenn Sie bereits Mitglied sind, geben Sie die E-Mail-Adresse Ihres Mindora-Kontos ein, um sich anzumelden.";
+"register.button.continue" = "Weiter";
+
+// MARK: - Register P3
+"register.p3.title" = "Nutzungsbedingungen und Datenschutzrichtlinie";
+"register.p3.subtitle" = "Bitte lesen Sie Folgendes, um fortzufahren:";
+"register.p3.agree_prefix" = "Ich habe die ";
+"register.p3.terms" = "Nutzungsbedingungen";
+"register.p3.and" = " und ";
+"register.p3.privacy" = "Mindora-Datenschutzrichtlinie gelesen und stimme zu.";
+"register.p3.marketing" = "Erhalten Sie exklusive Gesundheitstipps, Hinweise und Sonderangebote, um Ihre Mindora-Erfahrung optimal zu nutzen.";
+"register.p3.button.save" = "Speichern und fortfahren";
+
+// MARK: - Register P2
+"register.p2.title" = "Bestätigungscode eingeben";
+"register.p2.subtitle" = "Ein 4-stelliger Code wurde gesendet an";
+"register.p2.resend" = "Code erneut senden";
+
+"register.p2.resend_countdown" = "Sie können in %d Sekunden einen neuen Code anfordern.";
+// MARK: - Common Alerts
+"common.error" = "Fehler";
+"common.notice" = "Hinweis";
+"register.verification_code_sent" = "Bestätigungscode gesendet";
+
+// MARK: - Auth Errors
+"auth.error.invalid_url" = "Ungültige URL";
+"auth.error.serialization_error" = "Serialisierungsfehler";
+"auth.error.no_data" = "Keine Daten empfangen";
+"auth.error.api_error_default" = "API-Fehler: %d";
+"auth.error.invalid_response" = "Ungültige Antwort";
+"auth.error.missing_data" = "Fehlende Daten in der Antwort";
+"auth.error.network" = "Netzwerk nicht verfügbar. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.";
+"auth.error.timeout" = "Die Anfrage ist abgelaufen. Bitte versuchen Sie es erneut.";
+"auth.error.server" = "Der Dienst ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.";
+"auth.error.send_failed" = "Der Bestätigungscode konnte nicht gesendet werden. Bitte versuchen Sie es erneut.";
+"auth.error.verify_failed" = "Verifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.";
+"auth.error.code_invalid" = "Der Bestätigungscode ist falsch. Bitte versuchen Sie es erneut.";
+"auth.error.code_expired" = "Der Bestätigungscode ist abgelaufen. Bitte fordern Sie einen neuen an.";
+
+// MARK: - Subscription
+
+// MARK: - Explore
+"explore.greeting.hi" = "Hi,";
+
+
+
+
+"explore.fluctuation.resp_range" = "Atemschwankung";
+
+
+
+
+"explore.quote.open" = "“";
+"explore.quote.close" = "”";
+
+
+"explore.placeholder.number" = "- -";
+"explore.placeholder.hr" = "- - bpm";
+"explore.placeholder.resp" = "- - Atemzüge/Min";
+"explore.placeholder.duration" = "- - Min";
+"explore.placeholder.count" = "- - mal";
+"explore.placeholder.text" = "- -";
+"explore.placeholder.hr_fluctuation" = "- - bpm";
+"explore.placeholder.percent" = "- -%";
+
+"explore.value.count_format" = "%@ mal";
+"explore.value.duration_format" = "%@ Min";
+"explore.value.resp_rate_format" = "%@ Atemzüge/Min";
+"explore.value.hr_format" = "%@ bpm";
+"explore.value.hr_range_format" = "%@ bpm";
+
+
+"explore.empty.score" = "0";
+"explore.empty.title" = "Schlafbewertung";
+"explore.empty.message" = "Nach Ihrer ersten Überwachungssitzung\nerhalten Sie hier eine tiefere Analyse Ihrer Schlafqualität.\nBeginnen wir mit Ihrer ersten Schlafüberwachung.";
+
+"explore.empty.intro" = "Beim Einschlafen, beim nächtlichen Aufwachen und beim Zurückgleiten in den Tiefschlaf verfolgt Mindora Ihren Schlafrhythmus und passt seine Unterstützung an Ihren Zustand an.\nDiese Einblicke sind mehr als Veränderungen in Ihren Daten. Sie spiegeln die Szenarien, die Sie nutzen, den Rhythmus der Klänge und die Reaktionen Ihres Körpers wider.";
+"explore.empty.intro_detail" = "Scrollen Sie nach unten, um zu sehen, was letzte Nacht passiert ist, was Ihnen am meisten geholfen hat und was Mindora angepasst hat.";
+"explore.empty.desc.efficiency" = "Hier sehen Sie, wie Sie einschlafen. Mindora betrachtet, wann Sie einschlafen, wie lange es dauert und wie sich Herzfrequenz und Atmung davor verändern, damit Sie besser verstehen, wie Ihr Schlaf natürlich beginnt.";
+"explore.empty.desc.structure" = "Hier sehen Sie, wie sich Ihre Schlafphasen über die Nacht verteilen. Sie erkennen Anteil und Kontinuität von Leicht-, Tief- und REM-Schlaf und verstehen Ihre Schlafstruktur besser – ohne sie als gut oder schlecht zu bewerten.";
+"explore.empty.desc.fluctuation" = "Hier sehen Sie, wie sich Ihr Schlaf in der Nacht verändert, wie Ihr Körper reagiert und wann Mindora eingreift. Bei Veränderungen wertet Mindora Ihre physiologischen Signale aus, passt seine Unterstützung an und greift bei Bedarf ein, um Ihren Schlafrhythmus zu schützen.";
+"explore.empty.desc.preference" = "Hier werden die Klänge und Szenarien zusammengefasst, die Sie bevorzugen, damit Sie erkennen, was Ihrem Schlaf am besten hilft. Mindora lernt aus Ihren Schlafgewohnheiten und Klangvorlieben und empfiehlt Ihnen persönlichere Wege, Ihren Schlaf zu unterstützen.";
+"explore.empty.desc.advice" = "Mindora verfolgt die ganze Nacht über Veränderungen Ihres Schlafs und Ihrer physiologischen Signale. Bei Bedarf greifen KI-gestützte Anpassungen ein, um eine ruhigere, durchgehendere Nacht zu unterstützen.\nSobald Sie Mindora nutzen, zeigt dieser Bereich tiefere Schlafeinblicke – darunter Ihr Einschlafen, Ihre Schlafstruktur, nächtliche Veränderungen und empfohlene Klangwelten.";
+// MARK: - Subscription
+"subscription.nav.title" = "Mitgliedschaft";
+"subscription.my_midora" = "My Mindora";
+"subscription.not_member" = "Sie sind noch kein Mitglied";
+"subscription.not_member_desc" = "Abonnieren Sie den gewünschten Plan und genießen Sie exklusive Vorteile";
+"subscription.section.title" = "Mitgliedschaftsabonnement";
+"subscription.my.title" = "Mein Abonnement";
+"subscription.monthly" = "Monatlich";
+"subscription.yearly" = "Jährlich";
+"subscription.price.monthly" = "/Monat";
+"subscription.price.yearly" = "/Jahr";
+"subscription.action.subscribe" = "Abonnieren";
+"subscription.action.cancel" = "Kündigen";
+"subscription.action.switch" = "Plan wechseln";
+"subscription.desc.monthly.prefix" = "Verlängerung zu ";
+"subscription.desc.monthly.suffix" = "/Monat einen Tag vor Ablauf. Jederzeit vor der Abbuchung kündbar.";
+"subscription.desc.yearly" = "Genießen Sie ein ganzes Jahr Service. Jederzeit vor der nächsten Verlängerung kündbar.";
+"subscription.auto_renew" = "Zeitpunkt der automatischen Verlängerung: ";
+"subscription.desc.cancelled" = "Ihre Vorteile bleiben bis zum Ablauf des Abonnements aktiv. Bitte verlängern Sie rechtzeitig.";
+"subscription.exclusive" = "Exklusiv für Mitglieder";
+"subscription.feature.1" = "360°-Rundum-Schlafanalyse, Ihre private Schlafdatenbank";
+"subscription.feature.2" = "Intelligente Schlaf-Einblicke, von Daten zu Lösungen";
+"subscription.feature.3" = "Exklusiver Schlafplan, personalisierte Schlafverbesserung";
+"subscription.help.faq" = "FAQ";
+"subscription.help.message" = "Nachrichtenzentrale";
+"subscription.help.renewal" = "Abo verwalten";
+"subscription.help.restore" = "Kauf wiederherstellen";
+"subscription.help.community" = "Community beitreten";
+"subscription.help.contact" = "Kontakt";
+"subscription.giftcard.entry" = "Geschenkkarten & Einlösecodes";
+
+// Redeem Code
+"redeem.placeholder" = "Einlösecode eingeben";
+"redeem.action" = "Jetzt einlösen";
+"redeem.rules.entry" = "Nutzungsregeln";
+"redeem.submitted" = "Einlösecode übermittelt";
+"redeem.success" = "Erfolgreich eingelöst. Mitgliedschaft aktiviert.";
+"redeem.success.title" = "Erfolgreich eingelöst";
+"redeem.success.detail" = "%1$@-Mitgliedschaft eingelöst. Gültig bis %2$@.";
+"redeem.success.detail.no_date" = "%1$@-Mitgliedschaft eingelöst.";
+"redeem.success.detail.generic" = "Mitgliedschaft eingelöst. Gültig bis %1$@.";
+"redeem.period.yearly" = "Jährlich";
+"redeem.period.monthly" = "Monatlich";
+"redeem.error.generic" = "Einlösen fehlgeschlagen. Bitte versuchen Sie es später erneut.";
+"redeem.error.not_logged_in" = "Bitte melden Sie sich vor dem Einlösen an.";
+"redeem.rules.title" = "Nutzungsregeln";
+"redeem.rules.ok" = "OK";
+"redeem.rules.body" = "1. Mindora-Einlösecodes können durch den Kauf einer Mitgliedschafts-Geschenkkarte auf der offiziellen Website oder durch die Teilnahme an Aktivitäten von Mindora oder Partnern erhalten werden.\n\n2. Die durch das Einlösen eines Mindora-Einlösecodes erhaltenen Mitgliedschaftsvorteile sind identisch mit den gekauften.\n\n3. Bei ungewöhnlichen Aktivitäten aufgrund höherer Gewalt, Netzwerkproblemen, Betrug oder anderen nicht von Mindora verursachten Faktoren behält sich Mindora das Recht vor, Mitgliedschaftsdienste anzupassen oder auszusetzen.\n\n4. Mindora behält sich im gesetzlich zulässigen Rahmen das Recht auf endgültige Auslegung dieser Regeln vor. Bei Fragen kontaktieren Sie: support@mindora316.com";
+
+// Subscription Email
+"subscription.email.subject" = "Mindora Support";
+"subscription.email.app_version" = "App-Version";
+"subscription.email.ios_version" = "iOS-Version";
+"subscription.email.device" = "Gerät";
+"subscription.email.error.title" = "E-Mail-Fehler";
+"subscription.email.error.message" = "E-Mail ist auf diesem Gerät nicht konfiguriert.";
+
+// Subscription Status
+"subscription.tide_days" = "Mindora-Tage";
+"subscription.active.plan_prefix" = "Aktiv · ";
+"subscription.active.plan_suffix" = "-Abonnement";
+"subscription.plan_name.monthly" = "Monatlich";
+"subscription.plan_name.yearly" = "Jährlich";
+"subscription.expires_prefix" = "Läuft ab am ";
+
+// MARK: - Notifications
+"notifications.title" = "Benachrichtigungen";
+"notifications.empty" = "Noch keine Nachrichten";
+"notifications.history.divider" = "Ältere Nachrichten unten";
+"notifications.delete" = "Löschen";
+"notifications.permission.title" = "Benachrichtigungen erlauben";
+"notifications.permission.desc" = "Aktivieren Sie Systembenachrichtigungen, um Nachrichten rechtzeitig zu erhalten";
+"notifications.permission.status" = "Sie haben Mindora-Benachrichtigungen in den Systemeinstellungen deaktiviert";
+"notifications.permission.keep" = "Beibehalten";
+"notifications.permission.open" = "Zu den Einstellungen";
+"notifications.mock.system" = "Systemnachricht";
+"notifications.mock.title" = "Mitgliedschaftserinnerung";
+"notifications.mock.body" = "Ihr Abonnement läuft in 7 Tagen ab. Bitte verlängern Sie rechtzeitig, um Unterbrechungen zu vermeiden.";
+"notifications.mock.action" = "Mitgliedschaftsseite anzeigen";
+
+// 消息通知 · 动态生成
+"notifications.source.membership" = "Mitgliedschaft";
+"notifications.source.system" = "System";
+"notifications.source.health" = "Schlaf";
+"notifications.subscription.expiring.title" = "Mitgliedschaft läuft bald ab";
+"notifications.subscription.expiring.body" = "Ihre Mitgliedschaft läuft in %1$d Tagen ab. Bitte verlängern Sie rechtzeitig, um Ihre Vorteile zu behalten.";
+"notifications.subscription.expiring.action" = "Mitgliedschaftsseite anzeigen";
+"notifications.subscription.expired.title" = "Mitgliedschaft abgelaufen";
+"notifications.subscription.expired.body" = "Ihre Mitgliedschaft ist abgelaufen. Verlängern Sie jetzt, um alle Vorteile wiederherzustellen.";
+"notifications.subscription.expired.action" = "Jetzt verlängern";
+"notifications.subscription.activated.title" = "Mitgliedschaft aktiviert";
+"notifications.subscription.activated.body" = "Danke für Ihr Abonnement! Ihre Vorteile sind aktiv bis %1$@.";
+"notifications.subscription.activated.action" = "Vorteile anzeigen";
+"notifications.subscription.renewed.title" = "Mitgliedschaft verlängert";
+"notifications.subscription.renewed.body" = "Verlängerung erfolgreich. Ihre Mitgliedschaft läuft jetzt bis %1$@.";
+"notifications.subscription.renewed.action" = "Vorteile anzeigen";
+"notifications.redeem.title" = "Erfolgreich eingelöst";
+"notifications.redeem.body" = "Erfolgreich eingelöst. Ihre Mitgliedschaft ist aktiv bis %1$@.";
+"notifications.redeem.body_days" = "Erfolgreich eingelöst. %1$d Tage Mitgliedschaft hinzugefügt, gültig bis %2$@.";
+"notifications.redeem.action" = "Vorteile anzeigen";
+"notifications.permission.off.title" = "Benachrichtigungen deaktiviert";
+"notifications.permission.off.body" = "Sie haben Mindora-Benachrichtigungen in den Einstellungen deaktiviert und könnten Erinnerungen zu Mitgliedschaft und Schlafberichten verpassen.";
+"notifications.permission.off.action" = "Einstellungen öffnen";
+"notifications.sleep.low.title" = "Niedrige Schlafbewertung";
+"notifications.sleep.low.body" = "Ihre letzte Schlafbewertung beträgt %1$d. Tippen Sie, um zu sehen, was Ihren Schlaf beeinflusst hat.";
+"notifications.sleep.low.action" = "Schlafdetails anzeigen";
+"notifications.weargap.title" = "Seit %1$d Tagen keine Schlafdaten";
+"notifications.weargap.body" = "Wir haben seit %1$d Tagen keine Schlafdaten erhalten. Tragen Sie Ihr Gerät beim Schlafen, um weiterhin Analysen zu erhalten.";
+"notifications.weargap.action" = "Schlafdetails anzeigen";
+
+
+// MARK: - Terms & Privacy
+
+
+// MARK: - Help Page
+"help.page.title" = "Hilfe";
+"help.page.description" = "Wenn Sie Fragen zum Produkt haben,\nkönnen Sie uns durch Scannen des offiziellen QR-Codes oben oder per E-Mail kontaktieren.";
+"help.page.email" = "support@mindora316.com";
+
+// MARK: - Logout Alert
+"logout.alert.title" = "Abmelden";
+"logout.alert.message" = "Möchten Sie sich wirklich abmelden? Sie müssen sich erneut anmelden, um die App zu verwenden.";
+"logout.alert.cancel" = "Abbrechen";
+"logout.alert.confirm" = "Abmelden";
+
+// MARK: - Health Link Alert
+"health_link.alert.title" = "Weiterleitung zur Apple Health-Datenverknüpfung";
+"health_link.alert.cancel" = "Abbrechen";
+"health_link.alert.confirm" = "Bestätigen";
+"common.save" = "Speichern";
+"user_profile.label_date" = "Datum";
+
+// MARK: - Address
+
+// MARK: - Address
+"address.title" = "Meine Adressen";
+"address.empty" = "Noch keine Adresse hinzugefügt";
+"address.add_new" = "Neue Adresse hinzufügen";
+"address.paste_tip" = "Text einfügen für intelligente Erkennung";
+"address.paste" = "Einfügen";
+"address.name" = "Name";
+"address.name_placeholder" = "Bitte Namen eingeben";
+"address.phone" = "Telefon";
+"address.phone_placeholder" = "Bitte Telefonnummer eingeben";
+"address.phone_invalid" = "Bitte gib eine gültige Telefonnummer ein";
+"address.name_invalid" = "Name darf keine Ziffern enthalten";
+"address.region" = "Region";
+"address.region_placeholder" = "Region auswählen";
+"address.locate" = "Orten";
+"address.detail" = "Detaillierte Adresse";
+"address.detail_placeholder" = "Straße, Hausnummer usw.";
+"address.country" = "Land/Region";
+"address.phone_country" = "Land der Telefonnummer";
+"address.state" = "Bundesland/Provinz";
+"address.state_placeholder" = "Bundesland/Provinz eingeben";
+"address.city" = "Stadt";
+"address.district" = "Bezirk";
+"address.city_placeholder" = "Stadt";
+"address.street1" = "Adresszeile 1";
+"address.street1_placeholder" = "Straße oder Postfach";
+"address.street2" = "Adresszeile 2";
+"address.street2_placeholder" = "Wohnung, Etage, Gebäude";
+"address.zip" = "Postleitzahl";
+"address.state_only" = "Bundesstaat";
+"address.province" = "Provinz";
+"address.prefecture" = "Präfektur";
+"address.zip_only" = "PLZ";
+"address.postal_code" = "Postleitzahl";
+"address.zip_placeholder" = "Postleitzahl eingeben";
+"address.select" = "Auswählen";
+"address.locate_fill" = "Aktuellen Standort verwenden";
+"address.picker_search" = "Suchen";
+"address.name_required" = "Bitte Namen des Empfängers eingeben";
+"address.state_required" = "Bitte Bundesland/Provinz wählen";
+"address.city_required" = "Bitte Stadt eingeben";
+"address.street_required" = "Bitte Straße und Hausnummer eingeben";
+"address.zip_invalid" = "Bitte gültige Postleitzahl eingeben";
+"address.set_default" = "Als Standardadresse festlegen";
+"address.confirm" = "Bestätigen";
+"address.default_tag" = "Standard";
+"address.delete" = "Löschen";
+"permission.location_needed" = "Mindora benötigt Standortzugriff, um Ihre Adresse auszufüllen. Bitte in den Einstellungen aktivieren.";
+"common.tips" = "Tipps";
+"common.settings" = "Einstellungen";
+"common.cancel" = "Abbrechen";
+"address.select_title" = "Adresse auswählen";
+"address.search_placeholder" = "Ort suchen";
+"address.current_location" = "[Aktueller Standort]";
+
+// Subscription Restore
+"subscription.restore.loading" = "Wiederherstellen...";
+"subscription.restore.success" = "Wiederherstellung erfolgreich";
+"subscription.restore.no_purchases" = "Kein aktives Abonnement gefunden.";
+"subscription.bound_to_another" = "Dieses Abo ist mit einem anderen Konto verknüpft. Bitte melde dich mit diesem Konto an, um es zu nutzen.";
+
+// Renewal Management
+"renewal.title" = "Abo verwalten";
+"renewal.your_subscription" = "Ihr Abonnement";
+"renewal.product_name" = "My Mindora";
+"renewal.plan" = "Plan";
+"renewal.plan.monthly" = "Monatsabonnement";
+"renewal.renewal_date" = "Verlängerungsdatum";
+"renewal.amount" = "Betrag";
+"renewal.manage" = "Verwalten";
+"renewal.plan.yearly" = "Jahresabonnement";
+"renewal.plan.none" = "Sie haben keine Abonnements";
+
+
+// MARK: - FAQ
+"subscription.renewal_management" = "Abonnementverwaltung";
+"faq.title" = "Mindora FAQ";
+"faq.subtitle" = "Mindora ist ein intelligentes Schlafhilfegerät, das die Schlafqualität durch multisensorische Synergie und KI verbessert. Es ist kein Medizinprodukt. Hier sind einige Antworten auf häufige Fragen.";
+"faq.footer.prefix" = "Bei weiteren Fragen besuchen Sie das ";
+"faq.footer.link" = "Hilfecenter";
+"faq.footer.suffix" = " auf der Mindora-Website.";
+
+"faq.q1" = "Wie wähle ich einen Abonnementplan aus?";
+"faq.a1" = "Monatsabonnement: 2,99 $/Monat.\n\nJahresabonnement: 29,99 $/Jahr, womit Sie etwa 2 Monatsgebühren sparen.\n\nDie tatsächlichen Preise können je nach Land oder Region und anfallenden Steuern leicht variieren – bitte überprüfen Sie den endgültigen Betrag auf der Abonnementseite.\n\nWenn Sie Ihr Gerät im Mindora-Onlineshop kaufen, können Sie Ihrer Bestellung auch einen im Voraus bezahlten Jahresmitgliedschaftsplan hinzufügen.\n\nNeue Mitglieder, die vor dem 25. Dezember 2026 ein Gerät kaufen, erhalten ein kostenloses erstes Jahr der Mindora-Mitgliedschaft. Nach diesem kostenlosen Zeitraum muss die Mitgliedschaft separat erworben werden.\n\nDie Mindora-Mitgliedschaft ist an Ihr Mindora-Konto gebunden, nicht an Ihr physisches Mindora-Gerät. Wenn Sie mit einem bestehenden Mindora-Konto zusätzliche Geräte kaufen, erhalten Sie keinen weiteren kostenlosen Mitgliedschaftsmonat.";
+
+"faq.q2" = "Wie aktiviere ich meine Mitgliedschaft?";
+"faq.a2" = "Wenn Sie ein Hardware-Paket gekauft haben, das einen Mitgliedschaftszeitraum enthält, wird die kostenlose Mitgliedschaft automatisch aktiviert, sobald Sie Ihr Gerät zum ersten Mal erfolgreich verbinden und sich in der App anmelden.\n\nWenn Sie eine Mitgliedschaft separat erworben haben, tippen Sie einfach in der Mindora App auf „Konto upgraden“ oder „Abonnieren“, wählen Sie einen Plan und schließen Sie die Zahlung ab, um sie sofort zu aktivieren.";
+
+"faq.q3" = "Welche Telefonsysteme sind mit der Mindora App kompatibel?";
+"faq.a3" = "Die Mindora App unterstützt iPhones mit iOS 15 oder höher sowie Android-Telefone mit Android 11 oder höher und Bluetooth 5.0-Unterstützung.";
+
+"faq.q4" = "Muss ich das Bluetooth meines Telefons ständig eingeschaltet lassen?";
+"faq.a4" = "Ja. Um Ihr Gerät und die App synchron zu halten und die Fernsteuerung zu ermöglichen, muss Bluetooth eingeschaltet sein. Das Gerät selbst kann seine voreingestellten Schlafprogramme jedoch eigenständig ausführen.";
+
+"faq.q5" = "Wie verbinde/koppele ich ein Gerät?";
+"faq.a5" = "Schalten Sie das Bluetooth Ihres Telefons ein, starten Sie die Mindora App, tippen Sie auf dem Startbildschirm auf „Gerät hinzufügen“ und folgen Sie den Anweisungen auf dem Bildschirm. Eine ausführliche Schritt-für-Schritt-Anleitung finden Sie unter [Link zum spezifischen Hilfeartikel].";
+
+"faq.q6" = "Kann Mindora Daten mit anderen Gesundheits-Apps (wie Apple Health oder Google Fit) synchronisieren?";
+"faq.a6" = "Ja. In der Mindora App unter „Einstellungen“ > „Apps & Dienste“ können Sie die Synchronisierung Ihrer Schlafdaten mit Plattformen wie Apple Health oder Google Fit autorisieren.";
+
+"faq.q7" = "Benötige ich ein kostenpflichtiges Abonnement, um alle Funktionen zu nutzen?";
+"faq.a7" = "Die Kern-Schlafhilfe-Funktionen von Mindora (wie Basisklänge, Lichtszenen und Aromazerstäubung) sowie die KI-Schlafüberwachung sind nach dem Kauf der Hardware verfügbar. Eine Premium-Mitgliedschaft (sofern zutreffend) schaltet eine umfangreichere Klangbibliothek, personalisierte Schlafanalyseberichte, fortgeschrittene Schlafkurse, exklusive ASMR-Inhalte, fein personalisierte KI-Algorithmen und mehr frei.";
+
+"faq.q8" = "Wie verwalte oder kündige ich mein Abonnement?";
+"faq.a8" = "Sie können Ihr Abonnement jederzeit unter „Kontoeinstellungen“ in der Mindora App verwalten. Bei Käufen über den iOS App Store oder Google Play Store müssen Sie diese auch auf der Abonnementseite des entsprechenden Stores verwalten.";
+
+"faq.q9" = "Sind meine Schlafdaten sicher? Wie schützt Mindora meine Privatsphäre?";
+"faq.a9" = "Die Sicherheit Ihrer Daten hat höchste Priorität. Wir verwenden branchenübliche Verschlüsselung, um Daten bei der Übertragung und im Ruhezustand zu schützen. Sie können die vollständige Mindora-Datenschutzrichtlinie einsehen, um zu erfahren, wie wir Ihre personenbezogenen Daten erfassen, verwenden und schützen.";
+
+"faq.q10" = "Kann ich mein Konto und meine Daten löschen?";
+"faq.a10" = "Ja. Sie finden die Option „Konto löschen“ unter „Kontoeinstellungen“ in der Mindora App, oder Sie kontaktieren unseren Kundensupport, um dies anzufordern. Nach der Löschung werden Ihre personenbezogenen Daten von unseren aktiven Servern entfernt.";
+
+"faq.q11" = "Wo kann ich meine Mindora-Mitgliedschaft verwalten oder kündigen?";
+"faq.a11" = "Verwaltung in der App: Unter „Kontoeinstellungen“ > „Mein Abonnement“ in der Mindora App können Sie jederzeit Ihr nächstes Verlängerungsdatum überprüfen, Ihre Zahlungsmethode ändern oder die automatische Verlängerung kündigen.\n\nVerwaltung im App Store: Wenn Sie über den iOS- oder Android-App-Store abonniert haben, müssen Sie auch auf der Abonnementverwaltungsseite des entsprechenden Stores kündigen. Die Kündigung wird am Ende des aktuellen Abrechnungszeitraums wirksam.";
+
+
+// MARK: - Health Refactor
+"health.segment.day" = "Tag";
+"health.segment.week" = "Woche";
+"health.segment.month" = "Monat";
+"health.sleep.efficiency" = "Schlafeffizienz";
+"health.sleep.performance" = "Schlafleistung";
+"health.sleep.time_in_bed" = "Zeit im Bett";
+"health.sleep.resting_heart_rate" = "Ruheherzfrequenz";
+"health.sleep.sleep_heart_rate" = "Schlafherzfrequenz";
+"health.sleep.overnight_vitals" = "Nächtliche Vitalwerte";
+"health.sleep.respiratory_rate" = "Atemfrequenz";
+"health.sleep.body_temperature" = "Körpertemperatur";
+"health.sleep.scenarios" = "Schlafszenarien";
+"health.sleep.onset" = "Einschlafen";
+"health.sleep.awake_time" = "Wachzeit";
+
+
+// MARK: - Health Month View
+"health.month.trends_title" = "Schlaftrends";
+"health.month.trends_subtitle" = "Basierend auf der Analyse Ihrer Schlafdaten";
+"health.month.trends_body" = "Diesen Monat haben Sie eine konstante Schlafmenge mit sehr wenigen nächtlichen Aufwachphasen beibehalten.";
+"health.month.trends_desc" = "In den letzten 30 Tagen machte der Tiefschlaf 29,8 % Ihres Gesamtschlafs aus, über dem Standardniveau. \nIhre Schlafenszeit hat sich um durchschnittlich 32 Minuten nach vorne verschoben. \nBehalten Sie weiterhin einen regelmäßigen Schlafrhythmus bei.";
+"health.month.best_title" = "Einschlafeffizienz";
+"health.month.best_subtitle" = "Entwickelt, um Ihnen den besten Schlaf zu bringen";
+"health.month.best_desc" = "Diesen Monat war \"Sedona Red Rock Serenity\" Ihr am häufigsten genutztes Schlafszenario und zeigte die beste Einschlafleistung. \"Cocoa Island Moonlight Drift\" zeichnete sich bei der Aufrechterhaltung eines stabilen Schlafs aus……";
+"health.month.avg_heart_rate" = "Durchschn. Herzfrequenz";
+"health.month.total_sleep" = "Gesamtschlaf";
+"health.month.days_tracked" = "Erfasste Tage";
+
+"subscription.view_content_hint" = "Abonnieren, um anzuzeigen";
+"subscription.go_to_subscribe" = "Abonnieren";
+
+// MARK: - Explore
+"explore.title" = "Entdecken";
+"explore.greeting" = "Hi, %@";
+"explore.intro.data" = "Hi, letzte Nacht hat Ihr Körper einen stabilen, entspannten und gut erholsamen Schlafzustand erreicht. Vom Einschlafrhythmus bis zur Struktur der ganzen Nacht sind viele Schlüsselindikatoren besser als Ihr jüngster Durchschnitt. Das war keine Glücksnacht – es war eine Nacht mit gutem Zusammenspiel zwischen Ihrem Nervensystem und Ihrer Schlafarchitektur.";
+"explore.section.efficiency" = "Einschlafeffizienz";
+"explore.status.health_range" = "Gesunder Bereich";
+"explore.metric.onset_time" = "Einschlafzeit: %@ Min";
+"explore.section.structure" = "Schlafstruktur";
+"explore.status.average" = "Durchschnittsniveau";
+"explore.metric.continuous_sleep" = "Durchgehender Schlaf: %@ Min";
+"explore.section.fluctuation" = "Nächtliche Schwankungen";
+"explore.status.fluctuation_high" = "Hohe Schwankungen";
+"explore.metric.smart_intervention" = "Intelligente Intervention: %@";
+"explore.section.preference" = "Szenario-Präferenz";
+"explore.section.advice" = "Schlaf-Ratschläge";
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.time" = "- - Min";
+"explore.placeholder.label" = "Statusbereich";
+"explore.efficiency.first_sleep" = "Einschlafzeit";
+"explore.efficiency.pre_hr" = "Herzfrequenz vor dem Schlaf";
+"explore.efficiency.pre_resp" = "Atmung vor dem Schlaf";
+"explore.structure.rem" = "REM-Schlaf";
+"explore.structure.deep" = "Tiefschlaf";
+"explore.structure.light" = "Leichtschlaf";
+"explore.fluctuation.awake_count" = "Aufwachphasen";
+"explore.fluctuation.awake_duration" = "Dauer";
+"explore.fluctuation.awake_type" = "Typ";
+"explore.fluctuation.hr_range" = "Herzfrequenzbereich";
+"explore.preference.recent" = "Kürzlich verwendet";
+"explore.preference.cocos_island.title" = "Cocoa Island Moonlight Drift";
+"explore.preference.cocos_island.subtitle" = "Klangprofil: Ozean / rosa Rauschen / braunes Rauschen";
+"explore.quote.text" = "Mindora zeichnet nicht nur Ihren Schlaf auf. Nachdem es Ihren Zustand verstanden hat, wählt es eine geeignetere Methode, um Ihnen beim Weiterschlafen zu helfen.";
+"explore.article.1.title" = "Artikeltitel";
+"explore.article.1.subtitle" = "Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung";
+"explore.article.2.title" = "Artikeltitel";
+"explore.article.2.subtitle" = "Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung";
+"explore.article.3.title" = "Artikeltitel";
+"explore.article.3.subtitle" = "Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung…";
+"explore.article.4.title" = "Artikeltitel";
+"explore.article.4.subtitle" = "Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung Artikelzusammenfassung";
+
+"explore.mock.efficiency_desc" = "Die Trends von Herzfrequenz und Atmung sind beide ‚stabil‘, was darauf hindeutet, dass das parasympathische Nervensystem die Führung übernommen hat. Der Körper befindet sich in einem Zustand natürlicher Entspannung, und das Gehirn benötigt kein zusätzliches ‚Abbremsen‘, um einzuschlafen.\n\nEine relativ stabile oder langsam abnehmende Herzfrequenz und Atmung innerhalb von 30 Minuten vor dem Schlafengehen korreliert mit einer kürzeren Einschlaflatenz. Dies ist auch eines der häufigen physiologischen Signale in der Schlafmedizin, um die ‚Schlafbereitschaft‘ zu beurteilen.";
+"explore.mock.structure_desc" = "Diese Daten deuten nicht auf eine ‚strukturelle Anomalie‘ hin. Letzte Nacht fehlten keine Schlafphasen, doch wichtige Schlafabschnitte waren fragmentiert. Das ist typisch für: häufige nächtliche Unterbrechungen, bei denen ‚Tiefschlaf und REM komprimiert werden‘.\n\nDies ist eines der häufigsten und am besten reparierbaren Muster, das in stressigen Nächten auftritt.";
+"explore.mock.fluctuation_desc" = "Diese Signale deuten darauf hin, dass das nächtliche Nervensystem in einem stark reaktiven Zustand war, empfindlich gegenüber äußeren Reizen wie auch innerer Anspannung. Um 03:25 Uhr erkannte Mindora Schwankungen bei Herzfrequenz/Atmung, und das Erwachen dauerte über die physiologische Anpassungsschwelle hinaus. Mindora startete daraufhin eine 15-minütige Intervention mit ‚Amalfi Coast Breeze‘ – einer niederfrequenten, rhythmischen, durchgehenden Ozean-Klanglandschaft –, die dem Nervensystem half, zur parasympathischen Dominanz zurückzukehren, sodass Sie 15 Minuten nach dem Aufwachen wieder einschlafen konnten.";
+"explore.mock.preference_desc" = "Letzte Nacht sind Sie in der Umgebung „Cocoa Island Moonlight Drift“ eingeschlafen. Dieses Klangfeld wird von einer ozeanumhüllten Atmosphäre mit rosa/braunem Rauschen dominiert.\n\nDie Struktur wird von niederfrequenten, durchgehenden Meereswellen geprägt. Der Gesamtrhythmus ist stabil, ohne scharfe Spitzen – eine Umgebung, die nicht aktiv die Aufmerksamkeit auf sich zieht, aber dennoch präsent bleibt.\n\nForschungen legen nahe, dass niederfrequente, durchgehende natürliche Klanglandschaften die Wachsamkeit gegenüber Umgebungsveränderungen verringern und die Sicherheitsprüfungen vor dem Einschlafen reduzieren. Der langsame Rhythmus der Wellen kann sich zudem mit der Atmung synchronisieren und dem Nervensystem helfen, in den Ruhemodus zu wechseln.";
+"explore.mock.advice_desc" = "Bei der Betrachtung der Daten mehrerer Nächte ist Ihr allgemeiner Schlafzustand recht stabil. Wenn Sie die nächtlichen Schwankungen weiter reduzieren möchten, versuchen Sie, die äußeren Reize 1 Stunde vor dem Schlafengehen zu verringern oder die Klangwiedergabe in den kommenden Nächten früher zu beenden.\n\nSchlaf ist keine gerade Linie – er ist ein System, das gestört werden kann und sich selbst repariert. Diese Veränderungen aufzuzeichnen, dient nicht dazu, zu beurteilen, wie gut Sie geschlafen haben; es geht darum, den mühelosesten, stabilsten Weg zum Schlafen für Sie zu finden.\n\nLetzte Nacht hat Ihr Körper genau das getan.";
+"explore.mock.intervention" = "Szenario-Intervention";
+"explore.mock.awake_type" = "Angst-Typ";
+
+// MARK: - Store
+"store.coming_soon" = "Shop kommt bald";
+"store.banner.title" = "Wählen Sie Ihre Lieblings-\nMischungen & Kombinationen";
+"store.banner.discount_prefix" = "3 Artikel ";
+"store.banner.discount_value" = "9.5";
+"store.banner.discount_suffix" = " RABATT";
+"store.banner.learn_more" = "Mehr erfahren";
+"store.section.member_exclusive" = "Exklusiv für Mitglieder";
+"store.section.new_arrivals" = "Neuheiten";
+"store.badge.hot" = "Beliebt";
+"store.badge.new" = "Neu";
+"store.product.combo_oil" = "Ätherisches-Öl-Set";
+"store.product.frankincense_oil" = "Weihrauchöl";
+"store.product.calming_oil" = "Pflanzliches Beruhigungsöl";
+"store.product.silk_pajama" = "Seiden-Pyjama-Set";
+"store.product.gift_set" = "Seiden-Schlaf-Geschenk...";
+"store.search.placeholder" = "Produkte suchen";
+"store.search.cancel" = "Abbrechen";
+"store.search.history" = "Suchverlauf";
+
+"auth.session_expired" = "Sitzung abgelaufen. Bitte erneut anmelden.";
+
+/* MARK: - Home Popup (activity / ad / survey invite) */
+"popup.badge.survey" = "Umfrage";
+"popup.action.detail" = "Details ansehen";
+"popup.mock.survey.title" = "Hilf uns, besser zu werden";
+"popup.mock.survey.subtitle" = "Fülle eine 3-minütige Schlafumfrage aus und erhalte nach dem Absenden Mitgliedspunkte.";
+
+/* MARK: - Survey */
+"survey.title" = "Schlaf-Erlebnis-Umfrage";
+"survey.next" = "Weiter";
+"survey.submit" = "Absenden";
+"survey.submit.note" = "Mit dem Absenden stimmst du zu, deine Antworten zur Verbesserung des Produkterlebnisses zu verwenden.";
+"survey.choice.hint" = "Wähle die Antwort, die am besten zu deinem Gefühl passt";
+"survey.q1.title" = "Wie zufrieden warst du in den letzten 7 Tagen insgesamt mit deinem Schlaf?";
+"survey.q2.title" = "Wie zufrieden warst du in den letzten 7 Tagen insgesamt mit Mindora?";
+"survey.q3.title" = "Hast du Vorschläge zur Verbesserung von Mindora?";
+"survey.q3.hint" = "Bitte teile uns deine Vorschläge mit";
+"survey.q3.placeholder" = "Hier eingeben…";
+"survey.scale.very_satisfied" = "Sehr zufrieden";
+"survey.scale.satisfied" = "Zufrieden";
+"survey.scale.neutral" = "Neutral";
+"survey.scale.dissatisfied" = "Unzufrieden";
+"survey.scale.very_dissatisfied" = "Sehr unzufrieden";
+"survey.validation.choose" = "Bitte wähle eine Antwort";
+"survey.validation.input" = "Bitte gib deinen Vorschlag ein";
+"survey.error.generic" = "Etwas ist schiefgelaufen. Bitte versuche es erneut.";
+"survey.already_submitted" = "Diese Umfrage wurde bereits abgeschickt. Vielen Dank!";
+"survey.completed" = "Abgeschlossen";
+"survey.reward.title" = "Umfrage-Belohnung";
+"survey.reward.desc" = "Das Geschenk wird innerhalb von 10 Werktagen versendet und wir benachrichtigen dich per E-Mail.";
+"survey.success.title" = "Abgesendet";
+"survey.success.line1" = "Danke für dein ehrliches Feedback";
+"survey.success.line2" = "Das Geschenk wird innerhalb von 10 Werktagen versendet";
+"survey.success.line3" = "Wir benachrichtigen dich per E-Mail";
+"survey.success.back_home" = "Zurück zur Startseite";
+
+/* MARK: - Notifications: survey invite */
+"notifications.source.survey" = "Umfrage";
+"notifications.source.promo" = "Aktion";
+"notifications.promo.action" = "Details ansehen";
+"notifications.survey.title" = "Hilf uns, besser zu werden";
+"notifications.survey.valid_until" = "Gültig bis %@";
+"notifications.survey.action" = "Umfrage ausfüllen";
+
+/* MARK: - Companion Footprint */
+"footprint.title" = "Begleit-Verlauf";
+"footprint.explain" = "Info";
+"footprint.stat.companion" = "Schlafbegleitung";
+"footprint.stat.app_active" = "App aktiv";
+"footprint.stat.continuous" = "Durchgehende Nutzung";
+"footprint.stat.month_total" = "Diesen Monat";
+"footprint.stat.year_total" = "Dieses Jahr";
+"footprint.unit.day" = "Tage";
+"footprint.milestones.title" = "Meilensteine";
+"footprint.milestones.empty" = "Noch keine Meilensteine";
+"footprint.milestone.sleep_plan" = "Schlafplan";
+"footprint.milestone.days_completed" = "%d-Tage-Schlafziel · Abgeschlossen";
+"footprint.legend.app_active" = "App aktiv";
+"footprint.legend.companion" = "Schlafbegleitung";
+"footprint.legend.plan" = "Plan / Serie";
+"footprint.weekday.sun" = "So";
+"footprint.weekday.mon" = "Mo";
+"footprint.weekday.tue" = "Di";
+"footprint.weekday.wed" = "Mi";
+"footprint.weekday.thu" = "Do";
+"footprint.weekday.fri" = "Fr";
+"footprint.weekday.sat" = "Sa";
+"footprint.weekday.full.mon" = "Mo";
+"footprint.weekday.full.tue" = "Di";
+"footprint.weekday.full.wed" = "Mi";
+"footprint.weekday.full.thu" = "Do";
+"footprint.weekday.full.fri" = "Fr";
+"footprint.weekday.full.sat" = "Sa";
+"footprint.weekday.full.sun" = "So";
+"footprint.month_selector" = "%d/%d";
+"footprint.month_label" = "%d";
+"footprint.anchor_date" = "%d-%d-%d · %@";
+"footprint.annual.title" = "Begleit-Verlauf %d";
+"footprint.info.title" = "Kennzahlen-Leitfaden";
+"footprint.info.companion.desc" = "Gerät und App gleichzeitig effektiv genutzt; pro Kalendertag höchstens einmal gezählt. Zeigt den Monatswert.";
+"footprint.info.app_active.desc" = "Das Öffnen der App an einem Tag zählt als 1 Tag; erneutes Öffnen am selben Tag wird nicht erneut gezählt. Zeigt den Monatswert.";
+"footprint.info.continuous.desc" = "Kalendertage mit Nutzungseinträgen in diesem Kalenderjahr, seit dem ersten Download oder der ersten Nutzung.";
+"footprint.info.marks.title" = "Kalendermarkierungen";
+"footprint.picker.title" = "Monat auswählen";
+"footprint.picker.annual" = "Ganzes Jahr";
+"footprint.picker.confirm" = "Bestätigen";
+
+"notifications.survey.body" = "Wir laden dich ein, eine 3-minütige Schlafumfrage auszufüllen und nach dem Absenden ein Markengeschenk zu erhalten.";
+
+/* MARK: - Gift Claim */
+"gift.title" = "Geschenk einlösen";
+"gift.confirm" = "Bestätigen";
+"gift.physical.desc" = "Wir senden 「%@」 an deine gespeicherte Adresse:";
+"gift.physical.change_hint" = "Um die Adresse zu ändern, wende dich an den Kundenservice.";
+"gift.virtual.desc" = "Wir senden 「%@」 an deine gespeicherte E-Mail. Zum Ändern unten erneut eingeben.";
+"gift.email.placeholder" = "E-Mail eingeben";
+"gift.validation.email" = "Bitte gib eine gültige E-Mail ein";
+"gift.no_address" = "Noch keine Adresse gespeichert. Bitte im Profil hinzufügen.";
+"gift.no_address.title" = "Wir konnten deine Adresse leider nicht finden";
+"gift.no_address.hint" = "Bitte gib deine Lieferadresse ein";
+"gift.fill_address" = "Adresse eingeben";
+"gift.address.title" = "Adresse eingeben";
+"survey.reward.demo_gift" = "Marken-Schlafgeschenk";
+
+"device_scan.stale_pairing.title" = "Gerät in den Einstellungen ignorieren";
+"device_scan.stale_pairing.message" = "Die auf diesem iPhone gespeicherten Bluetooth-Kopplungsdaten sind nicht mehr gültig, daher kann keine Verbindung zu „%@“ hergestellt werden. Öffne Einstellungen → Bluetooth, tippe auf das ⓘ neben dem Gerät, wähle „Dieses Gerät ignorieren“ und versuche es erneut.";
+"settings.follow_system" = "Systemsprache verwenden";
+
+// MARK: - Sleep Plan（睡眠计划 Tab，2026-08-12）
+"tab.plan" = "Plan";
+"common.got_it" = "Verstanden";
+"subscription.section.title.premium" = "Premium-Mitgliedschaft";
+"subscription.action.upgrade" = "Upgrade";
+"subscription.desc.premium.monthly.prefix" = "Einen Tag vor Ablauf wird zu ";
+"subscription.desc.premium.monthly.suffix" = "/Monat verlängert. Sie können jederzeit vor der Abbuchung kündigen.";
+"subscription.desc.premium.yearly" = "Genießen Sie ab dem Aktivierungsdatum ein ganzes Jahr Premium. Jederzeit vor der nächsten Verlängerung kündbar.";
+"renewal.tier" = "Mitgliedsstufe";
+"renewal.tier.basic" = "Basis-Mitglied";
+"renewal.tier.premium" = "Premium-Mitglied";
+"renewal.tier.none" = "Keine";
+"renewal.environment" = "Umgebung";
+"renewal.environment.sandbox" = "Testumgebung (keine Abbuchung)";
+"sleepplan.title" = "Schlafplan";
+"sleepplan.intro" = "Setzen Sie sich ein Schlafziel – App und Gerät erinnern Sie rechtzeitig und unterstützen die Umsetzung. Verwandeln Sie besseren Schlaf in einen umsetzbaren Plan.";
+"sleepplan.section.training" = "Schlaftraining";
+"sleepplan.section.training.subtitle" = "Wissenschaftlich fundierte Schlafanpassungspläne. Wählen Sie einen aus, um schnell zu starten.";
+"sleepplan.section.my_plans" = "Meine Schlafpläne";
+"sleepplan.my_plans.empty" = "Noch keine Schlafpläne";
+"sleepplan.my_plans.quota" = "%@ · %d/%d";
+"sleepplan.kind.custom.default_name" = "Neuer Schlafplan 01";
+"sleepplan.kind.habit_formation.name" = "Schlafgewohnheit aufbauen";
+"sleepplan.kind.habit_formation.summary" = "21-Tage-Gewohnheitstraining";
+"sleepplan.kind.habit_formation.description" = "Bauen Sie in 21 Tagen eine stabile, nachhaltige Schlafgewohnheit auf. Ein regelmäßiger Rhythmus stabilisiert Ihren Schlafrhythmus und verbessert die Schlafqualität.";
+"sleepplan.kind.jet_lag.name" = "Jetlag-Korrektur";
+"sleepplan.kind.jet_lag.summary" = "7-Tage-Schlafanpassung";
+"sleepplan.kind.jet_lag.description" = "Verschieben Sie Ihre Schlaf- und Wachzeiten über 7 Tage schrittweise, um sich schnell an eine neue Zeitzone anzupassen.";
+"sleepplan.kind.anxiety_relief.name" = "Angstlinderung";
+"sleepplan.kind.anxiety_relief.summary" = "14 Tage Entspannung vor dem Schlafen";
+"sleepplan.kind.anxiety_relief.description" = "Ein 14-tägiges Entspannungsprogramm vor dem Schlafen, das die Angst vor dem Einschlafen lindert und Ihnen hilft, sich leichter zu entspannen.";
+"sleepplan.status.active" = "Aktiv";
+"sleepplan.status.not_enabled" = "Nicht aktiviert";
+"sleepplan.status.completed" = "Abgeschlossen";
+"sleepplan.status.stopped" = "Gestoppt";
+"sleepplan.list.target_sleep_time" = "Zielschlafzeit %@";
+"sleepplan.tier.basic" = "Basis-Mitglied";
+"sleepplan.tier.premium" = "Premium-Mitglied";
+"sleepplan.action.create_plan" = "Neuer Plan +";
+"sleepplan.action.edit" = "Bearbeiten";
+"sleepplan.action.plan_detail" = "Plandetails →";
+"sleepplan.action.save" = "Einstellungen speichern";
+"sleepplan.action.discard" = "Änderungen verwerfen";
+"sleepplan.action.keep_editing" = "Weiter bearbeiten";
+"sleepplan.action.tap_to_set" = "Zum Einstellen tippen";
+"sleepplan.action.upgrade_premium" = "Auf Premium upgraden";
+"sleepplan.alert.locked_tonight.title" = "Der heutige Plan hat bereits begonnen";
+"sleepplan.alert.locked_tonight.message" = "Kann derzeit nicht deaktiviert werden – bitte versuchen Sie es morgen erneut.";
+"sleepplan.alert.plan_full.title" = "Schlafplan-Plätze sind voll";
+"sleepplan.alert.plan_full.message" = "Die maximale Anzahl gespeicherter Schlafpläne ist erreicht. Bitte löschen Sie einen vorhandenen Plan und versuchen Sie es erneut.";
+"sleepplan.alert.plan_full.basic_message" = "Basic-Mitglieder können höchstens 1 Schlafplan speichern oder aktivieren. Bitte löschen Sie Ihren aktuellen Plan und versuchen Sie es erneut.";
+"sleepplan.alert.premium_required.title" = "Premium-Funktion";
+"sleepplan.alert.premium_required.message" = "Als Premium-Mitglied können Sie den Zeitpunkt der Einschlaferinnerung und den Wecksound für offizielle Schlaftrainings anpassen.";
+"sleepplan.alert.custom_plan_required.message" = "Basic-Mitglieder können höchstens 1 Schlafplan speichern oder aktivieren. Als Premium-Mitglied können Sie eigene Pläne erstellen und alle Pläne in der Liste wiederherstellen.";
+"sleepplan.alert.switch_plan.title" = "Schlafplan wechseln?";
+"sleepplan.alert.switch_plan.message" = "„%@“ wird gestoppt und dieser Plan aktiviert. Fortfahren?";
+"sleepplan.alert.exit_new.title" = "Neuen Plan verlassen?";
+"sleepplan.alert.exit_new.message" = "Der aktuelle Plan wurde noch nicht gespeichert. Wenn Sie beenden, gehen die eingegebenen Angaben verloren.";
+"sleepplan.alert.unsaved_edit.title" = "Nicht gespeicherte Änderungen";
+"sleepplan.alert.unsaved_edit.message" = "Wenn Sie zurückgehen, werden diese Änderungen nicht gespeichert.";
+"sleepplan.editor.name_hint" = "Tippen Sie auf den Plannamen, um ihn zur besseren Verwaltung umzubenennen.";
+"sleepplan.editor.sleep_goal" = "Schlafziel";
+"sleepplan.editor.sleep_goal_hint" = "Ziehen Sie ein Ende der Leiste, um Schlaf- oder Weckzeit festzulegen, oder tippen Sie auf die Zeitzahlen zur genauen Bearbeitung.";
+"sleepplan.editor.sleep_time" = "Schlafenszeit";
+"sleepplan.editor.wake_time" = "Weckzeit";
+"sleepplan.editor.options" = "Planoptionen";
+"sleepplan.editor.cycle" = "Zyklus";
+"sleepplan.editor.cycle.hint" = "Die Zykluslänge ist systemseitig festgelegt und kann nach Abschluss neu gestartet werden.";
+"sleepplan.editor.reminder" = "Einschlaf-Erinnerung";
+"sleepplan.editor.reminder.hint" = "Erhalten Sie eine frühzeitige Erinnerung zum Runterfahren, mit Stimmungslicht und Diffusor für die passende Atmosphäre.";
+"sleepplan.editor.sleep_aid" = "Einschlafhilfe";
+"sleepplan.editor.sleep_aid.hint" = "Basierend auf Ihren Schlafdaten wird jede Nacht eine passende Szene intelligent zugeordnet.";
+"sleepplan.editor.alarm" = "Weckton";
+"sleepplan.editor.alarm.hint" = "Der beim Aufwachen abgespielte Ton, der ein natürlicheres Aufwachen unterstützt.";
+"sleepplan.editor.save_hint" = "Füllen Sie alle Pflichtfelder aus, bevor Sie speichern. Der Plan wird zur Liste hinzugefügt, aber nicht sofort aktiviert.";
+"sleepplan.editor.save_hint.edit" = "Der gespeicherte Plan erscheint in der Liste als deaktiviert. Ihr aktuell aktiver Plan bleibt unverändert.";
+"sleepplan.editor.save_hint.official" = "Nach dem Speichern erscheint der Plan in der Liste „Meine Schlafpläne“, startet aber nicht sofort.\nKehren Sie zur Plan-Startseite zurück, um ihn zu aktivieren.";
+"sleepplan.sheet.reminder.title" = "Einschlaf-Erinnerung";
+"sleepplan.sheet.reminder.minutes_before" = "%d Min. vorher";
+"sleepplan.sheet.alarm_sound.title" = "Weckton";
+"sleepplan.sheet.sleep_aid.title" = "Einschlafhilfe";
+"sleepplan.sheet.sleep_aid.readonly_title" = "Intelligente Einschlafhilfe";
+"sleepplan.sheet.sleep_aid.readonly_message" = "Basierend auf Schlafwissenschaft und Ihren Schlafdaten wählt die KI jede Nacht intelligent eine passende Einschlafszene aus. Der Plan wird vom System konfiguriert und kann nicht manuell geändert werden.";
+"sleepplan.sheet.cycle.title" = "Zyklus";
+"sleepplan.sheet.cycle.instruction" = "Wählen Sie die Tage, an denen der Plan läuft";
+"sleepplan.sheet.cycle.repeat_weekly" = "Wöchentlich wiederholen";
+"sleepplan.sheet.cycle.repeat_hint" = "Bei Deaktivierung läuft der Plan nur einmal an den gewählten Tagen.";
+"sleepplan.sheet.cycle.warning" = "Bitte wählen Sie mindestens 3 aufeinanderfolgende Tage, um die Kontinuität des Schlafplans zu gewährleisten.";
+"sleepplan.sheet.cycle.hint" = "Wählen Sie mindestens 3 aufeinanderfolgende Tage; Lücken sind nicht zulässig. Samstag, Sonntag und Montag gelten als aufeinanderfolgend. Wenn aktiviert, wird der Plan jede Woche nur an den ausgewählten Tagen ausgeführt.";
+"sleepplan.sheet.cycle.readonly_message" = "Dieser Zyklus ist fest auf %d Tage eingestellt und läuft täglich. Nach Abschluss neu startbar.";
+"sleepplan.sheet.goal.title" = "Schlafziel-Einstellungen";
+"sleepplan.sheet.goal.duration" = "Ziel-Schlafdauer";
+"sleepplan.sheet.goal.sleep_time" = "Schlafenszeit";
+"sleepplan.sheet.goal.wake_time" = "Weckzeit";
+"sleepplan.sheet.goal.too_short" = "Die Schlafdauer ist zu kurz – bitte mindestens 1 Stunde einstellen.";
+"sleepplan.sheet.rename.title" = "Plan umbenennen";
+"sleepplan.sheet.rename.hint" = "Bis zu 10 Zeichen";
+"sleepplan.cycle.fixed_daily" = "%d Tage · täglich";
+"sleepplan.cycle.repeats_weekly" = "Wiederholt wöchentlich";
+"sleepplan.cycle.once" = "Einmalig";
+"sleepplan.duration.hours" = "%d Std.";
+"sleepplan.duration.hours_half" = "%d,5 Std.";
+"sleepplan.duration.hours_minutes" = "%d Std. %d Min.";
+"sleepplan.unit.hour" = "Std.";
+"sleepplan.unit.minute" = "Min.";
+"sleepplan.duration.hours_short" = "%d Std.";
+"sleepplan.reminder.minutes_before_short" = "%d Min. vorher";
+"sleepplan.reminder.off" = "Aus";
+"sleepplan.reminder.notification_title" = "Zeit zum Runterfahren";
+"sleepplan.reminder.notification_body" = "Ihre Schlafenszeit für „%@“ rückt näher – Zeit zum Entspannen.";
+"sleepplan.sound.temple_bell" = "Tempel-Morgenglocke";
+"sleepplan.sound.sunlit_coast" = "Sonnige Küste";
+"sleepplan.sound.rainforest_mist" = "Regenwaldnebel";
+"sleepplan.sleep_aid.smart.name" = "Intelligente Empfehlung";
+"sleepplan.sleep_aid.smart.desc" = "Ordnet jede Nacht basierend auf Ihren Schlafdaten intelligent eine passende Szene zu.";
+"sleepplan.sleep_aid.preference.name" = "Präferenzbasiert";
+"sleepplan.sleep_aid.preference.desc" = "Empfiehlt Szenen basierend auf Ihren bisherigen Auswahlen.";
+"sleepplan.sleep_aid.trending.name" = "Beliebt";
+"sleepplan.sleep_aid.trending.desc" = "Empfiehlt Szenen basierend auf Nutzung und Feedback der meisten Nutzer.";
+"weekday.mon" = "Mo";
+/* List separator used to join items such as weekday names. */
+"common.list_separator" = ", ";
+
+"weekday.short.1" = "Mo";
+"weekday.tue" = "Di";
+"weekday.short.2" = "Di";
+"weekday.wed" = "Mi";
+"weekday.short.3" = "Mi";
+"weekday.thu" = "Do";
+"weekday.short.4" = "Do";
+"weekday.fri" = "Fr";
+"weekday.short.5" = "Fr";
+"weekday.sat" = "Sa";
+"weekday.short.6" = "Sa";
+"weekday.sun" = "So";
+"weekday.short.7" = "So";
+"sleepplan.action.confirm_exit" = "Beenden bestätigen";
+
+/* 健康周/月视图：服务端分析缺失时的兜底文案（原为硬编码英文） */
+"health.chart.tooltip.duration" = "%1$@ Std. %2$@ Min.";
+
+/* 会员订阅卡（20260818 设计）*/
+"subscription.plan.subheader" = "Stufe und Abrechnungszeitraum wählen";
+"subscription.plan.tier.basic" = "Basis";
+"subscription.plan.tier.premium" = "AI Premium";
+"subscription.plan.monthly.note" = "Monatlich, jederzeit kündbar";
+"subscription.plan.yearly.note" = "Jährlich automatisch verlängert";
+"subscription.plan.monthly.tag" = "Flexibel";
+"subscription.plan.yearly.tag" = "16-17 % sparen";
+"subscription.plan.cta.basic" = "Basic abonnieren · %@";
+"subscription.plan.cta.premium" = "AI Premium abonnieren · %@";
+"subscription.plan.current" = "Aktueller Tarif";
+"subscription.plan.footnote" = "Verlängert sich automatisch, jederzeit kündbar. Der Endbetrag richtet sich nach dem App Store.";
+"subscription.benefit.basic.1.title" = "Vollständige Schlafdaten";
+"subscription.benefit.basic.1.desc" = "Schlafverlauf und Bewertungen ansehen und Veränderungen verfolgen";
+"subscription.benefit.basic.2.title" = "Persönliches Schlafmodell";
+"subscription.benefit.basic.2.desc" = "Lernt fortlaufend aus deinen Langzeit-Schlafdaten";
+"subscription.benefit.basic.3.title" = "KI-Überwachung";
+"subscription.benefit.basic.3.desc" = "Passt sich deinem Schlafzustand an und liefert umsetzbare Empfehlungen";
+"subscription.benefit.basic.4.title" = "Schlafpläne";
+"subscription.benefit.basic.4.desc" = "1 Plan speichern und aktivieren";
+"subscription.benefit.premium.1.title" = "Alles aus Basic";
+"subscription.benefit.premium.1.desc" = "Vollständige Daten, Trendanalyse und persönliches Schlafmodell";
+"subscription.benefit.premium.2.title" = "KI-generierte Einschlafroutine";
+"subscription.benefit.premium.2.desc" = "Erstellt aus deiner Tagesform einen persönlichen Ablauf";
+"subscription.benefit.premium.3.title" = "Tiefe Schlafanalysen";
+"subscription.benefit.premium.3.desc" = "Erkennt langfristige Schlafprobleme und ihre Hauptursachen";
+"subscription.benefit.premium.4.title" = "Schlafpläne";
+"subscription.benefit.premium.4.desc" = "Bis zu 5 Pläne speichern und aktivieren";
+
+/* 订阅卡：已订阅态与套餐切换 */
+"subscription.plan.cta.switch" = "Zu %@ wechseln";
+"subscription.plan.cta.upgrade" = "Auf AI Premium upgraden · %@";
+"subscription.plan.cta.downgrade" = "Zu Basis wechseln · %@";
+"subscription.plan.cta.scheduled" = "Vorgemerkt";
+"subscription.plan.status.current" = "Aktuell: %1$@ · %2$@";
+"subscription.plan.period.redeemed" = "Einlösecode";
+"subscription.plan.status.renew" = "Verlängert sich am %@";
+"subscription.plan.status.expire" = "Endet am %@";
+"subscription.plan.status.pending" = "Zu %1$@ gewechselt, gilt ab %2$@";
+"subscription.plan.manage" = "Verwalten";
+
+/* 资料卡会员状态行（带等级）*/
+"subscription.status.active" = "Aktiv · %1$@ · %2$@";
+"subscription.status.trial" = "Testphase · %@";
+"subscription.status.granted" = "Aktiv · %@";
+
+/* 订阅日期行标题：随续订状态变 */
+"subscription.date.next_billing" = "Nächste Abrechnung";
+"subscription.date.expiry" = "Läuft ab am";
+"subscription.date.grace" = "Zahlungsmethode aktualisieren";
+"subscription.date.retry" = "Zahlung wird wiederholt";
+"subscription.date.expired" = "Abgelaufen";
+
+/* 设计校对表（2026-10）新增：英文按设计稿，其他语言沿用原显示 */
+"sleepplan.editor.options.custom" = "Planoptionen";
+"sleepplan.editor.cycle.custom" = "Zyklus";
+"sleepplan.editor.cycle.hint.custom" = "Die Zykluslänge ist systemseitig festgelegt und kann nach Abschluss neu gestartet werden.";
+"sleepplan.sheet.cycle.readonly_title" = "Zyklus";
+"subscription.prompt.title" = "Sie sind noch kein Mitglied";
+"explore.gate.title" = "Sie sind noch kein Mitglied";
+"explore.gate.hint" = "Abonnieren, um anzuzeigen";
+"explore.gate.action" = "Abonnieren";
+"survey.progress" = "%1$d / %2$d";
+"unit.duration.hr_min" = "%1$dh %2$dmin";
+"unit.duration.hr" = "%dh";
+"unit.duration.min" = "%dmin";
+"unit.duration.under_1_min" = "<1min";
+"unit.bpm" = "%dbpm";
+"unit.bpm_range" = "%1$d-%2$dbpm";
+"unit.breaths_per_min" = "%d Atemzüge/Min";
+"unit.days_tracked" = "%1$d/%2$ddays";
+"unit.duration.compact.hr_min" = "%1$dh%2$dmin";
+"unit.duration.compact.hr" = "%dh";
+"health.sleep.stage_card.rem" = "REM";
+"health.sleep.stage_card.core" = "Kern";
+"health.sleep.stage_card.deep" = "Tief";
+"sleepplan.cycle.range" = "%1$@–%2$@";

@@ -6,7 +6,6 @@ class HelpViewController: UIViewController {
     
     // Group 1 Metrics
     private let box2MarginLeft: CGFloat = 18.0 // 36px
-    private let box2Width: CGFloat = 184.5 // 369px
     
     // Box 3 Metrics (Inside Group 1)
     private let box3Height: CGFloat = 157.0 // 314px
@@ -39,7 +38,11 @@ class HelpViewController: UIViewController {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = UIImage(named: "help_top")
-        imageView.contentMode = .scaleToFill // Fills Group 1
+        // .scaleToFill would stretch this photo non-uniformly: group1View's width tracks
+        // screen width (much wider on iPad) while its height is a fixed constant, so the
+        // aspect ratio drifts far from the photo's native shape on wider screens.
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -186,10 +189,11 @@ class HelpViewController: UIViewController {
         ])
         
         // Title Label
-        // Right-aligned in Box 2.
+        // 水平居中。原先按 CSS 把标题右边缘钉在 Box 2 末端，只有文字宽度恰好等于设计稿时才居中，
+        // 中文「帮助」比 "Help" 窄就偏左了。
         NSLayoutConstraint.activate([
             titleLabel.centerYAnchor.constraint(equalTo: backButton.centerYAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: group1View.leadingAnchor, constant: box2MarginLeft + box2Width)
+            titleLabel.centerXAnchor.constraint(equalTo: group1View.centerXAnchor)
         ])
         
         // Match CSS margin-top 539px (269.5pt) + Header Offset

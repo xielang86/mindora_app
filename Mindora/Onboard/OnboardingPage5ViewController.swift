@@ -55,7 +55,8 @@ final class OnboardingPage5ViewController: UIViewController {
     
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - UI Components
@@ -298,6 +299,7 @@ final class OnboardingPage5ViewController: UIViewController {
     
     @objc private func completeButtonTapped() {
         self.completeButtonView.animateButtonTap {
+            print("[OnboardingPage5] Complete tapped")
             // Check if we are running inside the app (Root is MainTabBarController)
             let keyWindow = UIApplication.shared.connectedScenes
                 .compactMap { $0 as? UIWindowScene }
@@ -327,6 +329,7 @@ final class OnboardingPage5ViewController: UIViewController {
                 }
             } else {
                 // First Launch Flow
+                print("[OnboardingPage5] Completing first launch flow")
                 OnboardingExitButton.completeOnboarding()
             }
         }

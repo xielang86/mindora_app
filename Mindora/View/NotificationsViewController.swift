@@ -7,13 +7,15 @@
 
 import UIKit
 import UserNotifications
+import SafariServices
 
 class NotificationsViewController: UIViewController {
 
     // MARK: - Properties
 
-    private var notifications: [NotificationModel] = []
-    
+    private var notifications: [NotificationModel] = []        // 当前消息
+    private var historyNotifications: [NotificationModel] = []  // 历史消息
+
     // MARK: - UI Components
     
     private let titleLabel: UILabel = {
@@ -68,6 +70,18 @@ class NotificationsViewController: UIViewController {
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
+
+    // 空态：没有任何消息时居中显示「暂无消息」
+    private let emptyLabel: UILabel = {
+        let label = UILabel()
+        label.text = L("notifications.empty")
+        label.font = UIFont(name: "PingFangSC-Regular", size: 14) ?? .systemFont(ofSize: 14)
+        label.textColor = UIColor(white: 1.0, alpha: 0.4)
+        label.textAlignment = .center
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
     // MARK: - Lifecycle
 
@@ -82,6 +96,12 @@ class NotificationsViewController: UIViewController {
         
         // Observe app becoming active to re-check permissions
         NotificationCenter.default.addObserver(self, selector: #selector(checkPermission), name: UIApplication.willEnterForegroundNotification, object: nil)
+        // 消息数据变化（后台生成新消息）时实时刷新列表
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadNotifications), name: AppNotificationStore.didChangeNotification, object: nil)
+        // 语言切换后重新本地化文案与日期
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadNotifications), name: LocalizationManager.languageDidChangeNotification, object: nil)
+        // 问卷提交后把「填写问卷」按钮切成已完成态
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadNotifications), name: SurveyService.didSubmitNotification, object: nil)
     }
     
     override func viewDidLayoutSubviews() {
@@ -117,6 +137,7 @@ class NotificationsViewController: UIViewController {
         listContainerView.addSubview(backButton)
         listContainerView.addSubview(navSeparatorView) // Add Separator View
         listContainerView.addSubview(tableView)
+        listContainerView.addSubview(emptyLabel)
         
         // Setup Separator Layer Pattern inside navSeparatorView
         let borderLayer = CALayer()
@@ -130,6 +151,7 @@ class NotificationsViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(NotificationCell.self, forCellReuseIdentifier: "NotificationCell")
+        tableView.register(SurveyNotificationCell.self, forCellReuseIdentifier: "SurveyNotificationCell")
         
         setupPermissionView()
         setupConstraints()
@@ -166,6 +188,9 @@ class NotificationsViewController: UIViewController {
             tableView.leadingAnchor.constraint(equalTo: listContainerView.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: listContainerView.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: listContainerView.bottomAnchor),
+
+            emptyLabel.centerXAnchor.constraint(equalTo: tableView.centerXAnchor),
+            emptyLabel.centerYAnchor.constraint(equalTo: tableView.centerYAnchor, constant: -40),
             
             // Permission View Overlay
             permissionViewContainer.topAnchor.constraint(equalTo: view.topAnchor),
@@ -366,10 +391,11 @@ class NotificationsViewController: UIViewController {
     }
     
     @objc private func handleBack() {
-        if let nav = navigationController {
+        // 栈底时 pop 无处可退、静默失败，返回按钮会彻底失效（订阅页踩过这个坑）
+        if let nav = navigationController, nav.viewControllers.count > 1 {
             nav.popViewController(animated: true)
         } else {
-            dismiss(animated: true, completion: nil)
+            (navigationController ?? self).dismiss(animated: true, completion: nil)
         }
     }
     
@@ -412,6 +438,9 @@ class NotificationsViewController: UIViewController {
     private func showList() {
         permissionViewContainer.isHidden = true
         listContainerView.isHidden = false
+        // 用户已看到消息列表 → 清未读，三处红点（Sleep/洞察铃铛 + 侧边栏）一起消失
+        UnreadBadgeCenter.shared.markAllRead()
+        AppNotificationStore.shared.markAllRead()
     }
     
     private func showPermissionRequest() {
@@ -420,55 +449,182 @@ class NotificationsViewController: UIViewController {
     }
     
     private func loadData() {
-        #if DEBUG
-        // Mock Data
-        let mockNotification = NotificationModel(
-            id: "1",
-            type: .subscription,
-            date: "01月17日 05:03", // Ideally dynamic, but user provided hardcoded mock string in sample
-            title: L("notifications.mock.system"),
-            subtitle: L("notifications.mock.title"),
-            body: L("notifications.mock.body"),
-            actionText: L("notifications.mock.action")
-        )
-        notifications = [mockNotification]
+        // 动态生成的真实消息：当前 / 历史两组，展示时按当前语言本地化。
+        let sections = AppNotificationStore.shared.sections()
+        notifications = sections.current.map { $0.displayModel() }
+        historyNotifications = sections.history.map { $0.displayModel() }
+        emptyLabel.isHidden = !(notifications.isEmpty && historyNotifications.isEmpty)
         tableView.reloadData()
-        #else
-        // Load real data if any (Empty for now as requested task is focused on mock)
-        notifications = []
-        tableView.reloadData()
-        #endif
+    }
+
+    @objc private func reloadNotifications() {
+        loadData()
+    }
+
+    // MARK: - 跳转到睡眠 Tab（健康类消息）
+
+    /// 关闭消息页并切到睡眠 Tab。消息页多为模态呈现，parent 链拿不到 Tab，需从呈现链 / 窗口根查找。
+    private func navigateToSleepTab() {
+        // 先切好睡眠 Tab（此时它还被模态盖着）。
+        resolveMainTab()?.switchToSleepTab(scrollTarget: .top)
+        // 再把「Tab 之上的整条模态栈」一次性关掉才能露出来。只依赖 presentingViewController 链
+        // （UIKit 始终维护一致）：上溯到「最底层模态」，dismiss 它的呈现者 → 连带关掉其上所有模态
+        // （消息页 + 可能还压着的侧栏）。不依赖 parent/child 层级，避免子控制器呈现时的边界情况。
+        var bottomModal: UIViewController = self
+        while let presenter = bottomModal.presentingViewController, presenter.presentingViewController != nil {
+            bottomModal = presenter
+        }
+        if let presenter = bottomModal.presentingViewController {
+            presenter.dismiss(animated: true)
+        } else {
+            dismiss(animated: true)
+        }
+    }
+
+    private func navigateToStoreTab() {
+        // 商城 Tab（与首页弹窗 route=="store" 一致），切完关掉整条模态栈露出。
+        AppRouter.open(.store, from: self)
+    }
+
+    private func resolveMainTab() -> MainTabBarController? {
+        // 1) 呈现链（模态呈现时向上找）
+        var presenter = presentingViewController
+        while let cur = presenter {
+            if let t = Self.findMainTab(in: cur) { return t }
+            presenter = cur.presentingViewController
+        }
+        // 2) 窗口根
+        let root = view.window?.rootViewController
+            ?? UIApplication.shared.connectedScenes
+                .compactMap { ($0 as? UIWindowScene)?.keyWindow }.first?.rootViewController
+        return Self.findMainTab(in: root)
+    }
+
+    private static func findMainTab(in vc: UIViewController?) -> MainTabBarController? {
+        guard let vc else { return nil }
+        if let t = vc as? MainTabBarController { return t }
+        if let nav = vc as? UINavigationController { return findMainTab(in: nav.viewControllers.first) }
+        for child in vc.children { if let t = findMainTab(in: child) { return t } }
+        return findMainTab(in: vc.presentedViewController)
     }
 }
 
 // MARK: - TableView Delegate & DataSource
 
 extension NotificationsViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return notifications.count
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return historyNotifications.isEmpty ? 1 : 2
     }
-    
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return section == 0 ? notifications.count : historyNotifications.count
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let model = indexPath.section == 0 ? notifications[indexPath.row] : historyNotifications[indexPath.row]
+
+        // 参与调研用专属卡片样式（问卷图标 + 填写问卷紫色按钮 + 有效期）。
+        if model.type == .survey {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "SurveyNotificationCell", for: indexPath) as? SurveyNotificationCell else {
+                return UITableViewCell()
+            }
+            cell.configure(with: model)
+            cell.didTapAction = { [weak self] in self?.handleNotificationAction(model) }
+            return cell
+        }
+
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "NotificationCell", for: indexPath) as? NotificationCell else {
             return UITableViewCell()
         }
-        let model = notifications[indexPath.row]
         cell.configure(with: model)
         cell.didTapAction = { [weak self] in
             self?.handleNotificationAction(model)
         }
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
-    
+
+    // 历史消息分隔符 "————— 以下为历史消息 —————"
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard section == 1 else { return nil }
+        return HistoryDividerView(text: L("notifications.history.divider"))
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return section == 1 ? 60 : 0
+    }
+
+    // 左滑删除。删除是纯本地行为：从 store 移除，并把对应的 popup_id 从账号清单里摘掉
+    // （见 AppNotificationStore.remove），下次登录恢复时自然不会再拉回来。
+    func tableView(_ tableView: UITableView,
+                   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
+    -> UISwipeActionsConfiguration? {
+        let model = indexPath.section == 0 ? notifications[indexPath.row] : historyNotifications[indexPath.row]
+        let action = UIContextualAction(style: .destructive,
+                                        title: L("notifications.delete")) { _, _, done in
+            // 不在这里手动删行：remove 会发 didChangeNotification，
+            // reloadNotifications 统一重建两个 section，避免两处各删一次对不上。
+            AppNotificationStore.shared.remove(id: model.id)
+            done(true)
+        }
+        action.backgroundColor = UIColor(red: 255/255, green: 59/255, blue: 48/255, alpha: 1.0)
+        return UISwipeActionsConfiguration(actions: [action])
+    }
+
     private func handleNotificationAction(_ model: NotificationModel) {
-        if model.type == .subscription {
+        switch model.type {
+        case .subscription:
             let vc = SubscriptionViewController()
             vc.modalPresentationStyle = .fullScreen
             present(vc, animated: true, completion: nil)
+        case .settings:
+            PermissionManager.shared.openAppSettings()
+        case .health:
+            navigateToSleepTab()
+        case .survey:
+            let surveyId = model.routePayload?["surveyId"] ?? ""
+            guard !surveyId.isEmpty else { break }
+            // 已提交过的问卷不再进入，避免重复填写后提交报错。
+            guard !SurveyService.shared.hasSubmitted(surveyId: surveyId) else {
+                Toast.show(L("survey.already_submitted"), in: view)
+                break
+            }
+            let vc = SurveyViewController(surveyId: surveyId)
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: true, completion: nil)
+        case .promo:
+            handlePromoAction(model.routePayload)
+        case .other:
+            break
+        }
+    }
+
+    /// 运营消息点击：复用弹窗 action 语义（问卷 / URL / 路由）。
+    private func handlePromoAction(_ payload: [String: String]?) {
+        let actionType = payload?["actionType"] ?? ""
+        switch actionType {
+        case "survey":
+            let surveyId = payload?["surveyId"] ?? ""
+            guard !surveyId.isEmpty else { break }
+            let vc = SurveyViewController(surveyId: surveyId)
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: true)
+        case "url":
+            // SFSafariViewController 仅接受 http/https，其余 scheme 会抛异常崩溃。
+            if let s = payload?["url"], let url = URL(string: s),
+               let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https" {
+                present(SFSafariViewController(url: url), animated: true)
+            }
+        case "route":
+            // App 内路由：候选常量见 AppRoute / Tools/doc/弹窗与调查问卷接口.md，
+            // 未知值回落到商城 Tab。
+            AppRouter.open(rawRoute: payload?["route"], from: self, fallback: .store)
+        default:
+            // 商城活动 / 广告未配置具体动作（dismiss / unknown / 空）→ 默认进入商城 Tab。
+            navigateToStoreTab()
         }
     }
 }
@@ -476,7 +632,11 @@ extension NotificationsViewController: UITableViewDelegate, UITableViewDataSourc
 // MARK: - Models
 
 enum NotificationType {
-    case subscription
+    case subscription   // 会员 / 兑换 → 订阅页
+    case settings       // 权限提醒 → 系统设置
+    case health         // 睡眠评分 / 佩戴断签 → 睡眠 Tab
+    case survey         // 参与调研 → 问卷页
+    case promo          // 运营弹窗（商城活动 / 广告）→ 按 payload 内 action 跳转
     case other
 }
 
@@ -488,6 +648,52 @@ struct NotificationModel {
     let subtitle: String
     let body: String
     let actionText: String
+    /// 跳转所需附加参数（如 survey 的 surveyId）。
+    var routePayload: [String: String]? = nil
+}
+
+// MARK: - History Divider
+
+final class HistoryDividerView: UIView {
+    init(text: String) {
+        super.init(frame: .zero)
+        // 设计稿：分割线与文字同为 #656565
+        let lineColor = UIColor(red: 101/255, green: 101/255, blue: 101/255, alpha: 1.0)
+
+        let label = UILabel()
+        label.text = text
+        label.font = UIFont(name: "PingFangSC-Light", size: 11) ?? .systemFont(ofSize: 11, weight: .light)
+        label.textColor = UIColor(red: 101/255, green: 101/255, blue: 101/255, alpha: 1.0)
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        let leftLine = UIView()
+        leftLine.backgroundColor = lineColor
+        leftLine.translatesAutoresizingMaskIntoConstraints = false
+
+        let rightLine = UIView()
+        rightLine.backgroundColor = lineColor
+        rightLine.translatesAutoresizingMaskIntoConstraints = false
+
+        addSubview(leftLine)
+        addSubview(label)
+        addSubview(rightLine)
+
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: centerYAnchor),
+
+            leftLine.centerYAnchor.constraint(equalTo: centerYAnchor),
+            leftLine.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 36),
+            leftLine.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -12),
+            leftLine.heightAnchor.constraint(equalToConstant: 0.5),
+
+            rightLine.centerYAnchor.constraint(equalTo: centerYAnchor),
+            rightLine.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 12),
+            rightLine.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -36),
+            rightLine.heightAnchor.constraint(equalToConstant: 0.5)
+        ])
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 
 // MARK: - Cells
@@ -714,4 +920,166 @@ class NotificationCell: UITableViewCell {
     @objc private func actionTapped() {
         didTapAction?()
     }
+}
+
+// MARK: - 参与调研专属卡片（图标 + 填写问卷紫色按钮 + 有效期）
+
+final class SurveyNotificationCell: UITableViewCell {
+
+    var didTapAction: (() -> Void)?
+
+    private let iconContainer: UIView = {
+        let v = UIView()
+        v.backgroundColor = UIColor(red: 128/255, green: 84/255, blue: 254/255, alpha: 1.0) // #8054FE
+        v.layer.cornerRadius = 6
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    private let iconGlyph: UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "square.and.pencil"))
+        iv.tintColor = .white
+        iv.contentMode = .scaleAspectFit
+        iv.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    private let titleLabel: UILabel = {
+        let l = UILabel()
+        l.font = UIFont(name: "PingFangSC-Regular", size: 12) ?? .systemFont(ofSize: 12)
+        l.textColor = .white
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let dateLabel: UILabel = {
+        let l = UILabel()
+        l.font = UIFont(name: "PingFangSC-Light", size: 11) ?? .systemFont(ofSize: 11, weight: .light)
+        l.textColor = .white
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let cardView: UIView = {
+        let v = UIView()
+        v.backgroundColor = UIColor(red: 44/255, green: 44/255, blue: 44/255, alpha: 1.0) // #2C2C2C
+        v.layer.cornerRadius = 12
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    private let cardTitleLabel: UILabel = {
+        let l = UILabel()
+        l.font = UIFont(name: "PingFangSC-Medium", size: 15) ?? .systemFont(ofSize: 15, weight: .medium)
+        l.textColor = .white
+        l.numberOfLines = 0
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let bodyLabel: UILabel = {
+        let l = UILabel()
+        l.font = UIFont(name: "PingFangSC-Regular", size: 12) ?? .systemFont(ofSize: 12)
+        l.textColor = UIColor(white: 1, alpha: 0.6)
+        l.numberOfLines = 0
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let fillButton: UIButton = {
+        let b = UIButton(type: .system)
+        b.backgroundColor = UIColor(red: 128/255, green: 84/255, blue: 254/255, alpha: 1.0) // #8054FE
+        b.setTitleColor(.white, for: .normal)
+        b.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 14) ?? .systemFont(ofSize: 14, weight: .medium)
+        b.layer.cornerRadius = 21
+        b.translatesAutoresizingMaskIntoConstraints = false
+        return b
+    }()
+    private let validityLabel: UILabel = {
+        let l = UILabel()
+        l.font = UIFont(name: "PingFangSC-Light", size: 11) ?? .systemFont(ofSize: 11, weight: .light)
+        l.textColor = UIColor(white: 1, alpha: 0.4)
+        l.textAlignment = .center
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private var validityTopToButton: NSLayoutConstraint!
+    private var validityHeight: NSLayoutConstraint!
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .clear
+        selectionStyle = .none
+        setup()
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    private func setup() {
+        [iconContainer, titleLabel, dateLabel, cardView].forEach { contentView.addSubview($0) }
+        iconContainer.addSubview(iconGlyph)
+        [cardTitleLabel, bodyLabel, fillButton, validityLabel].forEach { cardView.addSubview($0) }
+        fillButton.addTarget(self, action: #selector(actionTapped), for: .touchUpInside)
+
+        validityTopToButton = validityLabel.topAnchor.constraint(equalTo: fillButton.bottomAnchor, constant: 12)
+        validityHeight = validityLabel.heightAnchor.constraint(equalToConstant: 16)
+
+        NSLayoutConstraint.activate([
+            iconContainer.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 27.5),
+            iconContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
+            iconContainer.widthAnchor.constraint(equalToConstant: 21),
+            iconContainer.heightAnchor.constraint(equalToConstant: 21),
+            iconGlyph.centerXAnchor.constraint(equalTo: iconContainer.centerXAnchor),
+            iconGlyph.centerYAnchor.constraint(equalTo: iconContainer.centerYAnchor),
+
+            titleLabel.centerYAnchor.constraint(equalTo: iconContainer.centerYAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: 8),
+            dateLabel.centerYAnchor.constraint(equalTo: iconContainer.centerYAnchor),
+            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+
+            cardView.topAnchor.constraint(equalTo: iconContainer.bottomAnchor, constant: 9.5),
+            cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 48),
+            cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+
+            cardTitleLabel.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 16),
+            cardTitleLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 18),
+            cardTitleLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -18),
+
+            bodyLabel.topAnchor.constraint(equalTo: cardTitleLabel.bottomAnchor, constant: 10),
+            bodyLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 18),
+            bodyLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -18),
+
+            fillButton.topAnchor.constraint(equalTo: bodyLabel.bottomAnchor, constant: 16),
+            fillButton.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 18),
+            fillButton.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -18),
+            fillButton.heightAnchor.constraint(equalToConstant: 42),
+
+            validityTopToButton,
+            validityLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 18),
+            validityLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -18),
+            validityLabel.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -16)
+        ])
+    }
+
+    func configure(with model: NotificationModel) {
+        titleLabel.text = model.title
+        dateLabel.text = model.date
+        cardTitleLabel.text = model.subtitle
+        bodyLabel.text = model.body
+
+        // 已提交过的问卷：按钮置灰 + 文案改「已完成」+ 不可点。
+        // 点进去也会被 handleNotificationAction 拦下，但那时用户已经点了才知道 ——
+        // 外观上先说清楚。
+        let surveyId = model.routePayload?["surveyId"] ?? ""
+        let submitted = !surveyId.isEmpty && SurveyService.shared.hasSubmitted(surveyId: surveyId)
+        fillButton.setTitle(submitted ? L("survey.completed") : model.actionText, for: .normal)
+        fillButton.isEnabled = !submitted
+        fillButton.backgroundColor = submitted
+            ? UIColor(white: 1, alpha: 0.12)
+            : UIColor(red: 128/255, green: 84/255, blue: 254/255, alpha: 1.0) // #8054FE
+        fillButton.setTitleColor(submitted ? UIColor(white: 1, alpha: 0.35) : .white, for: .normal)
+        fillButton.setTitleColor(UIColor(white: 1, alpha: 0.35), for: .disabled)
+
+        let validity = model.routePayload?["validUntil"]
+        validityLabel.text = validity
+        validityLabel.isHidden = (validity?.isEmpty ?? true)
+        // 无有效期时收起底部占位，避免留白。
+        validityTopToButton.constant = (validity?.isEmpty ?? true) ? 0 : 12
+    }
+
+    @objc private func actionTapped() { didTapAction?() }
 }

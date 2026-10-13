@@ -2,15 +2,39 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.mindora.healthsync.refresh</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_mindora._tcp.</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Mindora needs access to your camera to take a profile picture.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Mindora reads your heart rate, resting heart rate, heart rate variability, respiratory rate, body temperature and sleep data from Health to show you personalized sleep insights. It is never used for advertising and is never shared with third parties.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Mindora only reads Health data to generate your sleep insights and does not write any data to Health.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Mindora uses the local network to discover and connect to your devices.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Mindora needs location access to help you quickly fill in your address.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Mindora needs permission to save screenshots to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Mindora needs permission to access your photo library to select a profile picture or save images.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -28,39 +52,13 @@
 			</array>
 		</dict>
 	</dict>
-	<key>UILaunchScreen</key>
-	<dict/>
-	<!-- HealthKit Read Permission Prompt -->
-	<key>NSHealthShareUsageDescription</key>
-	<string>This app reads your heart rate, sleep, blood oxygen, blood pressure and other Health data to display personalized insights; it does not write or share data without your permission.</string>
-	<!-- Bluetooth Permission Prompt -->
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>This app uses Bluetooth to connect and communicate with your Mindora device to sync health data.</string>
-	<!-- Local Network Permission Prompt -->
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Mindora uses the local network to discover and connect to your devices.</string>
-	<!-- BGTaskScheduler permitted identifiers -->
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.mindora.healthsync.refresh</string>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Mindora needs location access to help you quickly fill in your address.</string>
-	<!-- Photo Library Permissions -->
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Mindora needs permission to save screenshots to your photo library.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Mindora needs permission to access your photo library to select a profile picture or save images.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Mindora needs access to your camera to take a profile picture.</string>
-	<!-- If in future you need to write data to HealthKit, also add NSHealthUpdateUsageDescription -->
+	<key>UILaunchScreen</key>
+	<dict/>
 </dict>
 </plist>

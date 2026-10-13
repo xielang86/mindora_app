@@ -3,12 +3,15 @@
   mindora
 
   Created by gao chao on 2025/9/18.
-  
+
 */
 
 // MARK: - Tab Bar Titles
 "tab.home" = "홈";
 "tab.health" = "건강";
+"tab.sleep" = "수면";
+"tab.explore" = "탐색";
+"tab.store" = "스토어";
 "tab.settings" = "설정";
 
 // MARK: - Theme Modes
@@ -16,8 +19,18 @@
 "theme.light" = "라이트 모드";
 "theme.dark" = "다크 모드";
 
+// MARK: - Register P3
+
+// MARK: - Register P4
+"register.p4.title" = "Mindora 연결";
+"register.p4.subtitle" = "Mindora를 충전기에 연결한 후 다음 단계로 진행하세요. 휴대폰의 블루투스가 켜져 있는지 확인해 주세요.";
+"register.p4.button.set_mindor" = "Mindora 설정";
+"register.p4.no_mindora" = "아직 Mindora가 없으신가요?";
+
 // MARK: - Home Screen
 "home.title" = "홈";
+"home.device.status.connected" = "연결됨";
+"home.device.status.offline" = "오프라인";
 "home.nearby_devices" = "근처 기기";
 "home.scan" = "스캔";
 "home.scanning" = "근처 기기 스캔 중…";
@@ -34,6 +47,19 @@
 "home.search_finished_one" = "기기 1대 발견";
 "home.search_finished_many" = "기기 %d대 발견";
 
+// MARK: - Home Dashboard
+"home.metric.sleep_onset" = "입면 시간";
+"home.metric.deep_sleep" = "깊은 수면";
+"home.tab.sleep" = "수면";
+"home.tab.overall_score" = "종합 점수";
+"home.tab.activity" = "활동";
+"home.insights.title" = "수면 인사이트";
+"home.insights.subtitle" = "수면 데이터 분석 기반";
+"home.best.title" = "주간 베스트";
+"home.best.subtitle" = "최상의 수면을 선사하도록 설계됨";
+"home.best.used_times" = "사용 횟수";
+"home.best.score" = "점수";
+
 // MARK: - Health Screen
 "health.title" = "건강";
 "health.page_title" = "모든 건강 데이터";
@@ -41,6 +67,7 @@
 "health.time.past_7_days" = "지난 7일";
 "health.time.past_12_months" = "지난 12개월";
 "health.time.earlier" = "더 이전";
+
 // MARK: - Health Metrics
 "health.status.initial" = "Health 접근 요청 중";
 "health.status.loading" = "건강 데이터 불러오는 중";
@@ -94,6 +121,42 @@
 "health.weekday.fri" = "금";
 "health.weekday.sat" = "토";
 
+// MARK: - Health Week View
+"health.week.avg_score" = "평균 수면 점수";
+"health.week.good" = "양호";
+"health.week.insights" = "수면 인사이트";
+"health.week.insights_sub" = "수면 데이터 분석 기반";
+"health.week.insights_title" = "수면 트렌드";
+"health.week.insights.body" = "뛰어난 깊은 \n수면 성과";
+"health.week.insights.desc" = "깊은 수면이 전체 수면의 29.8%를 차지하여 \n표준 수준을 상회합니다. \n규칙적인 수면 습관을 유지하세요.";
+
+"health.week.best" = "주간 베스트";
+"health.week.best_title" = "입면 효율";
+"health.week.best_sub" = "최상의 수면을 선사하도록 설계됨";
+"health.week.best.used_times" = "사용 횟수";
+"health.week.best.score" = "점수";
+"health.week.sedona" = "세도나 사막의 고요함";
+"health.week.respiratory_rate" = "호흡수";
+"health.week.avg_heart_rate" = "평균 심박수";
+"health.week.avg_wrist_temp" = "손목 온도";
+"health.week.avg_awake" = "평균 각성 시간";
+"health.week.avg_rem" = "평균 REM";
+"health.week.avg_core" = "평균 코어 수면";
+"health.week.avg_deep" = "평균 깊은 수면";
+"health.week.days_tracked" = "측정 일수";
+"health.week.avg_total" = "평균 총 수면";
+"health.week.avg_onset" = "평균 입면 시간";
+
+// MARK: - Health Week Expanded Headers
+"health.week.header.heart_rate" = "평균 심박수";
+"health.week.header.total_sleep" = "총 수면";
+"health.week.header.time_in_bed" = "평균 침대 시간";
+"health.week.metric.from_baseline" = "(기준 대비)";
+
+// MARK: - Health Month View
+"health.month.optimal" = "최적";
+
+
 // MARK: - Settings Screen
 "settings.title" = "설정";
 "settings.subtitle" = "Mindora를 내 취향대로";
@@ -104,6 +167,8 @@
 "settings.language" = "언어";
 "settings.theme" = "테마 모드";
 "settings.profile" = "프로필 편집";
+"settings.profile_email_format" = "이메일: %@";
+"settings.profile_email_placeholder" = "로그인 안 됨";
 "settings.sync" = "건강 데이터 동기화";
 "settings.permission" = "권한 관리";
 "settings.version" = "앱 버전";
@@ -112,6 +177,7 @@
 "settings.show_onboarding" = "가이드 페이지 다시 보기";
 
 // Language and Theme Selection
+"settings.language_title" = "언어";
 "settings.select_language" = "언어 선택";
 "settings.select_theme" = "테마 모드 선택";
 
@@ -137,6 +203,46 @@
 "settings.syncing" = "동기화 중...";
 "settings.sync_success_title" = "동기화 성공";
 "settings.sync_success_message" = "샘플 건강 데이터 배치가 전송되었습니다.";
+
+// MARK: - Device Management
+"device_manage.status.connected" = "연결됨";
+"device_manage.status.not_connected" = "연결 안됨";
+
+// MARK: - Device Scan (iOS Bluetooth-style scan & multi-bind page)
+"device_scan.title" = "기기";
+"device_scan.hint" = "기기가 나타나지 않으면 설정에서 로컬 네트워크와 블루투스 권한을 활성화해 주세요.";
+"device_scan.open_settings" = "설정 열기";
+"device_scan.section.my_devices" = "내 기기";
+"device_scan.section.empty_footer" = "Mindora가 켜져 있고 휴대폰이 동일한 Wi-Fi 네트워크에 연결되어 있는지 확인하세요. 블루투스는 백업으로 사용할 수 있습니다.";
+"device_scan.searching" = "기기 검색 중...";
+"device_scan.no_devices_found" = "기기를 찾을 수 없습니다";
+"device_scan.tap_to_retry" = "탭하여 재시도";
+"device_scan.status.not_connected" = "연결 안됨";
+"device_scan.status.connected" = "연결됨";
+
+// MARK: - Device Detail (tap ⓘ on the scan list)
+"device_detail.section.name" = "이름";
+"device_detail.section.model" = "모델";
+"device_detail.section.device_id" = "기기 ID";
+"device_detail.value.unknown" = "알 수 없음";
+"device_detail.disconnect" = "연결 해제";
+"device_detail.connect" = "연결";
+"device_manage.button.connect" = "기기 검색";
+"device_manage.button.connect_other" = "기기 검색";
+"device_manage.button.disconnect" = "연결 해제";
+"device_manage.button.connect_device" = "연결";
+"device_manage.button.connect_other_device" = "다른 기기 연결";
+"device_manage.button.search_device" = "기기 검색";
+"device_manage.subtitle" = "로그인 정보는 30일간 보관되며, 이후에는 다시 페어링해야 합니다\n아래 기기 이미지를 탭하면 상세 정보를 볼 수 있습니다";
+"device_manage.default_name" = "Mindora";
+"device_manage.empty.title" = "연결된 기기 없음";
+"device_manage.empty.message" = "아래 버튼을 탭하여 Mindora를 페어링하세요.";
+"device_manage.action.disconnect" = "기기 연결 해제";
+"device_manage.action.disconnect_confirm" = "연결 해제";
+"device_manage.action.disconnect_message" = "언제든지 다시 페어링할 수 있습니다. 데이터는 이 휴대폰에 보관됩니다.";
+"device_manage.button.delete_device" = "이 기기 삭제";
+"device_manage.delete.confirm_title" = "기기 '%@'을(를) 삭제하시겠습니까?";
+
 "settings.sync_error_title" = "동기화 실패";
 
 // MARK: - Settings Sections
@@ -145,8 +251,45 @@
 "settings.section.other" = "기타";
 "settings.section.about" = "정보";
 
-// MARK: - Device Selection
-"device_selection.title" = "연결하려는 Mindora 기기를 선택해 주세요";
+// MARK: - Side Menu
+"sidemenu.title" = "내 계정";
+"sidemenu.user.name" = "사용자 이름";
+"sidemenu.subscription" = "구독";
+"sidemenu.upgrade" = "Pro로 업그레이드";
+"sidemenu.device" = "기기";
+"sidemenu.notifications" = "알림";
+"sidemenu.health_link" = "건강 데이터 연동";
+"sidemenu.language" = "언어";
+"sidemenu.help" = "도움말";
+"sidemenu.logout" = "로그아웃";
+"sidemenu.terms" = "이용약관";
+"sidemenu.privacy_policy" = "개인정보 처리방침";
+"sidemenu.not_logged_in" = "로그인 안 됨";
+
+// MARK: - User Profile
+"user_profile.user_id" = "사용자 ID";
+"user_profile.nickname" = "닉네임";
+"user_profile.gender" = "성별";
+"user_profile.gender.male" = "남성";
+"user_profile.gender.female" = "여성";
+"user_profile.gender.other" = "기타";
+"user_profile.age" = "나이";
+"user_profile.birthday" = "생일";
+"user_profile.weight_height" = "체중 / 키";
+"user_profile.weight_unit" = "체중 / kg";
+"user_profile.height_unit" = "키 / cm";
+"user_profile.weight_height_invalid" = "유효한 값을 입력하세요: 체중 20~300 kg, 키 50~250 cm.";
+"user_profile.email" = "이메일";
+"user_profile.phone" = "전화번호";
+"user_profile.address" = "주소";
+"user_profile.update" = "프로필 업데이트";
+"user_profile.username_default" = "사용자 이름";
+"user_profile.take_photo" = "사진 촬영";
+"user_profile.choose_from_album" = "앨범에서 선택";
+"user_profile.cancel" = "취소";
+"user_profile.email_locked_title" = "이메일을 수정할 수 없습니다";
+"user_profile.email_locked_message" = "소셜 계정 또는 SSO로 로그인한 사용자는 이메일을 직접 변경할 수 없습니다.\n도움이 필요하신가요? 문의처: %@";
+"user_profile.email_locked_contact" = "문의하기";
 
 // MARK: - Help Cards
 "help.title" = "연결 도움말";
@@ -164,9 +307,12 @@
 
 // MARK: - Common UI Elements
 "common.ok" = "확인";
-"common.cancel" = "취소";
 "common.confirm" = "확인";
 "common.retry" = "재시도";
+"common.saved_to_photos" = "사진에 저장됨";
+"common.save_success" = "저장되었습니다";
+"common.share_success" = "공유되었습니다";
+"common.copy_success" = "복사됨";
 
 // MARK: - Onboarding
 "onboarding.start" = "시작";
@@ -177,9 +323,10 @@
 "onboarding.page3.bluetooth_card_text_authorized" = "블루투스 권한이 활성화되었습니다\n기기가 정상적으로 연결될 수 있습니다";
 "onboarding.page4.scanning_title" = "근처 기기 스캔";
 "onboarding.page4.searching" = "지속적으로 자동 검색 중";
-"onboarding.page4.device_found" = "Mindora 발견";
+"onboarding.page4.device_found" = "%@ 발견";
 "onboarding.page4.no_device_found" = "기기를 찾을 수 없습니다";
-"onboarding.page4.description" = "연결하려는 Mindora 기기를 선택해 주세요. 블루투스가 켜져 있는지 확인하세요.";
+"onboarding.page4.description" = "Mindora가 켜져 있고 휴대폰이 동일한 Wi-Fi 네트워크에 연결되어 있는지 확인하세요. 블루투스는 백업으로 사용할 수 있습니다.";
+"onboarding.page4.multiple_found" = "%d대의 기기를 찾았습니다. 하나를 선택해 주세요";
 "onboarding.page5.success_title" = "Mindora 연결 성공";
 "onboarding.page5.complete" = "완료";
 
@@ -214,6 +361,8 @@
 "health.sync.section.metrics" = "지표";
 "health.sync.section.action" = "작업";
 "health.sync.section.status" = "상태";
+
+// Sync Metrics Names
 "health.sync.metric.heart_rate" = "심박수";
 "health.sync.metric.hrv" = "심박 변이";
 "health.sync.metric.spo2" = "혈중 산소";
@@ -236,6 +385,7 @@
 "permission.section.health" = "건강 데이터 권한";
 "permission.section.healthkit_footer_line1" = "접근이 제한된 경우 다음으로 이동하세요";
 "permission.section.healthkit_footer_line2" = "*설정 > 개인 정보 보호 및 보안 > 건강 > Mindora.\n*건강 앱 열기 > 공유 > 앱 > Mindora, 필요한 데이터 유형을 켜세요.";
+
 // Permission Status
 "permission.status.authorized" = "승인됨";
 "permission.status.partial" = "부분 승인";
@@ -257,7 +407,7 @@
 // Health Permission Actions
 "permission.health.action_title" = "건강 데이터 권한";
 "permission.health.action_message" = "작업을 선택하세요";
-"permission.open_settings_hint" = "iOS 설정의 Mindora 항목에서 이 권한을 조정할 수 있습니다.";
+"permission.open_settings_hint" = "설정 > Mindora로 이동하여 로컬 네트워크와 셀룰러 데이터 접근을 활성화하세요.";
 
 // Health Settings Guide
 "permission.health.settings_title" = "건강 개인 정보 보호 설정";
@@ -268,9 +418,843 @@
 // Health Permission CTA (avoid misleading status)
 "permission.health.confirm" = "설정";
 
-// Local Network Permission CTA
+// Local Network Permission CTA (cannot be accurately detected, prompt user to confirm in settings)
 "permission.local_network.confirm" = "설정에서 확인하세요";
 
 // Local Network Permission Denied
 "permission.local_network.denied_title" = "기기를 검색할 수 없습니다";
 "permission.local_network.denied_message" = "주변 Mindora 기기를 검색하려면 로컬 네트워크 접근 권한이 필요합니다. 설정에서 로컬 네트워크 접근을 활성화하세요.";
+"permission.cellular.denied_title" = "셀룰러 데이터 사용 불가";
+"permission.cellular.denied_message" = "Mindora가 셀룰러 데이터를 사용할 수 없어 수면 점수 등 온라인 콘텐츠를 불러올 수 없습니다. 설정에서 Mindora의 셀룰러 데이터를 허용하거나 Wi-Fi에 연결해 주세요.";
+
+// Bluetooth Permission Denied
+"permission.bluetooth.denied_title" = "블루투스로 스캔할 수 없습니다";
+"permission.bluetooth.denied_message" = "Wi-Fi를 사용할 수 없을 때 Mindora 기기를 검색하려면 블루투스 접근 권한이 필요합니다. 설정에서 Mindora의 블루투스를 활성화하세요.";
+
+// MARK: - Login
+"login.email_placeholder" = "이메일을 입력하세요";
+"login.get_code" = "이메일 인증";
+"login.toast.enter_email" = "이메일을 입력해 주세요";
+"login.toast.invalid_email" = "이메일 형식이 올바르지 않습니다";
+"login.toast.network_error_prefix" = "네트워크 오류: ";
+"login.toast.no_data" = "수신된 데이터 없음";
+"login.toast.send_code_failed" = "인증 코드 전송 실패";
+"login.toast.invalid_response" = "잘못된 응답";
+"login.toast.login_failed" = "로그인 실패";
+"login.verify_alert.title" = "이메일 인증";
+
+// Login Success
+"login.success.title" = "로그인 성공";
+"login.success.message" = "이메일 %@ 인증 완료";
+"login.verify_alert.message_format" = "%@(으)로 전송된 코드를 입력하세요";
+"login.verify_alert.code_placeholder" = "인증 코드";
+"login.verify_alert.login_action" = "로그인";
+"login.code_sent_title" = "인증 코드 전송됨";
+"login.code_sent_message" = "인증 코드가 이메일로 전송되었습니다: %@. 받은 편지함을 확인해 주세요.";
+
+// MARK: - User Profile
+"user_profile.title" = "프로필";
+"user_profile.change_avatar" = "아바타 변경";
+"user_profile.email_title" = "이메일";
+"user_profile.logout" = "로그아웃";
+"user_profile.logout_confirm_title" = "로그아웃하시겠습니까?";
+"user_profile.logout_confirm_message" = "로그아웃하면 로컬 데이터가 삭제됩니다.";
+"user_profile.logout_success" = "로그아웃되었습니다";
+"user_profile.delete" = "계정 삭제";
+"user_profile.delete_confirm_title" = "계정을 삭제하시겠습니까?";
+"user_profile.delete_confirm_message" = "이 작업을 수행하면 계정과 데이터가 영구적으로 삭제되며 복구할 수 없습니다. 확인을 위해 이메일 또는 전화번호로 인증 코드를 보냅니다.";
+"user_profile.delete_success" = "계정이 삭제되었습니다";
+"user_profile.delete_failed" = "계정 삭제 실패";
+"user_profile.delete_confirm_send" = "코드 보내기";
+"user_profile.delete_code_sent" = "인증 코드를 보냈습니다";
+"user_profile.delete_code_prompt_title" = "인증 코드 입력";
+"user_profile.delete_code_prompt_message" = "계정을 영구적으로 삭제하려면 이메일 또는 전화번호로 전송된 코드를 입력하세요. 이 작업은 되돌릴 수 없습니다.";
+"user_profile.delete_confirm_message_email" = "이 작업을 수행하면 계정과 데이터가 영구적으로 삭제되며 복구할 수 없습니다. 확인을 위해 이메일 %@(으)로 인증 코드를 보냅니다.";
+"user_profile.delete_confirm_message_phone" = "이 작업을 수행하면 계정과 데이터가 영구적으로 삭제되며 복구할 수 없습니다. 확인을 위해 전화번호 %@(으)로 인증 코드를 보냅니다.";
+"user_profile.delete_code_prompt_message_email" = "계정을 영구적으로 삭제하려면 이메일 %@(으)로 전송된 코드를 입력하세요. 이 작업은 되돌릴 수 없습니다.";
+"user_profile.delete_code_prompt_message_phone" = "계정을 영구적으로 삭제하려면 전화번호 %@(으)로 전송된 코드를 입력하세요. 이 작업은 되돌릴 수 없습니다.";
+"user_profile.delete_code_placeholder" = "인증 코드";
+"user_profile.delete_code_empty" = "인증 코드를 입력하세요";
+"user_profile.delete_submit" = "계정 삭제";
+"user_profile.delete_err_no_contact" = "계정에 이메일 또는 전화번호가 등록되어 있지 않아 코드를 보낼 수 없습니다.";
+"user_profile.delete_err_send_failed" = "코드를 보내지 못했습니다. 나중에 다시 시도해 주세요.";
+"user_profile.delete_err_bad_code" = "인증 코드가 올바르지 않거나 만료되었습니다.";
+"user_profile.delete_err_user_gone" = "이 계정은 존재하지 않거나 이미 삭제되었습니다.";
+"user_profile.token_missing" = "먼저 로그인해 주세요";
+"user_profile.photo_unavailable" = "사진에 접근할 수 없습니다";
+"user_profile.update_success" = "프로필이 업데이트되었습니다";
+"user_profile.update_failed" = "프로필 업데이트 실패";
+
+// MARK: - Login Start
+"login_start.tagline" = "당신의 일상에\n힘을 더하는\n개인 인사이트.";
+"login_start.button.start" = "시작";
+"login_start.button.no_device" = "아직 Mindora가 없으신가요?";
+
+
+// MARK: - Register P1
+"register.welcome" = "환영합니다!";
+"register.email_label" = "이메일 주소";
+"register.email_placeholder" = "이메일 주소";
+"register.info.create" = "계정을 만들려면 이메일 주소를 입력해 주세요.";
+"register.info.signin" = "이미 회원이시라면 Mindora 계정 이메일을 입력하여 로그인하세요.";
+"register.button.continue" = "계속";
+
+// MARK: - Register P3
+"register.p3.title" = "이용약관 및 개인정보 처리방침";
+"register.p3.subtitle" = "계속하려면 다음 내용을 확인해 주세요:";
+"register.p3.agree_prefix" = "다음을 읽고 동의합니다: ";
+"register.p3.terms" = "이용약관";
+"register.p3.and" = " 및 ";
+"register.p3.privacy" = "Mindora 개인정보 처리방침.";
+"register.p3.marketing" = "Mindora 경험을 최대한 활용할 수 있도록 독점 건강 교육, 팁, 특별 혜택을 받아보세요.";
+"register.p3.button.save" = "저장하고 계속";
+
+// MARK: - Register P2
+"register.p2.title" = "확인 코드 입력";
+"register.p2.subtitle" = "4자리 코드가 다음으로 전송되었습니다";
+"register.p2.resend" = "코드 재전송";
+
+"register.p2.resend_countdown" = "%d초 후에 다시 보낼 수 있습니다";
+// MARK: - Common Alerts
+"common.error" = "오류";
+"common.notice" = "알림";
+"register.verification_code_sent" = "인증 코드가 전송되었습니다";
+
+// MARK: - Auth Errors
+"auth.error.invalid_url" = "잘못된 URL";
+"auth.error.serialization_error" = "직렬화 오류";
+"auth.error.no_data" = "수신된 데이터 없음";
+"auth.error.api_error_default" = "API 오류: %d";
+"auth.error.invalid_response" = "잘못된 응답";
+"auth.error.missing_data" = "응답에 데이터가 없습니다";
+"auth.error.network" = "네트워크를 사용할 수 없습니다. 연결을 확인하고 다시 시도해 주세요.";
+"auth.error.timeout" = "요청 시간이 초과되었습니다. 다시 시도해 주세요.";
+"auth.error.server" = "서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도해 주세요.";
+"auth.error.send_failed" = "인증 코드를 보낼 수 없습니다. 다시 시도해 주세요.";
+"auth.error.verify_failed" = "인증에 실패했습니다. 다시 시도해 주세요.";
+"auth.error.code_invalid" = "인증 코드가 올바르지 않습니다. 다시 시도해 주세요.";
+"auth.error.code_expired" = "인증 코드가 만료되었습니다. 새 코드를 요청해 주세요.";
+
+// MARK: - Subscription
+
+// MARK: - Explore
+"explore.greeting.hi" = "Hi,";
+
+
+
+
+
+"explore.fluctuation.resp_range" = "호흡 변동";
+
+
+
+
+"explore.quote.open" = "“";
+"explore.quote.close" = "”";
+
+
+"explore.placeholder.number" = "- -";
+"explore.placeholder.hr" = "- - bpm";
+"explore.placeholder.resp" = "- - 회/분";
+"explore.placeholder.duration" = "- - 분";
+"explore.placeholder.count" = "- - 회";
+"explore.placeholder.text" = "- -";
+"explore.placeholder.hr_fluctuation" = "- - bpm";
+"explore.placeholder.percent" = "- -%";
+
+"explore.value.count_format" = "%@ 회";
+"explore.value.duration_format" = "%@ 분";
+"explore.value.resp_rate_format" = "%@ 회/분";
+"explore.value.hr_format" = "%@ bpm";
+"explore.value.hr_range_format" = "%@ bpm";
+
+
+"explore.empty.score" = "0";
+"explore.empty.title" = "수면 점수";
+"explore.empty.message" = "첫 모니터링 세션을 마치면,\n여기에서 수면 품질에 대한 더 깊이 있는 분석을 받게 됩니다.\n첫 수면 모니터링을 시작해 보세요.";
+
+"explore.empty.intro" = "잠들 때, 밤중에 깰 때, 다시 깊은 잠에 들 때까지 Mindora는 수면 리듬을 지켜보며 상태에 맞게 도움 방식을 조정합니다.\n이 인사이트는 단순한 데이터 변화가 아닙니다. 사용 중인 장면, 소리의 리듬, 그리고 몸의 실제 반응에서 비롯됩니다.";
+"explore.empty.intro_detail" = "아래로 스크롤하면 설명해 드립니다:\n어젯밤 무슨 일이 있었는지, 어떤 방식이 가장 도움이 되었는지, 그리고 Mindora가 무엇을 조정했는지.";
+"explore.empty.desc.efficiency" = "여기에는 잠드는 과정이 표시됩니다. Mindora는 잠드는 시각, 잠들기까지 걸린 시간, 잠들기 전 심박수와 호흡 변화를 바탕으로 입면 습관을 분석해 수면이 어떻게 자연스럽게 시작되는지 이해하도록 돕습니다.";
+"explore.empty.desc.structure" = "여기에는 밤 동안의 수면 단계 분포가 표시됩니다. 얕은 수면, 깊은 수면, 렘수면의 비율과 연속성을 확인할 수 있어, 좋고 나쁨을 판단하지 않고도 수면 구조를 이해하고 생활 리듬과 수면 습관을 조정하는 데 도움이 됩니다.";
+"explore.empty.desc.fluctuation" = "여기에는 밤 동안 Mindora의 모든 개입과 수면 중 몸의 반응이 기록됩니다. 수면 중 변동이 생기면 Mindora는 생리 지표를 바탕으로 상태를 판단해 적절한 범위에서 함께하고, 필요할 때 개입하여 수면 리듬을 지켜 줍니다.";
+"explore.empty.desc.preference" = "여기에는 선호하는 소리 유형과 장면이 요약됩니다. 이를 통해 어떤 요소가 수면에 더 효과적이었는지 알 수 있습니다. Mindora는 수면 습관과 사운드 장면 선호도를 학습해 더 효과적이고 개인화된 수면 케어를 추천합니다.";
+"explore.empty.desc.advice" = "Mindora는 밤새 수면 상태와 생리 지표의 변화를 살피고, 필요할 때 AI 조정으로 개입해 더 연속적이고 편안한 수면을 돕습니다.\n사용을 시작하면 이곳에 잠드는 과정, 수면 구조, 야간 변동, 추천 사운드스케이프 등 더 깊이 있는 수면 인사이트가 표시됩니다.";
+// MARK: - Subscription
+"subscription.nav.title" = "멤버십";
+"subscription.my_midora" = "My Mindora";
+"subscription.not_member" = "아직 회원이 아닙니다";
+"subscription.not_member_desc" = "필요한 플랜을 구독하고 전용 혜택을 누리세요";
+"subscription.section.title" = "멤버십 구독";
+"subscription.my.title" = "내 구독";
+"subscription.monthly" = "월간";
+"subscription.yearly" = "연간";
+"subscription.price.monthly" = "/월";
+"subscription.price.yearly" = "/년";
+"subscription.action.subscribe" = "구독";
+"subscription.action.cancel" = "구독 취소";
+"subscription.action.switch" = "플랜 변경";
+"subscription.desc.monthly.prefix" = "만료 하루 전 ";
+"subscription.desc.monthly.suffix" = "/월로 갱신됩니다. 결제 전 언제든지 취소할 수 있습니다.";
+"subscription.desc.yearly" = "1년 내내 서비스를 누리세요. 다음 갱신 전 언제든지 취소할 수 있습니다.";
+"subscription.auto_renew" = "자동 갱신 시간: ";
+"subscription.desc.cancelled" = "구독이 만료될 때까지 혜택이 유지됩니다. 제때 갱신해 주세요.";
+"subscription.exclusive" = "회원 전용";
+"subscription.feature.1" = "360° 종합 수면 분석, 나만의 개인 수면 데이터베이스";
+"subscription.feature.2" = "스마트 수면 인사이트, 데이터에서 솔루션까지";
+"subscription.feature.3" = "전용 수면 개선 플랜, 개인 맞춤형 수면 향상";
+"subscription.help.faq" = "자주 묻는 질문";
+"subscription.help.message" = "메시지 센터";
+"subscription.help.renewal" = "구독 관리";
+"subscription.help.restore" = "구매 복원";
+"subscription.help.community" = "커뮤니티 참여";
+"subscription.help.contact" = "문의하기";
+"subscription.giftcard.entry" = "기프트 카드 및 교환 코드";
+
+// Redeem Code
+"redeem.placeholder" = "교환 코드 입력";
+"redeem.action" = "지금 교환";
+"redeem.rules.entry" = "사용 규칙";
+"redeem.submitted" = "교환 코드가 제출되었습니다";
+"redeem.success" = "교환에 성공했습니다. 멤버십이 활성화되었습니다.";
+"redeem.success.title" = "교환 성공";
+"redeem.success.detail" = "%1$@ 멤버십이 교환되었습니다. 유효 기간: %2$@까지.";
+"redeem.success.detail.no_date" = "%1$@ 멤버십이 교환되었습니다.";
+"redeem.success.detail.generic" = "멤버십이 교환되었습니다. 유효 기간: %1$@까지.";
+"redeem.period.yearly" = "연간";
+"redeem.period.monthly" = "월간";
+"redeem.error.generic" = "교환에 실패했습니다. 나중에 다시 시도해 주세요.";
+"redeem.error.not_logged_in" = "교환하기 전에 로그인해 주세요.";
+"redeem.rules.title" = "사용 규칙";
+"redeem.rules.ok" = "확인";
+"redeem.rules.body" = "1. Mindora 교환 코드는 공식 웹사이트에서 멤버십 기프트 카드를 구매하거나 Mindora 또는 파트너 활동에 참여하여 받을 수 있습니다.\n\n2. Mindora 교환 코드를 등록하여 얻은 멤버십 혜택은 구매한 것과 동일합니다.\n\n3. 불가항력, 네트워크 문제, 부정 행위 등 Mindora 외적 요인으로 인해 비정상적인 활동이 발생한 경우, Mindora는 멤버십 서비스를 조정하거나 중단할 권리를 보유합니다.\n\n4. Mindora는 법이 허용하는 범위 내에서 본 규칙에 대한 최종 해석 권한을 보유합니다. 문의: support@mindora316.com";
+
+// Subscription Email
+"subscription.email.subject" = "Mindora 지원";
+"subscription.email.app_version" = "앱 버전";
+"subscription.email.ios_version" = "iOS 버전";
+"subscription.email.device" = "기기";
+"subscription.email.error.title" = "이메일 오류";
+"subscription.email.error.message" = "이 기기에 이메일이 설정되어 있지 않습니다.";
+
+// Subscription Status
+"subscription.tide_days" = "Mindora 일수";
+"subscription.active.plan_prefix" = "사용 중 · ";
+"subscription.active.plan_suffix" = " 구독";
+"subscription.plan_name.monthly" = "월간";
+"subscription.plan_name.yearly" = "연간";
+"subscription.expires_prefix" = "만료일 ";
+
+// MARK: - Notifications
+"notifications.title" = "알림";
+"notifications.empty" = "메시지가 없습니다";
+"notifications.history.divider" = "아래는 지난 메시지입니다";
+"notifications.delete" = "삭제";
+"notifications.permission.title" = "알림 허용";
+"notifications.permission.desc" = "시스템 알림을 켜서 메시지를 제때 받아보세요";
+"notifications.permission.status" = "시스템 설정에서 Mindora 알림을 비활성화했습니다";
+"notifications.permission.keep" = "유지";
+"notifications.permission.open" = "설정으로 이동";
+"notifications.mock.system" = "시스템 메시지";
+"notifications.mock.title" = "멤버십 알림";
+"notifications.mock.body" = "구독이 7일 후 만료됩니다. 중단을 방지하려면 제때 갱신해 주세요.";
+"notifications.mock.action" = "멤버십 페이지 보기";
+
+// 消息通知 · 动态生成
+"notifications.source.membership" = "멤버십 알림";
+"notifications.source.system" = "시스템 알림";
+"notifications.source.health" = "수면 알림";
+"notifications.subscription.expiring.title" = "멤버십 만료 예정";
+"notifications.subscription.expiring.body" = "멤버십이 %1$d일 후 만료됩니다. 혜택을 유지하려면 제때 갱신해 주세요.";
+"notifications.subscription.expiring.action" = "멤버십 페이지 보기";
+"notifications.subscription.expired.title" = "멤버십 만료됨";
+"notifications.subscription.expired.body" = "멤버십이 만료되었습니다. 지금 갱신하여 모든 혜택을 복원하세요.";
+"notifications.subscription.expired.action" = "지금 갱신";
+"notifications.subscription.activated.title" = "멤버십 활성화됨";
+"notifications.subscription.activated.body" = "구독해 주셔서 감사합니다! 멤버십 혜택이 활성화되었으며 %1$@까지 유효합니다.";
+"notifications.subscription.activated.action" = "멤버십 혜택 보기";
+"notifications.subscription.renewed.title" = "멤버십 갱신됨";
+"notifications.subscription.renewed.body" = "갱신이 완료되었습니다. 멤버십이 %1$@까지 연장되었습니다.";
+"notifications.subscription.renewed.action" = "멤버십 혜택 보기";
+"notifications.redeem.title" = "교환 성공";
+"notifications.redeem.body" = "교환이 완료되었습니다. 멤버십이 %1$@까지 유효합니다.";
+"notifications.redeem.body_days" = "교환이 완료되었습니다. 멤버십 %1$d일이 추가되었으며 %2$@까지 유효합니다.";
+"notifications.redeem.action" = "멤버십 혜택 보기";
+"notifications.permission.off.title" = "알림이 꺼져 있습니다";
+"notifications.permission.off.body" = "설정에서 Mindora 알림을 끄셨습니다. 멤버십 만료, 수면 리포트 등의 알림을 놓칠 수 있습니다.";
+"notifications.permission.off.action" = "설정 열기";
+"notifications.sleep.low.title" = "수면 점수 낮음";
+"notifications.sleep.low.body" = "최근 수면 점수가 %1$d입니다. 탭하여 수면에 영향을 미친 요소를 확인하세요.";
+"notifications.sleep.low.action" = "수면 상세 보기";
+"notifications.weargap.title" = "%1$d일간 수면 데이터 없음";
+"notifications.weargap.body" = "%1$d일 동안 수면 데이터를 받지 못했습니다. 기기를 착용하고 주무시면 수면 분석을 계속 받을 수 있습니다.";
+"notifications.weargap.action" = "수면 상세 보기";
+
+
+// MARK: - Terms & Privacy
+
+
+// MARK: - Help Page
+"help.page.title" = "도움말";
+"help.page.description" = "제품에 대해 궁금한 점이 있으시면,\n위의 공식 QR 코드를 스캔하거나 이메일로 문의해 주세요.";
+"help.page.email" = "support@mindora316.com";
+
+// MARK: - Logout Alert
+"logout.alert.title" = "로그아웃";
+"logout.alert.message" = "정말 로그아웃하시겠습니까? 앱을 사용하려면 다시 로그인해야 합니다.";
+"logout.alert.cancel" = "취소";
+"logout.alert.confirm" = "로그아웃";
+
+// MARK: - Health Link Alert
+"health_link.alert.title" = "Apple 건강 데이터 연동으로 이동합니다";
+"health_link.alert.cancel" = "취소";
+"health_link.alert.confirm" = "확인";
+"common.save" = "저장";
+"user_profile.label_date" = "날짜";
+
+// MARK: - Address
+
+// MARK: - Address
+"address.title" = "내 주소";
+"address.empty" = "추가된 주소가 없습니다";
+"address.add_new" = "새 주소 추가";
+"address.paste_tip" = "텍스트를 붙여넣으면 스마트하게 인식됩니다";
+"address.paste" = "붙여넣기";
+"address.name" = "이름";
+"address.name_placeholder" = "이름을 입력하세요";
+"address.phone" = "전화번호";
+"address.phone_placeholder" = "전화번호를 입력하세요";
+"address.phone_invalid" = "올바른 전화번호를 입력해 주세요";
+"address.name_invalid" = "받는 분 이름에 숫자를 넣을 수 없습니다";
+"address.region" = "지역";
+"address.region_placeholder" = "지역 선택";
+"address.locate" = "위치 찾기";
+"address.detail" = "상세 주소";
+"address.detail_placeholder" = "도로명, 건물 번호 등";
+"address.country" = "국가/지역";
+"address.phone_country" = "전화번호 국가";
+"address.state" = "주/도";
+"address.state_placeholder" = "주/도를 입력하세요";
+"address.city" = "도시";
+"address.district" = "구";
+"address.city_placeholder" = "도시";
+"address.street1" = "주소 1";
+"address.street1_placeholder" = "도로명 주소 또는 사서함";
+"address.street2" = "주소 2";
+"address.street2_placeholder" = "아파트, 동, 호수, 층 등";
+"address.zip" = "우편번호";
+"address.state_only" = "주";
+"address.province" = "도";
+"address.prefecture" = "현";
+"address.zip_only" = "우편번호";
+"address.postal_code" = "우편번호";
+"address.zip_placeholder" = "우편번호를 입력하세요";
+"address.select" = "선택하세요";
+"address.locate_fill" = "현재 위치로 채우기";
+"address.picker_search" = "검색";
+"address.name_required" = "받는 분 이름을 입력하세요";
+"address.state_required" = "주/도를 선택하세요";
+"address.city_required" = "도시를 입력하세요";
+"address.street_required" = "도로명 주소를 입력하세요";
+"address.zip_invalid" = "유효한 우편번호를 입력하세요";
+"address.set_default" = "기본 주소로 설정";
+"address.confirm" = "확인";
+"address.default_tag" = "기본";
+"address.delete" = "삭제";
+"permission.location_needed" = "Mindora가 주소 입력을 돕기 위해 위치 접근 권한이 필요합니다. 설정에서 활성화해 주세요.";
+"common.tips" = "팁";
+"common.settings" = "설정";
+"common.cancel" = "취소";
+"address.select_title" = "주소 선택";
+"address.search_placeholder" = "장소 검색";
+"address.current_location" = "[현재 위치]";
+
+// Subscription Restore
+"subscription.restore.loading" = "복원 중...";
+"subscription.restore.success" = "복원 성공";
+"subscription.restore.no_purchases" = "활성 구독을 찾을 수 없습니다.";
+"subscription.bound_to_another" = "이 구독은 다른 계정에 연결되어 있습니다. 해당 계정으로 로그인하여 사용하세요.";
+
+// Renewal Management
+"renewal.title" = "구독 관리";
+"renewal.your_subscription" = "내 구독";
+"renewal.product_name" = "My Mindora";
+"renewal.plan" = "플랜";
+"renewal.plan.monthly" = "월간 구독";
+"renewal.renewal_date" = "갱신일";
+"renewal.amount" = "금액";
+"renewal.manage" = "관리";
+"renewal.plan.yearly" = "연간 구독";
+"renewal.plan.none" = "구독이 없습니다";
+
+
+// MARK: - FAQ
+"subscription.renewal_management" = "구독 관리";
+"faq.title" = "Mindora 자주 묻는 질문";
+"faq.subtitle" = "Mindora는 다감각 시너지와 AI를 통해 수면의 질을 개선하도록 설계된 스마트 수면 보조 기기입니다. 의료 기기가 아닙니다. 다음은 자주 묻는 질문에 대한 답변입니다.";
+"faq.footer.prefix" = "다른 질문이 있으시면 Mindora 웹사이트의 ";
+"faq.footer.link" = "고객 지원 센터";
+"faq.footer.suffix" = "를 방문하세요.";
+
+"faq.q1" = "구독 플랜은 어떻게 선택하나요?";
+"faq.a1" = "월간 구독: 월 $2.99.\n\n연간 구독: 연 $29.99로 약 2개월분의 비용을 절약할 수 있습니다.\n\n실제 가격은 국가 또는 지역과 적용되는 세금에 따라 약간 다를 수 있으니 구독 페이지에서 최종 금액을 확인해 주세요.\n\nMindora 온라인 스토어에서 기기를 구매하면 주문에 선결제 연간 멤버십 플랜을 추가할 수도 있습니다.\n\n2026년 12월 25일 이전에 기기를 구매한 신규 회원은 Mindora 멤버십 첫 1년을 무료로 받습니다. 이 무료 기간이 끝난 후에는 멤버십을 별도로 구매해야 합니다.\n\nMindora 멤버십은 실제 Mindora 기기가 아니라 Mindora 계정에 연결됩니다. 기존 Mindora 계정으로 추가 기기를 구매해도 무료 멤버십 월이 추가로 제공되지 않습니다.";
+
+"faq.q2" = "멤버십은 어떻게 활성화하나요?";
+"faq.a2" = "멤버십 기간이 포함된 하드웨어 번들을 구매한 경우, 처음으로 기기를 성공적으로 연결하고 앱에 로그인하면 무료 멤버십이 자동으로 활성화됩니다.\n\n멤버십을 별도로 구매한 경우, Mindora 앱에서 “계정 업그레이드” 또는 “구독”을 탭하고 플랜을 선택한 후 결제를 완료하면 즉시 활성화됩니다.";
+
+"faq.q3" = "어떤 휴대폰 운영체제가 Mindora 앱과 호환되나요?";
+"faq.a3" = "Mindora 앱은 iOS 15 이상을 실행하는 iPhone과 블루투스 5.0을 지원하는 Android 11 이상의 안드로이드 휴대폰을 지원합니다.";
+
+"faq.q4" = "휴대폰 블루투스를 항상 켜 두어야 하나요?";
+"faq.a4" = "네. 기기와 앱의 동기화를 유지하고 원격 제어를 사용하려면 블루투스를 켜 두어야 합니다. 다만 기기 자체는 사전 설정된 수면 프로그램을 독립적으로 실행할 수 있습니다.";
+
+"faq.q5" = "기기를 어떻게 연결/페어링하나요?";
+"faq.a5" = "휴대폰의 블루투스를 켜고 Mindora 앱을 실행한 후 홈 화면에서 “기기 추가”를 탭하고 화면의 안내에 따르세요. 자세한 단계별 안내는 [관련 도움말 문서 링크]를 참고하세요.";
+
+"faq.q6" = "Mindora가 다른 건강 앱(예: Apple 건강, Google Fit)과 데이터를 동기화할 수 있나요?";
+"faq.a6" = "네. Mindora 앱의 “설정” > “앱 및 서비스”에서 수면 데이터를 Apple 건강이나 Google Fit 같은 플랫폼에 동기화하도록 승인할 수 있습니다.";
+
+"faq.q7" = "모든 기능을 사용하려면 유료 구독이 필요한가요?";
+"faq.a7" = "Mindora의 핵심 수면 보조 기능(기본 사운드, 조명 장면, 아로마 디퓨전 등)과 AI 수면 모니터링은 하드웨어를 구매하면 사용할 수 있습니다. 프리미엄 멤버십(해당하는 경우)은 더 풍부한 사운드 라이브러리, 개인 맞춤형 수면 분석 리포트, 고급 수면 강좌, 독점 ASMR 콘텐츠, 더욱 세밀하게 개인화된 AI 알고리즘 등을 잠금 해제합니다.";
+
+"faq.q8" = "구독은 어떻게 관리하거나 취소하나요?";
+"faq.a8" = "Mindora 앱의 “계정 설정”에서 언제든지 구독을 관리할 수 있습니다. iOS App Store 또는 Google Play 스토어를 통한 구매의 경우 해당 스토어의 구독 페이지에서도 관리해야 합니다.";
+
+"faq.q9" = "내 수면 데이터는 안전한가요? Mindora는 내 개인정보를 어떻게 보호하나요?";
+"faq.a9" = "데이터 보안은 무엇보다 중요합니다. 당사는 업계 표준 암호화를 사용하여 전송 중 및 저장 중인 데이터를 보호합니다. 당사가 개인정보를 수집, 사용, 보호하는 방법은 전체 Mindora 개인정보 처리방침에서 확인할 수 있습니다.";
+
+"faq.q10" = "계정과 데이터를 삭제할 수 있나요?";
+"faq.a10" = "네. Mindora 앱의 “계정 설정”에서 “계정 삭제” 옵션을 찾거나 고객 지원에 요청할 수 있습니다. 삭제 후 귀하의 개인 데이터는 당사의 활성 서버에서 제거됩니다.";
+
+"faq.q11" = "Mindora 멤버십은 어디에서 관리하거나 취소할 수 있나요?";
+"faq.a11" = "앱 내 관리: Mindora 앱의 “계정 설정” > “내 구독”에서 다음 갱신일 확인, 결제 수단 변경, 자동 갱신 취소를 언제든지 할 수 있습니다.\n\n앱 스토어 관리: iOS 또는 Android 앱 스토어를 통해 구독한 경우 해당 스토어의 구독 관리 페이지에서도 취소해야 합니다. 취소는 현재 결제 주기가 끝날 때 적용됩니다.";
+
+
+// MARK: - Health Refactor
+"health.segment.day" = "일";
+"health.segment.week" = "주";
+"health.segment.month" = "월";
+"health.sleep.efficiency" = "수면 효율";
+"health.sleep.performance" = "수면 성과";
+"health.sleep.time_in_bed" = "침대에 있던 시간";
+"health.sleep.resting_heart_rate" = "안정 시 심박수";
+"health.sleep.sleep_heart_rate" = "수면 심박수";
+"health.sleep.overnight_vitals" = "야간 생체 신호";
+"health.sleep.respiratory_rate" = "호흡수";
+"health.sleep.body_temperature" = "체온";
+"health.sleep.scenarios" = "수면 장면";
+"health.sleep.onset" = "입면";
+"health.sleep.awake_time" = "각성 시간";
+
+
+// MARK: - Health Month View
+"health.month.trends_title" = "수면 트렌드";
+"health.month.trends_subtitle" = "수면 데이터 분석 기반";
+"health.month.trends_body" = "이번 달, 야간 각성이 거의 없이 일관된 수면량을 유지했습니다.";
+"health.month.trends_desc" = "지난 30일 동안 깊은 수면이 전체 수면의 29.8%를 차지하여 표준 수준을 상회했습니다. \n취침 시간이 평균 32분 앞당겨졌습니다. \n규칙적인 수면 습관을 유지하세요.";
+"health.month.best_title" = "입면 효율";
+"health.month.best_subtitle" = "최상의 수면을 선사하도록 설계됨";
+"health.month.best_desc" = "이번 달 \"세도나 레드 록 평온\"이 가장 자주 사용한 수면 장면이었고 최고의 입면 성과를 보였습니다. \"코코아 아일랜드 달빛 표류\"는 안정적인 수면 유지에서 두각을 나타냈습니다……";
+"health.month.avg_heart_rate" = "평균 심박수";
+"health.month.total_sleep" = "총 수면";
+"health.month.days_tracked" = "측정 일수";
+
+"subscription.view_content_hint" = "구독하고 보기";
+"subscription.go_to_subscribe" = "구독하기";
+
+// MARK: - Explore
+"explore.title" = "탐색";
+"explore.greeting" = "안녕하세요, %@";
+"explore.intro.data" = "안녕하세요, 어젯밤 당신의 몸은 안정적이고 편안하며 회복력이 높은 수면 상태에 들어갔습니다. 입면 리듬부터 밤새 구조까지 여러 핵심 지표가 최근 평균보다 좋았습니다. 이것은 운이 좋았던 밤이 아니라, 당신의 신경계와 수면 구조가 잘 조화를 이룬 밤이었습니다.";
+"explore.section.efficiency" = "입면 효율";
+"explore.status.health_range" = "건강 범위";
+"explore.metric.onset_time" = "입면 시간: %@분";
+"explore.section.structure" = "수면 구조";
+"explore.status.average" = "평균 수준";
+"explore.metric.continuous_sleep" = "연속 수면: %@분";
+"explore.section.fluctuation" = "야간 변동";
+"explore.status.fluctuation_high" = "변동 높음";
+"explore.metric.smart_intervention" = "스마트 개입: %@";
+"explore.section.preference" = "장면 선호";
+"explore.section.advice" = "수면 조언";
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.time" = "- - 분";
+"explore.placeholder.label" = "상태 범위";
+"explore.efficiency.first_sleep" = "입면 시간";
+"explore.efficiency.pre_hr" = "잠들기 전 심박수";
+"explore.efficiency.pre_resp" = "잠들기 전 호흡";
+"explore.structure.rem" = "REM 수면";
+"explore.structure.deep" = "깊은 수면";
+"explore.structure.light" = "얕은 수면";
+"explore.fluctuation.awake_count" = "각성 횟수";
+"explore.fluctuation.awake_duration" = "지속 시간";
+"explore.fluctuation.awake_type" = "유형";
+"explore.fluctuation.hr_range" = "심박수 범위";
+"explore.preference.recent" = "최근 사용";
+"explore.preference.cocos_island.title" = "코코아 아일랜드 달빛 표류";
+"explore.preference.cocos_island.subtitle" = "사운드 프로파일: 바다 / 핑크 노이즈 / 브라운 노이즈";
+"explore.quote.text" = "Mindora는 단지 당신의 수면을 기록하는 것이 아닙니다. 당신의 상태를 이해한 후 더 적합한 방식을 선택하여 당신이 계속 잘 수 있도록 돕습니다.";
+"explore.article.1.title" = "기사 제목";
+"explore.article.1.subtitle" = "기사 요약 기사 요약 기사 요약 기사 요약";
+"explore.article.2.title" = "기사 제목";
+"explore.article.2.subtitle" = "기사 요약 기사 요약 기사 요약 기사 요약";
+"explore.article.3.title" = "기사 제목";
+"explore.article.3.subtitle" = "기사 요약 기사 요약 기사 요약 기사 요약…";
+"explore.article.4.title" = "기사 제목";
+"explore.article.4.subtitle" = "기사 요약 기사 요약 기사 요약 기사 요약";
+
+"explore.mock.efficiency_desc" = "심박수와 호흡 추세가 모두 '안정적'이며, 이는 부교감 신경계가 주도하고 있음을 시사합니다. 몸은 자연스럽게 이완된 상태에 있으며, 잠들기 위해 뇌가 추가로 '감속'할 필요가 없습니다.\n\n취침 30분 전 심박수와 호흡을 비교적 안정적이거나 천천히 감소하는 상태로 유지하는 것은 더 짧은 입면 잠복기와 관련이 있습니다. 이는 수면 의학에서 '수면 준비 완료도'를 판단하는 일반적인 생리 신호 중 하나이기도 합니다.";
+"explore.mock.structure_desc" = "이 데이터는 '구조적 이상'을 나타내지 않습니다. 어젯밤 누락된 수면 단계는 없었지만 주요 수면 구간이 단편화되었습니다. 이는 '깊은 수면과 REM이 압축되는' 잦은 야간 중단의 전형적인 모습입니다.\n\n이는 스트레스가 많은 밤에 가장 흔하게 나타나면서도 회복이 가능한 패턴 중 하나입니다.";
+"explore.mock.fluctuation_desc" = "이러한 신호는 야간 신경계가 외부 자극과 내부 불안 모두에 민감한 고반응 상태였음을 시사합니다. 새벽 03:25, Mindora는 심박수/호흡의 변동을 감지했고, 각성이 생리적 조정 임계값을 넘어 지속되었습니다. 이에 Mindora는 '아말피 코스트 브리즈'—저주파의 리드미컬하고 연속적인 바다 사운드스케이프—를 사용해 15분간의 개입을 시작하여, 신경계가 다시 부교감 우위 상태로 전환되도록 돕고, 깨어난 지 15분 후 다시 잠들 수 있게 했습니다.";
+"explore.mock.preference_desc" = "어젯밤 당신은 “코코아 아일랜드 달빛 표류” 환경에서 잠들었습니다. 이 사운드 필드는 핑크/브라운 노이즈가 어우러진 바다에 감싸인 분위기가 주를 이룹니다.\n\n구조는 저주파의 연속적인 파도 소리가 이끕니다. 전체 리듬은 안정적이며 날카로운 급변이 없어, 적극적으로 주의를 끌지 않으면서도 계속 존재하는 환경입니다.\n\n연구에 따르면 저주파의 연속적인 자연 사운드스케이프는 환경 변화에 대한 경계심을 낮추고 잠들기 전 안전 점검을 줄여줍니다. 파도의 느린 리듬은 호흡과 동기화되어 신경계가 휴식 모드로 전환되도록 돕기도 합니다.";
+"explore.mock.advice_desc" = "며칠간의 데이터를 관찰한 결과, 당신의 전반적인 수면 상태는 꽤 안정적입니다. 야간 변동을 더 줄이고 싶다면 취침 1시간 전 외부 자극을 낮추거나 앞으로 며칠 동안 사운드 재생을 더 일찍 종료해 보세요.\n\n수면은 직선이 아니라, 방해받을 수도 있고 스스로 회복할 수도 있는 시스템입니다. 이러한 변화를 기록하는 것은 당신이 얼마나 잘 잤는지 판단하기 위한 것이 아니라, 가장 적은 노력으로 가장 안정적으로 잘 수 있는 방법을 찾기 위한 것입니다.\n\n어젯밤, 당신의 몸은 바로 그것을 해냈습니다.";
+"explore.mock.intervention" = "장면 개입";
+"explore.mock.awake_type" = "불안형";
+
+// MARK: - Store
+"store.coming_soon" = "스토어 곧 출시";
+"store.banner.title" = "좋아하는\n블렌드 & 콤보를 선택하세요";
+"store.banner.discount_prefix" = "3개 구매 ";
+"store.banner.discount_value" = "9.5";
+"store.banner.discount_suffix" = " 할인";
+"store.banner.learn_more" = "자세히 보기";
+"store.section.member_exclusive" = "회원 전용";
+"store.section.new_arrivals" = "신상품";
+"store.badge.hot" = "인기";
+"store.badge.new" = "신규";
+"store.product.combo_oil" = "에센셜 오일 콤보";
+"store.product.frankincense_oil" = "프랑킨센스 오일";
+"store.product.calming_oil" = "식물성 카밍 오일";
+"store.product.silk_pajama" = "실크 파자마 세트";
+"store.product.gift_set" = "실크 수면 선물...";
+"store.search.placeholder" = "제품 검색";
+"store.search.cancel" = "취소";
+"store.search.history" = "검색 기록";
+
+"auth.session_expired" = "세션이 만료되었습니다. 다시 로그인하세요.";
+
+/* MARK: - Home Popup (activity / ad / survey invite) */
+"popup.badge.survey" = "설문";
+"popup.action.detail" = "자세히 보기";
+"popup.mock.survey.title" = "더 나아지도록 도와주세요";
+"popup.mock.survey.subtitle" = "3분 수면 설문을 완료하면 제출 후 멤버십 포인트를 받을 수 있습니다.";
+
+/* MARK: - Survey */
+"survey.title" = "수면 경험 설문";
+"survey.next" = "다음";
+"survey.submit" = "제출";
+"survey.submit.note" = "제출하면 답변을 제품 경험 개선에 사용하는 데 동의하는 것으로 간주됩니다.";
+"survey.choice.hint" = "느낌에 가장 잘 맞는 답변을 선택하세요";
+"survey.q1.title" = "지난 7일간 전반적인 수면에 얼마나 만족하시나요?";
+"survey.q2.title" = "지난 7일간 Mindora 전반에 얼마나 만족하시나요?";
+"survey.q3.title" = "Mindora 개선을 위한 제안이 있으신가요?";
+"survey.q3.hint" = "제안을 알려주세요";
+"survey.q3.placeholder" = "여기에 입력…";
+"survey.scale.very_satisfied" = "매우 만족";
+"survey.scale.satisfied" = "만족";
+"survey.scale.neutral" = "보통";
+"survey.scale.dissatisfied" = "불만족";
+"survey.scale.very_dissatisfied" = "매우 불만족";
+"survey.validation.choose" = "답변을 선택하세요";
+"survey.validation.input" = "제안을 입력하세요";
+"survey.error.generic" = "오류가 발생했습니다. 다시 시도해 주세요.";
+"survey.already_submitted" = "이미 제출한 설문입니다. 참여해 주셔서 감사합니다";
+"survey.completed" = "완료됨";
+"survey.reward.title" = "설문 보상";
+"survey.reward.desc" = "선물은 영업일 기준 10일 이내에 발송되며 이메일로 알려드립니다.";
+"survey.success.title" = "제출 완료";
+"survey.success.line1" = "솔직한 피드백에 감사드립니다";
+"survey.success.line2" = "선물은 영업일 기준 10일 이내에 발송됩니다";
+"survey.success.line3" = "이메일로 알려드리겠습니다";
+"survey.success.back_home" = "홈으로 돌아가기";
+
+/* MARK: - Notifications: survey invite */
+"notifications.source.survey" = "설문";
+"notifications.source.promo" = "활동";
+"notifications.promo.action" = "자세히 보기";
+"notifications.survey.title" = "더 나아지도록 도와주세요";
+"notifications.survey.valid_until" = "%@까지 유효";
+"notifications.survey.action" = "설문 작성";
+
+/* MARK: - Companion Footprint */
+"footprint.title" = "동행 기록";
+"footprint.explain" = "설명";
+"footprint.stat.companion" = "수면 동행";
+"footprint.stat.app_active" = "App 활성";
+"footprint.stat.continuous" = "연속 사용";
+"footprint.stat.month_total" = "이번 달";
+"footprint.stat.year_total" = "올해";
+"footprint.unit.day" = "일";
+"footprint.milestones.title" = "마일스톤";
+"footprint.milestones.empty" = "아직 마일스톤이 없습니다";
+"footprint.milestone.sleep_plan" = "수면 계획";
+"footprint.milestone.days_completed" = "%d일 수면 목표 · 완료";
+"footprint.legend.app_active" = "App 활성";
+"footprint.legend.companion" = "수면 동행";
+"footprint.legend.plan" = "계획 / 연속";
+"footprint.weekday.sun" = "일";
+"footprint.weekday.mon" = "월";
+"footprint.weekday.tue" = "화";
+"footprint.weekday.wed" = "수";
+"footprint.weekday.thu" = "목";
+"footprint.weekday.fri" = "금";
+"footprint.weekday.sat" = "토";
+"footprint.weekday.full.mon" = "월요일";
+"footprint.weekday.full.tue" = "화요일";
+"footprint.weekday.full.wed" = "수요일";
+"footprint.weekday.full.thu" = "목요일";
+"footprint.weekday.full.fri" = "금요일";
+"footprint.weekday.full.sat" = "토요일";
+"footprint.weekday.full.sun" = "일요일";
+"footprint.month_selector" = "%d년 %d월";
+"footprint.month_label" = "%d월";
+"footprint.anchor_date" = "%d년 %d월 %d일 · %@";
+"footprint.annual.title" = "%d년 동행 기록";
+"footprint.info.title" = "지표 안내";
+"footprint.info.companion.desc" = "기기와 App을 동시에 유효하게 사용한 경우; 같은 날에는 최대 1일로 계산됩니다. 이번 달 누계를 표시합니다.";
+"footprint.info.app_active.desc" = "해당 날짜에 App을 열면 1일로 계산되며, 같은 날 다시 열어도 중복 계산되지 않습니다. 이번 달 누계를 표시합니다.";
+"footprint.info.continuous.desc" = "최초 다운로드 또는 사용 이후, 올해 안에 사용 기록이 발생한 날짜의 누계입니다.";
+"footprint.info.marks.title" = "달력 표시";
+"footprint.picker.title" = "월 선택";
+"footprint.picker.annual" = "전체 연도";
+"footprint.picker.confirm" = "확인";
+
+"notifications.survey.body" = "3분 수면 경험 설문에 참여해 주세요. 제출 후 브랜드 선물을 받으실 수 있습니다.";
+
+/* MARK: - Gift Claim */
+"gift.title" = "선물 받기";
+"gift.confirm" = "확인";
+"gift.physical.desc" = "「%@」을(를) 등록된 주소로 배송해 드립니다:";
+"gift.physical.change_hint" = "주소를 변경하려면 고객센터에 문의해 주세요.";
+"gift.virtual.desc" = "「%@」을(를) 등록된 이메일로 보내드립니다. 변경하려면 아래에 다시 입력해 주세요.";
+"gift.email.placeholder" = "이메일 입력";
+"gift.validation.email" = "유효한 이메일을 입력해 주세요";
+"gift.no_address" = "저장된 주소가 없습니다. 프로필에서 추가해 주세요.";
+"gift.no_address.title" = "주소를 가져오지 못했습니다";
+"gift.no_address.hint" = "배송지 주소를 입력해 주세요";
+"gift.fill_address" = "주소 입력";
+"gift.address.title" = "주소 입력";
+"survey.reward.demo_gift" = "브랜드 수면 선물";
+
+"device_scan.stale_pairing.title" = "설정에서 기기 연결을 해제해 주세요";
+"device_scan.stale_pairing.message" = "이 iPhone에 저장된 블루투스 페어링 정보가 만료되어 ‘%@’에 연결할 수 없습니다. ‘설정 → Bluetooth’에서 해당 기기 오른쪽의 ⓘ를 누른 뒤 ‘이 기기 확인 해제’를 선택하고 다시 시도해 주세요.";
+"settings.follow_system" = "시스템 설정 따르기";
+
+// MARK: - Sleep Plan（睡眠计划 Tab，2026-08-12）
+"tab.plan" = "플랜";
+"common.got_it" = "확인했습니다";
+"subscription.section.title.premium" = "프리미엄 회원";
+"subscription.action.upgrade" = "업그레이드";
+"subscription.desc.premium.monthly.prefix" = "만료 하루 전에 ";
+"subscription.desc.premium.monthly.suffix" = "/월로 갱신됩니다. 결제 전 언제든지 취소할 수 있습니다.";
+"subscription.desc.premium.yearly" = "가입일로부터 1년간 프리미엄 혜택을 이용할 수 있습니다. 다음 갱신 전 언제든지 취소할 수 있습니다.";
+"renewal.tier" = "멤버십 등급";
+"renewal.tier.basic" = "베이직 회원";
+"renewal.tier.premium" = "프리미엄 회원";
+"renewal.tier.none" = "없음";
+"renewal.environment" = "환경";
+"renewal.environment.sandbox" = "테스트 환경(결제 없음)";
+"sleepplan.title" = "수면 플랜";
+"sleepplan.intro" = "수면 목표를 설정하면 앱과 기기가 제때 알려주고 함께 실행을 도와줍니다. 수면 개선을 실천 가능한 계획으로 만들어 보세요.";
+"sleepplan.section.training" = "수면 트레이닝";
+"sleepplan.section.training.subtitle" = "과학적 이론에 기반한 수면 조절 플랜입니다. 하나를 선택해 빠르게 시작해보세요.";
+"sleepplan.section.my_plans" = "내 수면 플랜";
+"sleepplan.my_plans.empty" = "아직 수면 플랜이 없습니다";
+"sleepplan.my_plans.quota" = "%@ · %d/%d";
+"sleepplan.kind.custom.default_name" = "새 수면 플랜01";
+"sleepplan.kind.habit_formation.name" = "수면 습관 만들기";
+"sleepplan.kind.habit_formation.summary" = "21일 습관 트레이닝";
+"sleepplan.kind.habit_formation.description" = "21일 동안 안정적이고 지속 가능한 수면 습관을 만들어 보세요. 규칙적인 생활은 수면 리듬을 안정시키고 수면의 질을 높여줍니다.";
+"sleepplan.kind.jet_lag.name" = "시차 교정";
+"sleepplan.kind.jet_lag.summary" = "7일 수면 조정";
+"sleepplan.kind.jet_lag.description" = "7일에 걸쳐 취침 및 기상 시간을 점진적으로 조정하여 새로운 시간대에 빠르게 적응합니다.";
+"sleepplan.kind.anxiety_relief.name" = "불안 완화";
+"sleepplan.kind.anxiety_relief.summary" = "14일 취침 전 이완";
+"sleepplan.kind.anxiety_relief.description" = "14일간의 취침 전 이완 훈련으로 잠들기 전 불안감을 완화하고 더 편안하게 잠들 수 있도록 돕습니다.";
+"sleepplan.status.active" = "활성";
+"sleepplan.status.not_enabled" = "비활성";
+"sleepplan.status.completed" = "완료됨";
+"sleepplan.status.stopped" = "중지됨";
+"sleepplan.list.target_sleep_time" = "목표 취침 %@";
+"sleepplan.tier.basic" = "베이직 회원";
+"sleepplan.tier.premium" = "프리미엄 회원";
+"sleepplan.action.create_plan" = "새 플랜 +";
+"sleepplan.action.edit" = "편집";
+"sleepplan.action.plan_detail" = "플랜 상세 →";
+"sleepplan.action.save" = "설정 저장";
+"sleepplan.action.discard" = "변경 취소";
+"sleepplan.action.keep_editing" = "계속 편집";
+"sleepplan.action.tap_to_set" = "탭하여 설정";
+"sleepplan.action.upgrade_premium" = "프리미엄으로 업그레이드";
+"sleepplan.alert.locked_tonight.title" = "오늘 밤 플랜이 이미 시작되었습니다";
+"sleepplan.alert.locked_tonight.message" = "지금은 끌 수 없습니다. 내일 다시 시도해주세요.";
+"sleepplan.alert.plan_full.title" = "수면 플랜 슬롯이 가득 찼습니다";
+"sleepplan.alert.plan_full.message" = "저장된 수면 계획 수가 한도에 도달했습니다. 기존 계획을 삭제한 후 다시 시도해주세요.";
+"sleepplan.alert.plan_full.basic_message" = "베이직 회원은 수면 계획을 최대 1개만 저장하거나 활성화할 수 있습니다. 현재 계획을 삭제한 후 다시 시도해주세요.";
+"sleepplan.alert.premium_required.title" = "프리미엄 회원 기능";
+"sleepplan.alert.premium_required.message" = "프리미엄 회원으로 업그레이드하면 공식 수면 훈련의 입면 알림 시간과 알람 소리를 조정할 수 있습니다.";
+"sleepplan.alert.custom_plan_required.message" = "베이직 회원은 수면 계획을 최대 1개만 저장하거나 활성화할 수 있습니다. 프리미엄 회원으로 업그레이드하면 맞춤 계획을 만들고 목록의 모든 계획을 복원할 수 있습니다.";
+"sleepplan.alert.switch_plan.title" = "수면 플랜을 전환하시겠습니까?";
+"sleepplan.alert.switch_plan.message" = "'%@' 플랜을 중지하고 이 플랜을 활성화합니다. 계속하시겠습니까?";
+"sleepplan.alert.exit_new.title" = "새 플랜 만들기를 종료하시겠습니까?";
+"sleepplan.alert.exit_new.message" = "현재 계획이 아직 저장되지 않았습니다. 종료하면 설정한 내용이 유지되지 않습니다.";
+"sleepplan.alert.unsaved_edit.title" = "저장되지 않은 변경 사항";
+"sleepplan.alert.unsaved_edit.message" = "돌아가면 이 변경 사항은 저장되지 않습니다.";
+"sleepplan.editor.name_hint" = "플랜 이름을 탭하여 변경하면 관리하기 편리합니다.";
+"sleepplan.editor.sleep_goal" = "수면 목표";
+"sleepplan.editor.sleep_goal_hint" = "바의 끝을 드래그하여 취침/기상 시간을 설정하거나, 시간 숫자를 탭하여 정확히 편집하세요.";
+"sleepplan.editor.sleep_time" = "취침 시간";
+"sleepplan.editor.wake_time" = "기상 시간";
+"sleepplan.editor.options" = "플랜 옵션";
+"sleepplan.editor.cycle" = "실행 주기";
+"sleepplan.editor.cycle.hint" = "트레이닝 주기는 시스템에서 고정되며, 완료 후 다시 시작할 수 있습니다.";
+"sleepplan.editor.reminder" = "취침 알림";
+"sleepplan.editor.reminder.hint" = "취침 준비 시간을 미리 알려주고, 무드 조명과 디퓨저를 함께 켜서 수면 분위기를 만들어줍니다.";
+"sleepplan.editor.sleep_aid" = "수면 보조";
+"sleepplan.editor.sleep_aid.hint" = "수면 데이터를 기반으로 매일 밤 적합한 장면을 스마트하게 매칭합니다.";
+"sleepplan.editor.alarm" = "알람 소리";
+"sleepplan.editor.alarm.hint" = "기상 시 재생되는 알람 소리로 더 자연스럽게 깨어날 수 있도록 도와줍니다.";
+"sleepplan.editor.save_hint" = "모든 필수 항목을 완료한 후 저장하세요. 저장하면 목록에 추가되지만 즉시 활성화되지는 않습니다.";
+"sleepplan.editor.save_hint.edit" = "저장한 계획은 목록에 꺼짐 상태로 표시되며, 현재 실행 중인 계획에는 영향을 주지 않습니다.";
+"sleepplan.editor.save_hint.official" = "저장하면 계획이 ‘내 수면 계획’ 목록에 표시되지만 바로 시작되지는 않습니다.\n계획 홈으로 돌아가 직접 켜 주세요.";
+"sleepplan.sheet.reminder.title" = "취침 알림";
+"sleepplan.sheet.reminder.minutes_before" = "%d분 전";
+"sleepplan.sheet.alarm_sound.title" = "알람 소리";
+"sleepplan.sheet.sleep_aid.title" = "수면 보조";
+"sleepplan.sheet.sleep_aid.readonly_title" = "스마트 수면 보조";
+"sleepplan.sheet.sleep_aid.readonly_message" = "수면 과학과 회원님의 수면 데이터를 기반으로 AI가 매일 밤 적합한 수면 보조 장면을 지능적으로 매칭합니다. 이 방안은 시스템이 구성하며 수동으로 수정할 수 없습니다.";
+"sleepplan.sheet.cycle.title" = "실행 주기";
+"sleepplan.sheet.cycle.instruction" = "플랜을 실행할 요일을 선택하세요";
+"sleepplan.sheet.cycle.repeat_weekly" = "매주 반복";
+"sleepplan.sheet.cycle.repeat_hint" = "꺼져 있으면 선택한 요일을 한 번만 실행합니다.";
+"sleepplan.sheet.cycle.warning" = "수면 계획의 연속성을 위해 최소 3일 연속으로 선택해주세요.";
+"sleepplan.sheet.cycle.hint" = "최소 3일을 연속으로 선택하세요. 간격을 둘 수 없습니다. 토요일, 일요일, 월요일은 연속으로 간주됩니다. 활성화하면 매주 선택한 요일에만 계획이 실행됩니다.";
+"sleepplan.sheet.cycle.readonly_message" = "이 트레이닝 주기는 %d일로 고정되어 매일 실행됩니다. 완료 후 다시 시작할 수 있습니다.";
+"sleepplan.sheet.goal.title" = "수면 목표 설정";
+"sleepplan.sheet.goal.duration" = "목표 수면 시간";
+"sleepplan.sheet.goal.sleep_time" = "취침 시간";
+"sleepplan.sheet.goal.wake_time" = "기상 시간";
+"sleepplan.sheet.goal.too_short" = "수면 시간이 너무 짧습니다. 최소 1시간으로 설정하세요.";
+"sleepplan.sheet.rename.title" = "플랜 이름 변경";
+"sleepplan.sheet.rename.hint" = "최대 10자";
+"sleepplan.cycle.fixed_daily" = "%d일 · 매일";
+"sleepplan.cycle.repeats_weekly" = "매주 반복";
+"sleepplan.cycle.once" = "1회";
+"sleepplan.duration.hours" = "%d시간";
+"sleepplan.duration.hours_half" = "%d.5시간";
+"sleepplan.duration.hours_minutes" = "%d시간 %d분";
+"sleepplan.unit.hour" = "시간";
+"sleepplan.unit.minute" = "분";
+"sleepplan.duration.hours_short" = "%d시간";
+"sleepplan.reminder.minutes_before_short" = "%d분 전";
+"sleepplan.reminder.off" = "꺼짐";
+"sleepplan.reminder.notification_title" = "잠자리에 들 시간입니다";
+"sleepplan.reminder.notification_body" = "'%@' 플랜의 취침 시간이 다가오고 있습니다. 편안하게 잠들 준비를 시작하세요.";
+"sleepplan.sound.temple_bell" = "사원 아침 종";
+"sleepplan.sound.sunlit_coast" = "햇살 해변";
+"sleepplan.sound.rainforest_mist" = "열대우림 아침 안개";
+"sleepplan.sleep_aid.smart.name" = "스마트 추천";
+"sleepplan.sleep_aid.smart.desc" = "수면 데이터를 기반으로 매일 밤 적합한 장면을 스마트하게 매칭합니다.";
+"sleepplan.sleep_aid.preference.name" = "선호 기반 추천";
+"sleepplan.sleep_aid.preference.desc" = "이전 선택 성향을 기반으로 장면을 추천합니다.";
+"sleepplan.sleep_aid.trending.name" = "인기 추천";
+"sleepplan.sleep_aid.trending.desc" = "대다수 사용자의 사용 및 피드백을 기반으로 장면을 추천합니다.";
+"weekday.mon" = "월";
+/* List separator used to join items such as weekday names. */
+"common.list_separator" = ", ";
+
+"weekday.short.1" = "월";
+"weekday.tue" = "화";
+"weekday.short.2" = "화";
+"weekday.wed" = "수";
+"weekday.short.3" = "수";
+"weekday.thu" = "목";
+"weekday.short.4" = "목";
+"weekday.fri" = "금";
+"weekday.short.5" = "금";
+"weekday.sat" = "토";
+"weekday.short.6" = "토";
+"weekday.sun" = "일";
+"weekday.short.7" = "일";
+"sleepplan.action.confirm_exit" = "종료 확인";
+
+/* 健康周/月视图：服务端分析缺失时的兜底文案（原为硬编码英文） */
+"health.chart.tooltip.duration" = "%1$@시간 %2$@분";
+
+/* 会员订阅卡（20260818 设计）*/
+"subscription.plan.subheader" = "멤버십 등급과 결제 주기를 선택하세요";
+"subscription.plan.tier.basic" = "일반 회원";
+"subscription.plan.tier.premium" = "AI 프리미엄";
+"subscription.plan.monthly.note" = "매월 갱신, 언제든 해지 가능";
+"subscription.plan.yearly.note" = "매년 자동 결제";
+"subscription.plan.monthly.tag" = "유연한 구독";
+"subscription.plan.yearly.tag" = "16~17% 절약";
+"subscription.plan.cta.basic" = "Basic 구독 · %@";
+"subscription.plan.cta.premium" = "AI Premium 구독 · %@";
+"subscription.plan.current" = "현재 플랜";
+"subscription.plan.footnote" = "자동 갱신되며 언제든 해지할 수 있습니다. 최종 금액은 App Store 기준입니다.";
+"subscription.benefit.basic.1.title" = "전체 수면 데이터";
+"subscription.benefit.basic.1.desc" = "수면 기록과 점수를 확인하고 수면 변화 추이를 추적합니다";
+"subscription.benefit.basic.2.title" = "개인 수면 모델";
+"subscription.benefit.basic.2.desc" = "장기 수면 데이터를 바탕으로 계속 학습합니다";
+"subscription.benefit.basic.3.title" = "AI 동적 모니터링";
+"subscription.benefit.basic.3.desc" = "수면 상태에 맞춰 조정하고 실행 가능한 개선 제안을 제공합니다";
+"subscription.benefit.basic.4.title" = "수면 계획";
+"subscription.benefit.basic.4.desc" = "1개의 계획을 저장하고 실행할 수 있습니다";
+"subscription.benefit.premium.1.title" = "Basic의 모든 혜택 포함";
+"subscription.benefit.premium.1.desc" = "전체 데이터, 추세 분석, 개인 수면 모델";
+"subscription.benefit.premium.2.title" = "AI 수면 루틴 생성";
+"subscription.benefit.premium.2.desc" = "그날의 상태에 맞춰 맞춤형 방안을 생성합니다";
+"subscription.benefit.premium.3.title" = "심층 수면 인사이트";
+"subscription.benefit.premium.3.desc" = "장기적인 수면 문제와 핵심 원인을 찾아냅니다";
+"subscription.benefit.premium.4.title" = "수면 계획";
+"subscription.benefit.premium.4.desc" = "최대 5개의 계획을 저장하고 실행할 수 있습니다";
+
+/* 订阅卡：已订阅态与套餐切换 */
+"subscription.plan.cta.switch" = "%@(으)로 변경";
+"subscription.plan.cta.upgrade" = "AI Premium으로 업그레이드 · %@";
+"subscription.plan.cta.downgrade" = "일반 회원으로 변경 · %@";
+"subscription.plan.cta.scheduled" = "변경 예약됨";
+"subscription.plan.status.current" = "현재: %1$@ · %2$@";
+"subscription.plan.period.redeemed" = "교환 코드";
+"subscription.plan.status.renew" = "%@ 갱신";
+"subscription.plan.status.expire" = "%@ 종료";
+"subscription.plan.status.pending" = "%1$@(으)로 변경됨, %2$@부터 적용";
+"subscription.plan.manage" = "구독 관리";
+
+/* 资料卡会员状态行（带等级）*/
+"subscription.status.active" = "이용 중 · %1$@ · %2$@";
+"subscription.status.trial" = "체험 중 · %@";
+"subscription.status.granted" = "이용 중 · %@";
+
+/* 订阅日期行标题：随续订状态变 */
+"subscription.date.next_billing" = "다음 결제일";
+"subscription.date.expiry" = "만료일";
+"subscription.date.grace" = "결제 정보 업데이트 필요";
+"subscription.date.retry" = "결제 재시도 중";
+"subscription.date.expired" = "만료됨";
+
+/* 设计校对表（2026-10）新增：英文按设计稿，其他语言沿用原显示 */
+"sleepplan.editor.options.custom" = "플랜 옵션";
+"sleepplan.editor.cycle.custom" = "실행 주기";
+"sleepplan.editor.cycle.hint.custom" = "트레이닝 주기는 시스템에서 고정되며, 완료 후 다시 시작할 수 있습니다.";
+"sleepplan.sheet.cycle.readonly_title" = "실행 주기";
+"subscription.prompt.title" = "아직 회원이 아닙니다";
+"explore.gate.title" = "아직 회원이 아닙니다";
+"explore.gate.hint" = "구독하고 보기";
+"explore.gate.action" = "구독하기";
+"survey.progress" = "%1$d / %2$d";
+"unit.duration.hr_min" = "%1$dh %2$dmin";
+"unit.duration.hr" = "%dh";
+"unit.duration.min" = "%dmin";
+"unit.duration.under_1_min" = "<1min";
+"unit.bpm" = "%dbpm";
+"unit.bpm_range" = "%1$d-%2$dbpm";
+"unit.breaths_per_min" = "%d 회/분";
+"unit.days_tracked" = "%1$d/%2$ddays";
+"unit.duration.compact.hr_min" = "%1$dh%2$dmin";
+"unit.duration.compact.hr" = "%dh";
+"health.sleep.stage_card.rem" = "REM";
+"health.sleep.stage_card.core" = "코어";
+"health.sleep.stage_card.deep" = "깊은 수면";
+"sleepplan.cycle.range" = "%1$@~%2$@";

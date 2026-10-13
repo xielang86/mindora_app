@@ -30,6 +30,15 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
         return iv
     }()
     
+    /// 正在跑的恢复购买任务，用户点取消时用它中止等待
+    private var restoreTask: Task<Void, Never>?
+
+    /// 上一次 updateUI 时的订阅状态快照，用来挡掉状态没变的重复重建（见 subscriptionChanged）
+    private var renderedSignature: String?
+
+    /// 订阅卡实例。全程复用，不随 updateUI 重建 —— 详见 updateUI 里的说明。
+    private var planCard: SubscriptionPlanCardView?
+
     // Navigation Bar
     private let navBar: UIView = {
         let view = UIView()
@@ -75,11 +84,15 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // 进订阅页就把服务端会员状态刷一遍（1 分钟内不重复）：这页最讲究准，回前台那 10 分钟冷却太长，
+        // 订阅刚到期 / 服务端刚续费时用户进来看到的还是上一份快照。
+        MembershipStatusService.shared.refresh(reason: "subscription-page", minInterval: 60)
         setupBaseUI()
         updateUI()
         
         NotificationCenter.default.addObserver(self, selector: #selector(subscriptionChanged), name: NSNotification.Name("SubscriptionStatusChanged"), object: nil)
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(purchaseFailed(_:)), name: NSNotification.Name("SubscriptionPurchaseFailed"), object: nil)
+
         Task {
             await SubscriptionManager.shared.loadProducts()
         }
@@ -91,7 +104,29 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
     }
     
     @objc private func subscriptionChanged() {
+        // "SubscriptionStatusChanged" 被当成通用刷新广播用，一次进页面就会来好几发（loadProducts
+        // 拿到价格发一次、权益解析完再发一次、回前台还发）。updateUI 是把整个 mainStack 拆了重建，
+        // 每发一次都会把订阅卡换成新的一张 —— 状态没变也重建，就是白闪一次，还会把用户已经手动
+        // 切到的等级/周期打回默认。这里按「页面真正依赖的那几项」比对，没变就不重建。
+        let signature = currentStateSignature()
+        guard signature != renderedSignature else { return }
         updateUI()
+    }
+
+    /// updateUI 渲染结果所依赖的全部订阅状态。任何一项变了才需要重建页面。
+    private func currentStateSignature() -> String {
+        let m = SubscriptionManager.shared
+        return [
+            String(describing: m.paidMembershipTier),
+            String(describing: m.membershipTier),
+            String(m.isSubscribed),
+            String(m.hasResolvedStatus),
+            String(describing: m.currentPlan),
+            m.activeProductID ?? "-",
+            m.pendingRenewalProductID ?? "-",
+            String(describing: m.renewalState),
+            String(m.products.count)
+        ].joined(separator: "|")
     }
     
     // MARK: - UI Setup
@@ -160,24 +195,63 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
     }
     
     private func updateUI() {
+        renderedSignature = currentStateSignature()
         // Clear stack
         mainStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         let manager = SubscriptionManager.shared
         
         // 1. Profile / Header Info
-        mainStack.addArrangedSubview(createProfileSection(isSubscribed: manager.isSubscribed))
-        
-        // 2. Subscription Options / My Subscription
-        if manager.isSubscribed {
-            setupSubscribedContent()
+        let profile = createProfileSection(isSubscribed: manager.isSubscribed)
+        mainStack.addArrangedSubview(profile)
+        mainStack.setCustomSpacing(36, after: profile)   // 设计稿 72px
+
+        // 2. 会员订阅卡（等级分段器 + 周期卡 + 权益 + 订阅按钮，20260818 设计）
+        //
+        // 三档都要展示这张卡，包括已经买了最高档的高级会员——早先的做法是高级会员直接不渲染，
+        // 结果付了最贵的钱的人反而看不到自己买了什么、也看不到哪天续费，页面上一个可点的
+        // 订阅操作都没有。现在改成卡内切「当前套餐」态：权益照常显示，按钮位换成续费信息 +
+        // 管理订阅，另一档仍可点（升级/降级/换时长）。
+        //
+        // 已订阅普通会员：卡内默认停在「AI 高级会员」页，**必须留出升级入口**——否则普通会员
+        //   在 App 内根本没有升到高级的路径（曾经就是这么漏的）。
+        // ★ 这里一律用 paidMembershipTier（不含体验期），不能用 isSubscribed / membershipTier：
+        //   体验期内那两个值分别是 true / .premium，会让「注册即送 7 天」的用户看不到任何购买入口，
+        //   7 天里想付费都没地方付。
+        let header = createPlanSectionHeader()
+        mainStack.addArrangedSubview(header)
+        mainStack.setCustomSpacing(19, after: header)   // 设计稿 38px
+        //
+        // 初始默认停在哪一档，用的是「已确认 → 实时值，未确认 → 上次已知值」：StoreKit 权益解析
+        // 完成前 purchasedProductIDs 还是空的，paidMembershipTier 恒为 .free，直接拿它摆默认会让
+        // 已订阅用户第一次进页面时先看到「普通会员」、解析完成刷新后再跳到「AI 高级会员」——
+        // 用户报的「第一次进会自己跳一下、第二次不跳」就是这个（第二次内存里已有解析结果）。
+        // ★ 订阅卡只建一次，之后一律复用同一个实例（updateUI 会把整个 mainStack 拆了重建，
+        //   每次都新建一张卡的话，卡上选中的档位就会按「当时的订阅状态」重摆一遍 —— 页面已经
+        //   在屏幕上了还重摆，用户看到的就是分段器自己跳一下）。订阅状态是分好几路异步到的
+        //   （StoreKit 权益解析、服务端资料里的兑换/赠送会员、体验期），每到一路都广播一次刷新，
+        //   所以这里必须复用：丸子只能由用户的手指挪。
+        let card: SubscriptionPlanCardView
+        if let existing = planCard {
+            existing.update(paidTier: manager.paidMembershipTier)
+            card = existing
         } else {
-            setupUnsubscribedContent()
+            let resolved = manager.hasResolvedStatus
+            let initialTier = resolved ? manager.paidMembershipTier : manager.lastKnownPaidTier
+            let initialYearly = resolved ? (manager.currentPlan == .yearly) : manager.lastKnownYearly
+            card = SubscriptionPlanCardView(paidTier: manager.paidMembershipTier,
+                                            initialTier: initialTier,
+                                            initialYearly: initialYearly) { tier, period in
+                SubscriptionManager.shared.purchase(type: period, tier: tier)
+            }
+            planCard = card
         }
-        
-        // 3. Features
-        mainStack.addArrangedSubview(createFeaturesSection())
-        
+        mainStack.addArrangedSubview(card)
+        mainStack.setCustomSpacing(30, after: card) // 设计稿 60px
+
+        // 3. 礼品卡和兑换码入口
+        mainStack.addArrangedSubview(createGiftCardSection())
+
         // 4. Footer Links
         mainStack.addArrangedSubview(createFooterSection())
         
@@ -196,10 +270,18 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
     private func createProfileSection(isSubscribed: Bool) -> UIView {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
-        
+        // The banner artwork is designed at a phone-card aspect ratio; this container's
+        // width tracks the full available width (much wider on iPad) while its height stays
+        // text-content-driven, so a plain .scaleToFill would stretch the artwork out of
+        // proportion on wide screens. Round the container via its own layer instead of
+        // relying on corners baked into the image, then let the image crop-to-fill.
+        container.layer.cornerRadius = 18   // 设计稿 36px
+        container.clipsToBounds = true
+
         let bgImageView = UIImageView()
         bgImageView.translatesAutoresizingMaskIntoConstraints = false
-        bgImageView.contentMode = .scaleToFill // Stretch to fill container
+        bgImageView.contentMode = .scaleAspectFill
+        bgImageView.clipsToBounds = true
         container.addSubview(bgImageView)
         
         let contentStack = UIStackView()
@@ -222,7 +304,7 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
             contentStack.addArrangedSubview(titleLabel)
             contentStack.setCustomSpacing(20, after: titleLabel) // spacing 52px approx 26pt
             
-            // 2. TIDE Days Container (sub_pro_bg2)
+            // 2. Mindora Days Container (sub_pro_bg2)
             let daysContainer = UIView()
             daysContainer.translatesAutoresizingMaskIntoConstraints = false
             
@@ -279,25 +361,20 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
             infoRow.spacing = 20
             infoRow.translatesAutoresizingMaskIntoConstraints = false
             
-            let planName = SubscriptionManager.shared.currentPlan == .monthly ? 
-                L("subscription.plan_name.monthly") : 
-                L("subscription.plan_name.yearly")
-            
             let statusLabel = UILabel()
-            statusLabel.text = L("subscription.active.plan_prefix") + planName + L("subscription.active.plan_suffix")
+            statusLabel.text = Self.membershipStatusText()
             statusLabel.font = UIFont(name: "PingFangSC-Regular", size: 11) // 22px -> 11pt
             statusLabel.textColor = .white
+            // 加了等级之后这一行会明显变长（德/法尤其），和右边的到期日挤在一行里，
+            // 允许小幅缩字号，别让任何一边被截成「…」。
+            statusLabel.adjustsFontSizeToFitWidth = true
+            statusLabel.minimumScaleFactor = 0.75
             
-            let date = SubscriptionManager.shared.expiryDate
-            let formatter = DateFormatter()
-            // Use current locale instead of fixed en_US to support Chinese format etc.
-            formatter.locale = Locale.current 
-            formatter.dateStyle = .medium
-            formatter.timeStyle = .none
-            let dateStr = formatter.string(from: date)
-            
+            // 「标题 + 日期」统一走 SubscriptionManager.expiryStatusText()：标题随续订状态变，
+            // 全 App 只用「下次扣费日 / 到期日」两个词（原来这里是「有效期至」、套餐卡是
+            // 「续费/到期」、续订管理页是「续期时间」，同一个事实三种说法）。
             let expiryLabel = UILabel()
-            expiryLabel.text = L("subscription.expires_prefix") + dateStr
+            expiryLabel.text = SubscriptionManager.shared.expiryStatusText()
             expiryLabel.font = UIFont(name: "PingFangSC-Regular", size: 11)
             expiryLabel.textColor = .white
             
@@ -315,20 +392,39 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
             // Centered Title and Paragraph
             
             contentStack.addArrangedSubview(titleLabel)
-            contentStack.setCustomSpacing(20, after: titleLabel) // margin-top 44px -> 22pt
-            
+            contentStack.setCustomSpacing(27, after: titleLabel) // 设计稿 54px
+
             let subtitleLabel = UILabel()
             subtitleLabel.numberOfLines = 0
             subtitleLabel.textAlignment = .center
             // Use attributed string for "You are not a member\nSubscribe..."
             let text = L("subscription.not_member") + "\n" + L("subscription.not_member_desc")
-            subtitleLabel.text = text
             subtitleLabel.font = UIFont(name: "PingFangSC-Light", size: 12) // 24px -> 12pt
             subtitleLabel.textColor = .white
-            
+            // 行高 38px -> 19pt：两行之间明显比默认松，设计稿的卡片高度是按这个撑出来的。
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.alignment = .center
+            paragraph.minimumLineHeight = 19
+            paragraph.maximumLineHeight = 19
+            subtitleLabel.attributedText = NSAttributedString(
+                string: text,
+                attributes: [.paragraphStyle: paragraph])
+
             contentStack.addArrangedSubview(subtitleLabel)
+            // 左右各留出麦穗的位置，长语言（德/法）折行也不会压到装饰上。
+            subtitleLabel.widthAnchor.constraint(lessThanOrEqualTo: contentStack.widthAnchor, constant: -80).isActive = true
         }
         
+        // 未订阅态的麦穗是整张背景图的一部分，卡片高度必须锁在设计稿的 335×150，
+        // 否则高度被文字撑出来后 scaleAspectFill 会把两侧的穗子裁掉半截。
+        let bottomConstraint = contentStack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -25)
+        if !isSubscribed {
+            bottomConstraint.priority = .defaultLow
+            container.heightAnchor.constraint(
+                equalTo: container.widthAnchor,
+                multiplier: 150.0 / 335.0).isActive = true
+        }
+
         NSLayoutConstraint.activate([
             bgImageView.topAnchor.constraint(equalTo: container.topAnchor),
             bgImageView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
@@ -336,323 +432,144 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
             bgImageView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
             
             contentStack.topAnchor.constraint(equalTo: container.topAnchor, constant: 20),
-            contentStack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -25),
+            bottomConstraint,
             contentStack.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             contentStack.widthAnchor.constraint(equalTo: container.widthAnchor)
         ])
-        
+
+        // 右上角的进入箭头：卡片整块可点，但没有任何视觉提示时用户不知道能点，
+        // 设计稿补了这个箭头。它只是标识，点击仍走整卡的手势。
+        let enterArrow = UIImageView(image: UIImage(named: "sub_card_enter"))
+        enterArrow.translatesAutoresizingMaskIntoConstraints = false
+        enterArrow.contentMode = .scaleAspectFit
+        container.addSubview(enterArrow)
+        NSLayoutConstraint.activate([
+            enterArrow.widthAnchor.constraint(equalToConstant: 7),   // 设计稿 13px
+            enterArrow.heightAnchor.constraint(equalToConstant: 13), // 设计稿 25px
+            enterArrow.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -20), // 设计稿 40px
+            enterArrow.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor)
+        ])
+
+        // 点击顶部会员卡 → 进入「陪伴足迹」（订阅与否都可进入，无数据时展示空态）。
+        // 系统订阅管理仍可从页脚「续费管理」进入。
+        container.isUserInteractionEnabled = true
+        container.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleFootprintTap)))
+
         return container
     }
-    
-    private func setupUnsubscribedContent() {
-        // Title
-        let sectionTitle = UILabel()
-        sectionTitle.text = L("subscription.section.title")
-        sectionTitle.font = UIFont(name: "PingFangSC-Semibold", size: 16)
-        sectionTitle.textColor = .white
-        mainStack.addArrangedSubview(sectionTitle)
-        
-        // Helper to get price string
-        func getPrice(for id: String, defaultPrice: String) -> String {
-            if let product = SubscriptionManager.shared.products.first(where: { $0.id == id }) {
-                return product.displayPrice
-            }
-            return defaultPrice
-        }
-        
-        let monthlyPrice = getPrice(for: Constants.Subscription.monthlyProductID, defaultPrice: Constants.Subscription.monthlyPrice)
-        let yearlyPrice = getPrice(for: Constants.Subscription.yearlyProductID, defaultPrice: Constants.Subscription.yearlyPrice)
-        
-        // Monthly Item
-        let monthly = createProductView(
-            title: L("subscription.monthly"),
-            price: monthlyPrice + L("subscription.price.monthly"),
-            desc: L("subscription.desc.monthly.prefix") + monthlyPrice + L("subscription.desc.monthly.suffix"),
-            actionTitle: L("subscription.action.subscribe"),
-            isActionDestructive: false) {
-                SubscriptionManager.shared.purchase(type: .monthly)
-            }
-        mainStack.addArrangedSubview(monthly)
-        
-        // Yearly Item
-        let yearly = createProductView(
-            title: L("subscription.yearly"),
-            price: yearlyPrice + L("subscription.price.yearly"),
-            desc: L("subscription.desc.yearly"),
-            actionTitle: L("subscription.action.subscribe"),
-            isActionDestructive: false) {
-                SubscriptionManager.shared.purchase(type: .yearly)
-            }
-        mainStack.addArrangedSubview(yearly)
-    }
-    
-    private func setupSubscribedContent() {
-        let sectionTitle = UILabel()
-        sectionTitle.text = L("subscription.my.title")
-        sectionTitle.font = UIFont(name: "PingFangSC-Semibold", size: 16)
-        sectionTitle.textColor = .white
-        mainStack.addArrangedSubview(sectionTitle)
-        
-        let currentPlan = SubscriptionManager.shared.currentPlan
-        
-        // Helper to get price string
-        func getPrice(for id: String, defaultPrice: String) -> String {
-            if let product = SubscriptionManager.shared.products.first(where: { $0.id == id }) {
-                return product.displayPrice
-            }
-            return defaultPrice
-        }
-        
-        let monthlyPrice = getPrice(for: Constants.Subscription.monthlyProductID, defaultPrice: Constants.Subscription.monthlyPrice)
-        let yearlyPrice = getPrice(for: Constants.Subscription.yearlyProductID, defaultPrice: Constants.Subscription.yearlyPrice)
-        
-        // Active Plan
-        if currentPlan == .monthly {
-             // Expiry info for active
-             let date = Calendar.current.date(byAdding: .day, value: -1, to: SubscriptionManager.shared.expiryDate) ?? Date()
-             let formatter = DateFormatter()
-             formatter.locale = Locale.current 
-             formatter.dateStyle = .medium
-             formatter.timeStyle = .none
-             let dateStr = formatter.string(from: date)
-             
-             let isAutoRenew = SubscriptionManager.shared.willAutoRenew
-             let infoText: String
-             let actionTitle: String
-             
-             if isAutoRenew {
-                 infoText = L("subscription.auto_renew") + dateStr
-                 actionTitle = L("subscription.action.cancel")
-             } else {
-                 infoText = L("subscription.expires_prefix") + dateStr
-                 actionTitle = L("subscription.action.subscribe")
-             }
 
-             let monthly = createProductView(
-                title: L("subscription.monthly"),
-                price: monthlyPrice + L("subscription.price.monthly"),
-                desc: isAutoRenew ? (L("subscription.desc.monthly.prefix") + monthlyPrice + L("subscription.desc.monthly.suffix")) : L("subscription.desc.cancelled"),
-                actionTitle: actionTitle,
-                isActionDestructive: isAutoRenew,
-                extraInfo: infoText) {
-                    if isAutoRenew {
-                        SubscriptionManager.shared.cancelSubscription()
-                    } else {
-                        SubscriptionManager.shared.purchase(type: .monthly)
-                    }
-                }
-            mainStack.addArrangedSubview(monthly)
-        }
-        
-        // Show Yearly upgrade option if monthly? Or show both?
-        // Design 2 shows Monthly (Active) then Yearly (Option).
-        let yearly = createProductView(
-            title: L("subscription.yearly"),
-            price: yearlyPrice + L("subscription.price.yearly"),
-            desc: L("subscription.desc.yearly"),
-            actionTitle: L("subscription.action.subscribe"),
-            isActionDestructive: false) {
-                SubscriptionManager.shared.purchase(type: .yearly)
+    /// 顶部资料卡左下角那行会员状态。
+    ///
+    /// 原来只写「生效中 · 月度订阅」，分了普通/高级两档之后光看周期分不出等级——
+    /// 高级年度和普通年度在卡上长得一模一样。现在统一带上等级。
+    ///
+    /// 另外三种非购买途径的会员也得说清楚，否则文案会撒谎：
+    ///  - 注册即送的体验期：不是「生效中」，也没有月度/年度可言；
+    ///  - 服务端兑换（礼品卡/兑换码）：有等级但没有 StoreKit 周期，写「月度/年度」是编的；
+    ///    原来的三元判断会把它一律落到「年度订阅」上。
+    private static func membershipStatusText() -> String {
+        let manager = SubscriptionManager.shared
+        let tierKey = manager.membershipTier == .premium ? "subscription.plan.tier.premium"
+                                                         : "subscription.plan.tier.basic"
+        let tierName = L(tierKey)
+
+        if manager.paidMembershipTier == .free {
+            // 没有真实购买：体验期 / 兑换会员
+            if manager.isPremiumTrialActive {
+                return String(format: L("subscription.status.trial"), tierName)
             }
-        mainStack.addArrangedSubview(yearly)
-        
+            return String(format: L("subscription.status.granted"), tierName)
+        }
+
+        let periodName = L(manager.currentPlan == .yearly ? "subscription.plan_name.yearly"
+                                                          : "subscription.plan_name.monthly")
+        return String(format: L("subscription.status.active"), tierName, periodName)
+    }
+
+    @objc private func handleFootprintTap() {
+        let vc = CompanionFootprintViewController()
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true, completion: nil)
     }
     
-    private func createProductView(title: String, price: String, desc: String, actionTitle: String, isActionDestructive: Bool, extraInfo: String? = nil, action: @escaping () -> Void) -> UIView {
+    /// 「会员订阅 / 选择会员等级与付费周期」两行标题（在订阅卡外面，不在卡里）。
+    private func createPlanSectionHeader() -> UIView {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+
+        let title = UILabel()
+        title.text = L("subscription.section.title")
+        title.font = UIFont(name: "PingFangSC-Regular", size: 18)
+        title.textColor = .white
+        title.translatesAutoresizingMaskIntoConstraints = false
+
+        let subtitle = UILabel()
+        subtitle.text = L("subscription.plan.subheader")
+        subtitle.font = UIFont(name: "PingFangSC-Regular", size: 9.5)
+        subtitle.textColor = UIColor(white: 1, alpha: 0.8)
+        subtitle.translatesAutoresizingMaskIntoConstraints = false
+
+        container.addSubview(title)
+        container.addSubview(subtitle)
+        NSLayoutConstraint.activate([
+            title.topAnchor.constraint(equalTo: container.topAnchor),
+            title.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            title.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor),
+            subtitle.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 5),
+            subtitle.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            subtitle.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor),
+            subtitle.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+        return container
+    }
+
+
+    private func createGiftCardSection() -> UIView {
         let container = UIView()
         container.backgroundColor = UIColor(red: 44/255, green: 44/255, blue: 44/255, alpha: 1.0) // #2C2C2C
         container.layer.cornerRadius = 12
-        
-        // Top Row: Title + Price | Button
-        let topRow = UIView()
-        topRow.translatesAutoresizingMaskIntoConstraints = false
-        
-        let titleLab = UILabel()
-        titleLab.text = title
-        titleLab.textColor = .white
-        titleLab.font = UIFont(name: "PingFangSC-Medium", size: 18)
-        
-        let priceLab = UILabel()
-        priceLab.text = price
-        priceLab.textColor = UIColor(red: 172/255, green: 143/255, blue: 255/255, alpha: 1.0) // #AC8FFF
-        priceLab.font = UIFont(name: "PingFangSC-Semibold", size: 11)
-        
-        let textStack = UIStackView(arrangedSubviews: [titleLab, priceLab])
-        textStack.axis = .vertical
-        textStack.spacing = 2
-        textStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        let button = UIButton(type: .system)
-        button.setTitle(actionTitle, for: .normal)
-        button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 11)
-        
-        if isActionDestructive {
-            // Cancel Subscription: Purple BG, White Text
-            button.backgroundColor = UIColor(red: 128/255, green: 84/255, blue: 254/255, alpha: 1.0) // #8054FE
-            button.setTitleColor(.white, for: .normal)
-            button.layer.borderWidth = 0
-        } else {
-            // Subscribe: White BG, Purple Text
-            button.backgroundColor = .white
-            button.setTitleColor(UIColor(red: 128/255, green: 84/255, blue: 254/255, alpha: 1.0), for: .normal) // #8054FE
-            button.layer.borderWidth = 0
-        }
-        
-        button.layer.cornerRadius = 15
-        if #available(iOS 15.0, *) {
-            var config = UIButton.Configuration.plain()
-            config.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)
-            button.configuration = config
-        } else {
-            button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 15, bottom: 5, right: 15)
-        }
-        button.addAction(UIAction(handler: { [weak button] _ in
-            button?.animateButtonTap {
-                action()
-            }
-        }), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        topRow.addSubview(textStack)
-        topRow.addSubview(button)
-        
-        container.addSubview(topRow)
-        
-        // Extra Info (Auto Renew Date)
-        var lastView: UIView = topRow
-        
-        if let info = extraInfo {
-            let infoLabel = UILabel()
-            infoLabel.text = info
-            infoLabel.font = UIFont(name: "PingFangSC-Regular", size: 11)
-            infoLabel.textColor = .white
-            infoLabel.translatesAutoresizingMaskIntoConstraints = false
-            container.addSubview(infoLabel)
-            
-            NSLayoutConstraint.activate([
-                infoLabel.topAnchor.constraint(equalTo: topRow.bottomAnchor, constant: 5),
-                infoLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 15),
-                infoLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -15)
-            ])
-            lastView = infoLabel
-        }
-        
-        // Separator - Dashed? User requested SketchPng8683...
-        // Use custom dashed line view
-        let separatorFn = {
-            let v = SubscriptionLineSeparatorView(style: .dashed)
-            v.translatesAutoresizingMaskIntoConstraints = false
-            return v
-        }()
 
-        
-        let descLab = UILabel()
-        descLab.text = desc
-        descLab.numberOfLines = 0
-        descLab.font = UIFont.systemFont(ofSize: 12)
-        descLab.textColor = .lightGray
-        descLab.translatesAutoresizingMaskIntoConstraints = false
-        
-        container.addSubview(separatorFn)
-        container.addSubview(descLab)
-        
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.addTarget(self, action: #selector(handleGiftCardTap), for: .touchUpInside)
+
+        let label = UILabel()
+        label.text = L("subscription.giftcard.entry")
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        let arrow = UIImageView(image: UIImage(named: "enter_icon"))
+        arrow.contentMode = .scaleAspectFit
+        arrow.translatesAutoresizingMaskIntoConstraints = false
+
+        btn.addSubview(label)
+        btn.addSubview(arrow)
+        container.addSubview(btn)
+
         NSLayoutConstraint.activate([
-            topRow.topAnchor.constraint(equalTo: container.topAnchor, constant: 15),
-            topRow.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 15),
-            topRow.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -15),
-            
-            textStack.leadingAnchor.constraint(equalTo: topRow.leadingAnchor),
-            textStack.centerYAnchor.constraint(equalTo: topRow.centerYAnchor),
-            
-            button.trailingAnchor.constraint(equalTo: topRow.trailingAnchor),
-            button.centerYAnchor.constraint(equalTo: topRow.centerYAnchor),
-            button.heightAnchor.constraint(equalToConstant: 30),
-            
-            topRow.heightAnchor.constraint(equalToConstant: 40),
-            
-            separatorFn.topAnchor.constraint(equalTo: lastView.bottomAnchor, constant: 10),
-            separatorFn.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 15),
-            separatorFn.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -15),
-            separatorFn.heightAnchor.constraint(equalToConstant: 1),
-            
-            descLab.topAnchor.constraint(equalTo: separatorFn.bottomAnchor, constant: 10),
-            descLab.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 15),
-            descLab.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -15),
-            descLab.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -15)
+            btn.topAnchor.constraint(equalTo: container.topAnchor),
+            btn.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            btn.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 20),
+            btn.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -20),
+            btn.heightAnchor.constraint(equalToConstant: 50),
+
+            label.leadingAnchor.constraint(equalTo: btn.leadingAnchor),
+            label.centerYAnchor.constraint(equalTo: btn.centerYAnchor),
+
+            arrow.trailingAnchor.constraint(equalTo: btn.trailingAnchor),
+            arrow.centerYAnchor.constraint(equalTo: btn.centerYAnchor),
+            arrow.widthAnchor.constraint(equalToConstant: 12),
+            arrow.heightAnchor.constraint(equalToConstant: 12)
         ])
-        
+
         return container
     }
-    
-    private func createFeaturesSection() -> UIView {
-        let container = UIView()
-        container.backgroundColor = UIColor(red: 44/255, green: 44/255, blue: 44/255, alpha: 1.0) // #2C2C2C
-        container.layer.cornerRadius = 12
-        
-        let headerView = UIView()
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let titleLabel = UILabel()
-        titleLabel.text = L("subscription.exclusive")
-        titleLabel.font = UIFont(name: "PingFangSC-Semibold", size: 16)
-        titleLabel.textColor = .white
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        headerView.addSubview(titleLabel)
-        container.addSubview(headerView)
-        
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 15
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        let features = [
-            ("sub_bf_line1", L("subscription.feature.1")),
-            ("sub_bf_line2", L("subscription.feature.2")),
-            ("sub_bf_line3", L("subscription.feature.3"))
-        ]
-        
-        for (imgName, text) in features {
-            let row = UIStackView()
-            row.axis = .horizontal
-            row.spacing = 10
-            row.alignment = .top // Align top in case of multiline
-            
-            let icon = UIImageView(image: UIImage(named: imgName))
-            icon.contentMode = .scaleAspectFit
-            // Need constraint for icon size? Assuming images are proper size.
-            icon.widthAnchor.constraint(equalToConstant: 20).isActive = true // Approx
-            icon.heightAnchor.constraint(equalToConstant: 20).isActive = true
-            
-            let label = UILabel()
-            label.text = text
-            label.numberOfLines = 0
-            label.font = UIFont.systemFont(ofSize: 14)
-            label.textColor = .white
-            
-            row.addArrangedSubview(icon)
-            row.addArrangedSubview(label)
-            stack.addArrangedSubview(row)
-        }
-        
-        container.addSubview(stack)
-        
-        NSLayoutConstraint.activate([
-            headerView.topAnchor.constraint(equalTo: container.topAnchor, constant: 15),
-            headerView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 15),
-            headerView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -15),
-            
-            titleLabel.topAnchor.constraint(equalTo: headerView.topAnchor),
-            titleLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
-            
-            stack.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 15),
-            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 15),
-            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -15),
-            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -15)
-        ])
-        
-        return container
+
+    @objc private func handleGiftCardTap() {
+        let vc = RedeemCodeViewController()
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true, completion: nil)
     }
 
     private func createFooterSection() -> UIView {
@@ -671,7 +588,10 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
             "subscription.help.renewal",
             "subscription.help.restore",
             "subscription.help.community",
-            "subscription.help.contact"
+            "subscription.help.contact",
+            // App Store 订阅合规：订阅页必须提供隐私政策 + 用户协议入口（App 内浏览器打开）。隐私优先。
+            "sidemenu.privacy_policy",
+            "sidemenu.terms"
         ]
         
         for (index, key) in itemKeys.enumerated() {
@@ -754,10 +674,24 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
             let vc = HelpViewController()
             vc.modalPresentationStyle = .fullScreen
             self.present(vc, animated: true, completion: nil)
+        case 6:
+            // 隐私政策：App 内浏览器打开（无自定义标题）。
+            if let url = URL(string: Constants.Network.privacyPolicyURL) {
+                self.present(SFSafariViewController(url: url), animated: true, completion: nil)
+            }
+        case 7:
+            // 用户协议：App 内浏览器打开（无自定义标题）。
+            if let url = URL(string: Constants.Network.termsOfUseURL) {
+                self.present(SFSafariViewController(url: url), animated: true, completion: nil)
+            }
         default:
             break
         }
     }
+
+    /// 恢复购买的超时上限。AppStore.sync() 会弹系统登录框，
+    /// 遇到网络/账号异常时可能迟迟不返回。
+    private static let restoreTimeout: TimeInterval = 30
 
     private func handleRestore() {
         let alert = UIAlertController(title: nil, message: L("subscription.restore.loading"), preferredStyle: .alert)
@@ -766,19 +700,54 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
         indicator.style = .medium
         indicator.startAnimating()
         alert.view.addSubview(indicator)
-        
+
+        // 必须给出口。这个 alert 盖住整页，原来既没有按钮也没有超时：
+        // 只要 AppStore.sync() 不返回，用户连返回按钮都点不到，只能杀 App。
+        alert.addAction(UIAlertAction(title: L("common.cancel"), style: .cancel) { [weak self] _ in
+            self?.restoreTask?.cancel()
+            self?.restoreTask = nil
+        })
+
         present(alert, animated: true) { [weak self] in
-            Task {
-                await SubscriptionManager.shared.restore()
+            guard let self else { return }
+            self.restoreTask = Task { [weak self] in
+                await Self.restoreWithTimeout()
+                guard !Task.isCancelled else { return }
                 await MainActor.run {
+                    guard let self, self.restoreTask != nil else { return }
+                    self.restoreTask = nil
+                    // 用户已按取消的话 alert 早被系统收走了，这里 dismiss 是空操作
                     alert.dismiss(animated: true) {
-                        self?.showRestoreResult()
+                        self.showRestoreResult()
                     }
                 }
             }
         }
     }
+
+    /// 恢复购买跑到超时就放弃等待，让 UI 能继续往下走。
+    /// AppStore.sync() 本身不保证响应取消，所以这里只是不再等它，而不是真的中止它。
+    private static func restoreWithTimeout() async {
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { await SubscriptionManager.shared.restore() }
+            group.addTask { try? await Task.sleep(nanoseconds: UInt64(restoreTimeout * 1_000_000_000)) }
+            await group.next()
+            group.cancelAll()
+        }
+    }
     
+    /// 购买失败（非用户取消）：把 StoreKit 的错误原样弹出来，用户至少知道这单没成。
+    @objc private func purchaseFailed(_ note: Notification) {
+        let message = (note.userInfo?["message"] as? String) ?? ""
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: L("common.ok"), style: .default))
+        // StoreKit 的购买页可能还没收干净：从最上层的控制器弹，不然 present 会被系统丢掉、用户什么都看不到。
+        var presenter: UIViewController = self
+        while let top = presenter.presentedViewController, !(top is UIAlertController) { presenter = top }
+        guard !(presenter.presentedViewController is UIAlertController) else { return }
+        presenter.present(alert, animated: true)
+    }
+
     private func showRestoreResult() {
         let isSubscribed = SubscriptionManager.shared.isSubscribed
         let message = isSubscribed ? L("subscription.restore.success") : L("subscription.restore.no_purchases")
@@ -834,10 +803,17 @@ class SubscriptionViewController: UIViewController, MFMailComposeViewControllerD
     }
 
     @objc private func handleBack() {
-        if let nav = navigationController {
+        // 只有栈里确实有上一页时才 pop。
+        //
+        // 睡眠计划的升级入口（SleepPlanUpsellPresenter）会把本页包进一个新建的
+        // UINavigationController 当根视图再模态弹出：那时 navigationController 非 nil，
+        // 但本页就是栈底，popViewController 无处可退、静默失败 —— 返回按钮看着能点却
+        // 毫无反应，加上 viewWillAppear 藏掉了系统返回栏，用户只能杀 App 才出得去。
+        if let nav = navigationController, nav.viewControllers.count > 1 {
             nav.popViewController(animated: true)
         } else {
-            dismiss(animated: true)
+            // 被 nav 包着时要连 nav 一起收掉，否则只关自己会留下空壳
+            (navigationController ?? self).dismiss(animated: true)
         }
     }
 }

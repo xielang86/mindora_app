@@ -8,13 +8,15 @@ class BirthdayEditViewController: UIViewController {
 
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
+        // 生日是要存档/上报的固定格式，不能跟系统 locale 的历法走
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy.MM.dd"
         return formatter
     }()
     
     // MARK: - Scaled Metrics Helper
     private var scale: CGFloat {
-        return UIScreen.main.bounds.width / 375.0
+        return iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0
     }
     
     private func s(_ value: CGFloat) -> CGFloat {
@@ -111,12 +113,12 @@ class BirthdayEditViewController: UIViewController {
     private func setupInitialDate() {
         if let dateString = currentBirthday, let date = dateFormatter.date(from: dateString) {
             datePicker.date = date
-            dateValueLabel.text = dateString
+            dateValueLabel.text = DateDisplay.date(date)
         } else {
              // Default to standard picker date if empty (today)
              // Or maybe a reasonable default like 1990?
              // Image shows 1998.
-             dateValueLabel.text = dateFormatter.string(from: datePicker.date)
+             dateValueLabel.text = DateDisplay.date(datePicker.date)
         }
     }
 
@@ -210,6 +212,6 @@ class BirthdayEditViewController: UIViewController {
     }
     
     @objc private func dateChanged(_ sender: UIDatePicker) {
-        dateValueLabel.text = dateFormatter.string(from: sender.date)
+        dateValueLabel.text = DateDisplay.date(sender.date)
     }
 }

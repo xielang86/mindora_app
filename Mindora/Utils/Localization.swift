@@ -91,19 +91,8 @@ final class LocalizationManager {
             if let saved = savedLanguage, let language = SupportedLanguage(rawValue: saved) {
                 return language
             }
-            
-            // 如果没有保存的语言，则根据系统语言选择
-            let systemLanguage = Locale.preferredLanguages.first ?? "en"
-
-            // 尝试匹配系统语言
-            for language in SupportedLanguage.allCases {
-                if systemLanguage.hasPrefix(language.rawValue) {
-                    return language
-                }
-            }
-
-            // 默认回退到英文
-            return .english
+            // 没有 App 内覆盖 → 跟随系统
+            return systemResolvedLanguage
         }
         set {
             userDefaults.set(newValue.rawValue, forKey: languageKey)
@@ -118,6 +107,97 @@ final class LocalizationManager {
     /// 设置语言
     func setLanguage(_ language: SupportedLanguage) {
         currentLanguage = language
+    }
+
+    /// 展示型格式化（月份名、星期、上午/下午、数字）该用的 locale。
+    ///
+    /// 换语言包只改 `NSLocalizedString` 的查表，**改不了 `Locale.current`** ——
+    /// 它始终跟着系统。所以 `DateFormatter` 不显式赋 locale 时，App 内选了日语，
+    /// 月份名还是按系统语言出。凡是给用户看的格式化都从这里取 locale。
+    ///
+    /// 注意：传给服务端或用于解析的固定格式（`yyyy-MM-dd` 之类）**不能**用这个，
+    /// 必须用 `en_US_POSIX`，否则遇到佛历/和历用户会格式化出 "2569-08-06"。
+    var currentLocale: Locale {
+        Locale(identifier: currentLanguage.rawValue)
+    }
+
+    // MARK: - 与系统语言设置对齐
+
+    private let systemSnapshotKey = "AppSystemLanguageSnapshot"
+
+    /// 是否处于「跟随系统」状态：没有 App 内覆盖时就是。
+    var isFollowingSystem: Bool {
+        userDefaults.string(forKey: languageKey) == nil
+    }
+
+    /// 回到跟随系统：清掉 App 内覆盖，语言交还给 iOS 的裁决。
+    func followSystemLanguage() {
+        userDefaults.removeObject(forKey: languageKey)
+        userDefaults.synchronize()
+        setLanguageBundle()
+        NotificationCenter.default.post(name: Self.languageDidChangeNotification, object: nil)
+    }
+
+    /// 系统侧当前生效的语言原始值。
+    ///
+    /// 用 `Bundle.main.preferredLocalizations.first` 而不是 `Locale.preferredLanguages.first`：
+    /// 前者是 **iOS 针对本 App 给出的裁决**，已经把「设置 → Mindora → 语言」的 per-app 覆盖
+    /// 算进去了，而且是从 App 实际带的语言包里选的，不会给出我们不支持的语种。
+    ///
+    /// （试过从 App 自己的 preferences domain 读 `AppleLanguages` 来单独识别 per-app 覆盖，
+    /// 实测恒为 nil，这条路不通。）
+    private var systemLanguageRaw: String? {
+        Bundle.main.preferredLocalizations.first ?? Locale.preferredLanguages.first
+    }
+
+    /// 系统侧语言映射到支持列表，映射不到时回退英文。
+    var systemResolvedLanguage: SupportedLanguage {
+        supportedLanguage(forRaw: systemLanguageRaw) ?? .english
+    }
+
+    /// 把原始语言标识（`zh-Hans-CN` / `en-US` …）映射到支持的语言，不支持则 nil。
+    private func supportedLanguage(forRaw raw: String?) -> SupportedLanguage? {
+        guard let raw else { return nil }
+        return SupportedLanguage.allCases.first { raw.hasPrefix($0.rawValue) }
+    }
+
+    /// 用户在系统设置里改了语言时采纳它。
+    ///
+    /// 在系统设置里改语言同样是**用户的显式选择**，而且发生得比 App 内那次更晚，忽略它是 bug。
+    ///
+    /// 判据是「系统侧的值相对上次记录**变了**」，而不是「系统值与 App 内选择不同」：
+    /// 后者会让用户在 App 内选的语言每次启动都被系统值冲掉，等于 App 内的选择作废。
+    /// 跟随系统状态下无需处理——`currentLanguage` 本来就实时读系统值。
+    ///
+    /// - Returns: 是否真的改了语言。
+    @discardableResult
+    func adoptSystemLanguageIfChanged() -> Bool {
+        let raw = systemLanguageRaw
+        let previous = userDefaults.string(forKey: systemSnapshotKey)
+        userDefaults.set(raw ?? "", forKey: systemSnapshotKey)
+
+        // 这块的判据依赖多个来源，出问题时不打出来根本没法定位，所以每次启动都记一行。
+        Log.info("Language", "语言状态 系统裁决=\(raw ?? "nil") 快照=\(previous ?? "nil") "
+                 + "App当前=\(currentLanguage.rawValue) 跟随系统=\(isFollowingSystem)")
+
+        // 跟随系统时 currentLanguage 直接取系统值，不需要也不该写入 App 内覆盖。
+        guard !isFollowingSystem else { return false }
+
+        guard let previous else { return false }
+        guard previous != (raw ?? "") else { return false }
+
+        // 系统语言换成了我们不支持的语种（如俄语）：保持现状，不要莫名其妙掉成英文。
+        guard let adopted = supportedLanguage(forRaw: raw) else {
+            Log.info("Language", "系统语言变为 \(raw ?? "nil")，不在支持列表，维持 \(currentLanguage.rawValue)")
+            return false
+        }
+        guard adopted != currentLanguage else { return false }
+
+        Log.info("Language", "系统设置里改了语言：\(previous) → \(raw ?? "nil")，采纳 \(adopted.rawValue) 并回到跟随系统")
+        // 清掉 App 内覆盖而不是写入新值：既然这次是从系统来的，之后就该一直跟着系统走，
+        // 用户不必每次改系统都指望这套快照比对能识别出来。
+        followSystemLanguage()
+        return true
     }
     
     /// 本地化字符串

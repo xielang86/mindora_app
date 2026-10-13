@@ -103,6 +103,7 @@ final class RegisterP3Controller: UIViewController, UITextViewDelegate {
         super.viewDidLoad()
         setupUI()
         setupActions()
+        installTapToDismissKeyboard()
     }
     
     // MARK: - Setup
@@ -121,11 +122,27 @@ final class RegisterP3Controller: UIViewController, UITextViewDelegate {
         view.addSubview(marketingLabel)
         
         view.addSubview(continueButton)
-        
+
+        addTopBannerFadeIfNeeded()
         setupFontsAndStyles()
         setupConstraints()
     }
-    
+
+    /// iPad 上给顶部横幅图底部补一层淡出到背景色的渐变，掩盖 .scaleAspectFill 裁掉的
+    /// 烘焙渐变（详见 BottomFadeView）。iPhone 不加，保持原样。
+    private func addTopBannerFadeIfNeeded() {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        let fade = BottomFadeView(color: UIColor(red: 24/255.0, green: 24/255.0, blue: 24/255.0, alpha: 1.0))
+        fade.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(fade, aboveSubview: backgroundImageView)
+        NSLayoutConstraint.activate([
+            fade.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor),
+            fade.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor),
+            fade.bottomAnchor.constraint(equalTo: backgroundImageView.bottomAnchor),
+            fade.heightAnchor.constraint(equalTo: backgroundImageView.heightAnchor, multiplier: 0.55)
+        ])
+    }
+
     private func setupFontsAndStyles() {
         // Title Scaling
         let titleSize = scale(48, basedOn: view.bounds.height, designDimension: designHeight)
@@ -240,40 +257,50 @@ final class RegisterP3Controller: UIViewController, UITextViewDelegate {
         let buttonWidth = scale(540, basedOn: view.bounds.width, designDimension: designWidth)
         let buttonHeight = scale(96, basedOn: view.bounds.height, designDimension: designHeight)
 
+        // 内容列：宽度=封顶后的画布宽度（iPhone 上=整屏宽，iPad 上=手机宽 430pt），居中。
+        // 副标题、两个开关及其文字原本都是「贴屏幕左边缘 + 设计内边距」定位——iPad 上标题/按钮
+        // 居中、这些却挤在最左边，整体没有水平居中。改成相对这条居中内容列的左沿定位，就能
+        // 像 iPhone 一样成组居中。iPhone 上内容列=整屏宽，换算后位置与原来完全一致（无回归）。
+        let contentGuide = UILayoutGuide()
+        view.addLayoutGuide(contentGuide)
+
         NSLayoutConstraint.activate([
+            contentGuide.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            contentGuide.widthAnchor.constraint(equalToConstant: scale(designWidth, basedOn: view.bounds.width, designDimension: designWidth)),
+
             // Background - Top Aligned, Fixed Height
             backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImageView.heightAnchor.constraint(equalToConstant: bgHeight),
-            
+
             // Title
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: titleTop),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.widthAnchor.constraint(equalToConstant: titleWidth),
-            
+
             // Subtitle
             subtitleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: subtitleTop),
-            subtitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: subtitleLeading),
+            subtitleLabel.leadingAnchor.constraint(equalTo: contentGuide.leadingAnchor, constant: subtitleLeading),
             subtitleLabel.widthAnchor.constraint(equalToConstant: subtitleWidth),
-            
+
             // Terms Row
             termsSwitch.topAnchor.constraint(equalTo: view.topAnchor, constant: termsTop),
-            termsSwitch.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: contentLeading),
-            
+            termsSwitch.leadingAnchor.constraint(equalTo: contentGuide.leadingAnchor, constant: contentLeading),
+
             termsTextView.topAnchor.constraint(equalTo: termsSwitch.topAnchor, constant: -5),
             termsTextView.leadingAnchor.constraint(equalTo: termsSwitch.trailingAnchor, constant: switchTextGap),
             termsTextView.widthAnchor.constraint(equalToConstant: termsTextWidth),
             termsTextView.heightAnchor.constraint(greaterThanOrEqualToConstant: scale(120, basedOn: view.bounds.height, designDimension: designHeight)),
-            
+
             // Marketing Row
             marketingSwitch.topAnchor.constraint(equalTo: view.topAnchor, constant: marketingTop),
-            marketingSwitch.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: contentLeading),
-            
+            marketingSwitch.leadingAnchor.constraint(equalTo: contentGuide.leadingAnchor, constant: contentLeading),
+
             marketingLabel.topAnchor.constraint(equalTo: marketingSwitch.topAnchor),
             marketingLabel.leadingAnchor.constraint(equalTo: marketingSwitch.trailingAnchor, constant: switchTextGap),
             marketingLabel.widthAnchor.constraint(equalToConstant: termsTextWidth),
-            
+
             // Continue Button
             continueButton.topAnchor.constraint(equalTo: view.topAnchor, constant: buttonTop),
             continueButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -310,14 +337,15 @@ final class RegisterP3Controller: UIViewController, UITextViewDelegate {
     // MARK: - UITextViewDelegate
     
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        let safariVC = SFSafariViewController(url: URL)
-        present(safariVC, animated: true)
+        // 用户协议 / 隐私政策：App 内浏览器打开（无自定义标题，与侧栏 / 订阅页一致）。
+        present(SFSafariViewController(url: URL), animated: true)
         return false // Don't let system handle it, we handled it
     }
     
     // MARK: - Helpers
     
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
 }

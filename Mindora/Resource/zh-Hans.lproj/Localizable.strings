@@ -10,7 +10,7 @@
 "tab.home" = "首页";
 "tab.health" = "健康";
 "tab.sleep" = "睡眠";
-"tab.explore" = "探索";
+"tab.explore" = "洞察";
 "tab.store" = "商店";
 "tab.settings" = "设置";
 
@@ -20,14 +20,6 @@
 "theme.dark" = "深色模式";
 
 // MARK: - Register P3
-"register.p3.title" = "创建账户";
-"register.p3.subtitle" = "欢迎回来！请输入您的详细信息。";
-"register.p3.marketing" = "我同意接收营销信息";
-"register.p3.button.save" = "继续";
-"register.p3.agree_prefix" = "我同意 ";
-"register.p3.terms" = "服务条款";
-"register.p3.and" = " 和 ";
-"register.p3.privacy" = "隐私政策";
 
 // MARK: - Register P4
 "register.p4.title" = "连接您的 Mindora";
@@ -37,6 +29,8 @@
 
 // MARK: - Home Screen
 "home.title" = "首页";
+"home.device.status.connected" = "已连接";
+"home.device.status.offline" = "已离线";
 "home.nearby_devices" = "附近的设备";
 "home.scan" = "扫描";
 "home.scanning" = "正在扫描附近设备…";
@@ -144,7 +138,7 @@
 "health.week.sedona" = "塞多纳沙漠的宁静";
 "health.week.respiratory_rate" = "呼吸频率";
 "health.week.avg_heart_rate" = "平均心率";
-"health.week.avg_skin_temp" = "平均手腕温度";
+"health.week.avg_wrist_temp" = "手腕温度";
 "health.week.avg_awake" = "平均清醒时间";
 "health.week.avg_rem" = "平均快速眼动时间";
 "health.week.avg_core" = "平均核心睡眠时间";
@@ -213,8 +207,43 @@
 
 // MARK: - Device Management
 "device_manage.status.connected" = "已连接";
-"device_manage.button.connect_other" = "连接其他设备";
-"device_manage.default_name" = "Mindora Black Two";
+"device_manage.status.not_connected" = "未连接";
+
+// MARK: - Device Scan (iOS 蓝牙设置同款扫描 + 多选绑定页)
+"device_scan.title" = "设备";
+"device_scan.hint" = "如果没有发现设备，请确保已开启本地网络和蓝牙权限。";
+"device_scan.open_settings" = "前往系统设置";
+"device_scan.section.my_devices" = "我的设备";
+"device_scan.section.empty_footer" = "请确保 Mindora 已开机，手机与设备处于同一 Wi-Fi 网络。蓝牙可作为备用连接通道。";
+"device_scan.searching" = "正在搜索附近设备...";
+"device_scan.no_devices_found" = "未发现设备";
+"device_scan.tap_to_retry" = "点击重试";
+"device_scan.status.not_connected" = "未连接";
+"device_scan.status.connected" = "已连接";
+
+// MARK: - Device Detail (扫描列表点 ⓘ 进入)
+"device_detail.section.name" = "名称";
+"device_detail.section.model" = "型号";
+"device_detail.section.device_id" = "设备 ID";
+"device_detail.value.unknown" = "未知";
+"device_detail.disconnect" = "断开连接";
+"device_detail.connect" = "连接";
+
+"device_manage.button.connect" = "搜索设备";
+"device_manage.button.connect_other" = "搜索设备";
+"device_manage.button.disconnect" = "断开连接";
+"device_manage.button.connect_device" = "连接设备";
+"device_manage.button.connect_other_device" = "连接其他设备";
+"device_manage.button.search_device" = "搜索设备";
+"device_manage.subtitle" = "登录信息保留30天，超时需重新配对\n点击下方设备图可查看设备详情";
+"device_manage.default_name" = "Mindora";
+"device_manage.empty.title" = "暂未连接设备";
+"device_manage.empty.message" = "点击下方按钮即可配对你的 Mindora。";
+"device_manage.action.disconnect" = "解绑此设备";
+"device_manage.action.disconnect_confirm" = "解绑";
+"device_manage.action.disconnect_message" = "解绑后可以随时重新配对，本机数据不会被清除。";
+"device_manage.button.delete_device" = "删除该设备";
+"device_manage.delete.confirm_title" = "确认删除设备「%@」？";
 
 
 // MARK: - Settings Sections
@@ -230,17 +259,15 @@
 "sidemenu.upgrade" = "升级到 Pro 版本";
 "sidemenu.device" = "设备";
 "sidemenu.notifications" = "消息通知";
-"sidemenu.privacy_data" = "隐私 & 数据";
 "sidemenu.health_link" = "健康数据关联";
 "sidemenu.language" = "语言";
 "sidemenu.help" = "帮助";
-"sidemenu.logout" = "退出登陆";
-"sidemenu.terms" = "《服务条款》";
-"sidemenu.privacy_policy" = "《隐私政策》";
+"sidemenu.logout" = "退出登录";
+"sidemenu.terms" = "使用条款";
+"sidemenu.privacy_policy" = "隐私政策";
 "sidemenu.not_logged_in" = "未登录";
 
 // MARK: - User Profile
-"user_profile.title" = "个人资料";
 "user_profile.user_id" = "用户ID";
 "user_profile.nickname" = "昵称";
 "user_profile.gender" = "性别";
@@ -249,6 +276,10 @@
 "user_profile.gender.other" = "其他";
 "user_profile.age" = "年龄";
 "user_profile.birthday" = "生日";
+"user_profile.weight_height" = "体重 / 身高";
+"user_profile.weight_unit" = "体重 / kg";
+"user_profile.height_unit" = "身高 / cm";
+"user_profile.weight_height_invalid" = "请输入有效数值：体重 20–300 kg，身高 50–250 cm。";
 "user_profile.email" = "邮箱";
 "user_profile.phone" = "电话";
 "user_profile.address" = "地址";
@@ -257,9 +288,9 @@
 "user_profile.take_photo" = "拍照";
 "user_profile.choose_from_album" = "从手机相册选择";
 "user_profile.cancel" = "取消";
-
-// MARK: - Device Selection
-"device_selection.title" = "请选择您想要连接的Mindora设备";
+"user_profile.email_locked_title" = "无法编辑邮箱";
+"user_profile.email_locked_message" = "使用社交账号或SSO登录的用户无法直接更新邮箱。\n需要帮助？请联系：%@";
+"user_profile.email_locked_contact" = "联系我们";
 
 // MARK: - Help Cards
 "help.title" = "连接帮助";
@@ -277,7 +308,6 @@
 
 // MARK: - Common UI Elements
 "common.ok" = "好的";
-"common.cancel" = "取消";
 "common.confirm" = "确认";
 "common.retry" = "重试";
 "common.saved_to_photos" = "已保存到相册";
@@ -294,9 +324,10 @@
 "onboarding.page3.bluetooth_card_text_authorized" = "蓝牙权限已开启\n设备可以正常连接";
 "onboarding.page4.scanning_title" = "扫描附近设备";
 "onboarding.page4.searching" = "持续自动搜索中";
-"onboarding.page4.device_found" = "已搜索到 Mindora";
+"onboarding.page4.device_found" = "已搜索到 %@";
 "onboarding.page4.no_device_found" = "未找到设备";
-"onboarding.page4.description" = "请选择您想要连接的Mindora设备,请确认蓝牙保持开启状态。";
+"onboarding.page4.description" = "请确保 Mindora 已开机，手机与设备处于同一 Wi-Fi 网络。蓝牙可作为备用连接通道。";
+"onboarding.page4.multiple_found" = "已找到 %d 台设备，请选择一台";
 "onboarding.page5.success_title" = "Mindora连接成功";
 "onboarding.page5.complete" = "完成";
 
@@ -394,6 +425,12 @@
 // Local Network Permission Denied
 "permission.local_network.denied_title" = "无法搜索设备";
 "permission.local_network.denied_message" = "需要本地网络权限才能搜索附近的 Mindora 设备。请在设置中开启本地网络访问权限。";
+"permission.cellular.denied_title" = "无法使用蜂窝数据";
+"permission.cellular.denied_message" = "Mindora 未被允许使用蜂窝数据，睡眠评分等在线内容无法加载。请在设置中将「无线数据」设为「WLAN 与蜂窝数据」，或连接 Wi-Fi。";
+
+// Bluetooth Permission Denied
+"permission.bluetooth.denied_title" = "无法通过蓝牙扫描";
+"permission.bluetooth.denied_message" = "Wi-Fi 不可用时需要蓝牙权限来发现 Mindora 设备。请到设置中为 Mindora 开启蓝牙权限。";
 
 
 // MARK: - Login
@@ -425,9 +462,24 @@
 "user_profile.logout_success" = "已退出登录";
 "user_profile.delete" = "删除账号";
 "user_profile.delete_confirm_title" = "确认删除账号？";
-"user_profile.delete_confirm_message" = "将发送删除请求并清空本地数据。";
+"user_profile.delete_confirm_message" = "此操作将永久删除你的账号和数据，且无法恢复。我们会向你的邮箱或手机发送验证码以确认。";
 "user_profile.delete_success" = "账号已删除";
 "user_profile.delete_failed" = "删除账号失败";
+"user_profile.delete_confirm_send" = "发送验证码";
+"user_profile.delete_code_sent" = "验证码已发送";
+"user_profile.delete_code_prompt_title" = "输入验证码";
+"user_profile.delete_code_prompt_message" = "请输入发送到你邮箱或手机的验证码，以永久删除账号。此操作无法恢复。";
+"user_profile.delete_confirm_message_email" = "此操作将永久删除你的账号和数据，且无法恢复。我们会向你的邮箱 %@ 发送验证码以确认。";
+"user_profile.delete_confirm_message_phone" = "此操作将永久删除你的账号和数据，且无法恢复。我们会向你的手机 %@ 发送验证码以确认。";
+"user_profile.delete_code_prompt_message_email" = "请输入发送到你邮箱 %@ 的验证码，以永久删除账号。此操作无法恢复。";
+"user_profile.delete_code_prompt_message_phone" = "请输入发送到你手机 %@ 的验证码，以永久删除账号。此操作无法恢复。";
+"user_profile.delete_code_placeholder" = "验证码";
+"user_profile.delete_code_empty" = "请输入验证码";
+"user_profile.delete_submit" = "确认删除";
+"user_profile.delete_err_no_contact" = "你的账号未绑定邮箱或手机号，无法发送验证码。";
+"user_profile.delete_err_send_failed" = "验证码发送失败，请稍后重试。";
+"user_profile.delete_err_bad_code" = "验证码错误或已过期。";
+"user_profile.delete_err_user_gone" = "账号不存在或已注销。";
 "user_profile.token_missing" = "请先登录";
 "user_profile.photo_unavailable" = "无法访问相册";
 "user_profile.update_success" = "个人资料已更新";
@@ -436,7 +488,7 @@
 "login.code_sent_message" = "验证码已经发送到您的邮箱：%@，请登录邮箱查看验证码。";
 
 // MARK: - Login Start
-// "login_start.tagline" = "个人洞察\n赋能您的\n每一天";
+"login_start.tagline" = "个人洞察\n赋能您的\n每一天";
 "login_start.button.start" = "开始";
 "login_start.button.no_device" = "还没有 Mindora?";
 
@@ -454,6 +506,7 @@
 "register.p2.subtitle" = "4位验证码已发送至";
 "register.p2.resend" = "重新发送";
 
+"register.p2.resend_countdown" = "%d 秒后可重新发送";
 // MARK: - Register P3
 "register.p3.title" = "使用条款和隐私政策";
 "register.p3.subtitle" = "请查阅以下内容以继续：";
@@ -476,10 +529,17 @@
 "auth.error.api_error_default" = "API 错误：%d";
 "auth.error.invalid_response" = "无效的响应";
 "auth.error.missing_data" = "响应数据缺失";
+"auth.error.network" = "网络不可用，请检查网络后重试。";
+"auth.error.timeout" = "请求超时，请稍后再试。";
+"auth.error.server" = "服务暂时不可用，请稍后再试。";
+"auth.error.send_failed" = "发送验证码失败，请稍后再试。";
+"auth.error.verify_failed" = "验证失败，请稍后再试。";
+"auth.error.code_invalid" = "验证码不正确，请重新输入。";
+"auth.error.code_expired" = "验证码已过期，请重新获取。";
 
 // MARK: - Subscription
 "subscription.nav.title" = "会员订阅";
-"subscription.my_midora" = "我的MIDORA";
+"subscription.my_midora" = "My Mindora";
 "subscription.not_member" = "您还不是会员";
 "subscription.not_member_desc" = "订阅您需要的会员类型，享受专属权益";
 "subscription.section.title" = "会员订阅";
@@ -490,11 +550,11 @@
 "subscription.price.yearly" = "/年";
 "subscription.action.subscribe" = "开通订阅";
 "subscription.action.cancel" = "取消订阅";
+"subscription.action.switch" = "切换方案";
 "subscription.desc.monthly.prefix" = "订阅到期前一天将以";
 "subscription.desc.monthly.suffix" = "/月续期，可在费用扣除前随时取消订阅。";
 "subscription.desc.yearly" = "自开通日期起可享受一整年的会员服务，可在下次续费前随时取消订阅。";
 "subscription.auto_renew" = "自动续费时间：";
-"subscription.expires_prefix" = "订阅到期时间：";
 "subscription.desc.cancelled" = "您的会员权益将保留至订阅到期，到期后将无法享受会员服务，请及时续费。";
 "subscription.exclusive" = "会员专属";
 "subscription.feature.1" = "360°全方位睡眠分析，你的私人睡眠数据库";
@@ -502,10 +562,29 @@
 "subscription.feature.3" = "专属助眠方案，个性化睡眠提升";
 "subscription.help.faq" = "常见问题";
 "subscription.help.message" = "消息中心";
-"subscription.help.renewal" = "续费管理";
+"subscription.help.renewal" = "订阅管理";
 "subscription.help.restore" = "恢复购买";
 "subscription.help.community" = "加入社群";
 "subscription.help.contact" = "联系我们";
+"subscription.giftcard.entry" = "礼品卡和兑换码";
+
+// Redeem Code 兑换码兑换
+"redeem.placeholder" = "请输入兑换码";
+"redeem.action" = "立即兑换";
+"redeem.rules.entry" = "使用规则";
+"redeem.submitted" = "兑换码已提交";
+"redeem.success" = "兑换成功，会员已开通";
+"redeem.success.title" = "兑换成功";
+"redeem.success.detail" = "兑换%1$@会员成功，会员有效期至 %2$@";
+"redeem.success.detail.no_date" = "兑换%1$@会员成功";
+"redeem.success.detail.generic" = "兑换会员成功，会员有效期至 %1$@";
+"redeem.period.yearly" = "年度";
+"redeem.period.monthly" = "月度";
+"redeem.error.generic" = "兑换失败，请稍后重试";
+"redeem.error.not_logged_in" = "请先登录后再兑换";
+"redeem.rules.title" = "使用规则";
+"redeem.rules.ok" = "好的";
+"redeem.rules.body" = "1.Mindora兑换码可通过品牌官网购买会员礼品卡或参与Mindora以及合作伙伴的相关活动获得。\n\n2.绑定Mindora兑换码获得的会员权益与付费购买的会员权益完全一致\n\n3.由于不可抗拒的因素、网络、作弊等非Mindora产品原因导致活动出现异常情况，Mindora方有权去调整、暂停会员服务的权利\n\n4.Mindora在法律规定的范围内享有本规则的最终解释权，如有疑问，请联系:support@mindora316.com";
 
 // Subscription Email
 "subscription.email.subject" = "Mindora 反馈";
@@ -525,6 +604,9 @@
 
 // MARK: - Notifications
 "notifications.title" = "消息通知";
+"notifications.empty" = "暂无消息";
+"notifications.history.divider" = "以下为历史消息";
+"notifications.delete" = "删除";
 "notifications.permission.title" = "允许通知";
 "notifications.permission.desc" = "打开系统通知，及时接收消息";
 "notifications.permission.status" = "你已在系统中关闭Mindora通知权限";
@@ -535,12 +617,46 @@
 "notifications.mock.body" = "您订阅的会员还有7天到期，为避免影响后续使用，请及时续费。";
 "notifications.mock.action" = "进入会员页面查看";
 
-// MARK: - Terms & Privacy
-"legal.terms.title" = "Mindora 服务条款";
-"legal.terms.content" = "欢迎使用Mindora！感谢您对我们的关注。\n\n本《服务条款》(“本协议”)阐述了您使用 mindora316.com(“网站”)、智能助眠硬件、充电器及/或其他相关产品，包括Mindora移动应用程序(“Mindora应用”)(统称为“服务”)所适用的条款和条件。本网站和Mindora应用由 Mindora Technologies Inc. 及其关联公司和子公司(统称为“Mindora”、“我们”或“我们的”)拥有并运营。\n\n在本协议中，我们称自己为“Mindora”、“我们”；我们称您为“您”或“用户”。Mindora和用户在本协议中单独称为“一方”，合称为“双方”。\n\n通过访问或使用服务（包括访问网站），即表示您有意并明确同意受本协议所有条款和条件以及《Mindora隐私政策》（详见 mindora316.com/privacy-policy，通过引用并入本协议，下称“隐私政策”）的约束。如果您不同意这些条款和条件，则不得使用服务。";
+// 消息通知 · 动态生成（来源标签 + 各类文案；%1$d/%1$@ 为占位符，保持顺序）
+"notifications.source.membership" = "会员消息";
+"notifications.source.system" = "系统消息";
+"notifications.source.health" = "睡眠提醒";
 
-"legal.privacy.title" = "Mindora 隐私政策";
-"legal.privacy.content" = "更新日期：2026年1月29日\n生效日期：2026年1月29日\n\nMindora及其全球的关联公司（以下简称“Mindora”、“我们”、“我方”）深知隐私对您的重要性，并会尊重您的隐私。《Mindora隐私政策》（以下简称“本政策”）适用于我方提供的Mindora及内置系统服务（以下简称“Mindora服务”）。Mindora是我们开发的一款智能助眠硬件，致力于为您带来更科学、更智慧的睡眠改善方案。Mindora App 是控制Mindora的客户端，用于帮助用户通过手机更加全面地使用Mindora设备，同时向用户提供更多实用功能，如在用户对话中标记音频重点、识别用户状态、获得用户习惯等。本政策尚未涵盖的部分，则以《Mindora通用隐私政策》为准。除另有约定，本政策所用术语与《Mindora用户协议》中的术语具有相同含义。\n\n如您根据您所居住的司法辖区法律为未成年人或不具有完全民事行为能力的主体（以下简称“未成年人”），请您在法定监护人陪同下仔细阅读并充分理解本协议，并征得法定监护人的同意后使用Mindora及服务。\n\n请仔细阅读本政策（尤其是粗体内容）并确定了解我们对您个人信息的处理规则。我们高度重视对您个人信息的保护，并将遵循现行法律法规，基于合法、正当的方式并遵循诚信原则妥善处理您的个人信息。如您对本政策有任何疑问，您可以通过我方平台公布的联系方式与我们联系。";
+"notifications.subscription.expiring.title" = "会员即将到期";
+"notifications.subscription.expiring.body" = "您的会员还有 %1$d 天到期，为避免影响使用，请及时续费。";
+"notifications.subscription.expiring.action" = "进入会员页面查看";
+
+"notifications.subscription.expired.title" = "会员已到期";
+"notifications.subscription.expired.body" = "您的会员已到期，续订即可恢复全部权益。";
+"notifications.subscription.expired.action" = "立即续订";
+
+"notifications.subscription.activated.title" = "会员已开通";
+"notifications.subscription.activated.body" = "感谢订阅，会员权益已生效，有效期至 %1$@。";
+"notifications.subscription.activated.action" = "查看会员权益";
+
+"notifications.subscription.renewed.title" = "会员已续订";
+"notifications.subscription.renewed.body" = "续订成功，会员有效期已延长至 %1$@。";
+"notifications.subscription.renewed.action" = "查看会员权益";
+
+"notifications.redeem.title" = "兑换成功";
+"notifications.redeem.body" = "兑换成功，会员有效期至 %1$@。";
+"notifications.redeem.body_days" = "兑换成功，已为你添加 %1$d 天会员，有效期至 %2$@。";
+"notifications.redeem.action" = "查看会员权益";
+
+"notifications.permission.off.title" = "通知已关闭";
+"notifications.permission.off.body" = "你已在系统设置中关闭 Mindora 通知，可能错过会员到期、睡眠报告等提醒。";
+"notifications.permission.off.action" = "去设置开启";
+
+"notifications.sleep.low.title" = "睡眠评分偏低";
+"notifications.sleep.low.body" = "最近一晚睡眠评分为 %1$d，睡眠质量有待改善，点击查看详细分析。";
+"notifications.sleep.low.action" = "查看睡眠详情";
+
+"notifications.weargap.title" = "已 %1$d 天无睡眠数据";
+"notifications.weargap.body" = "已有 %1$d 天未同步到睡眠数据，佩戴设备入睡即可继续获得睡眠分析。";
+"notifications.weargap.action" = "查看睡眠详情";
+
+// MARK: - Terms & Privacy
+
 
 // MARK: - Help Page
 "help.page.title" = "帮助";
@@ -570,11 +686,39 @@
 "address.name_placeholder" = "请输入姓名";
 "address.phone" = "手机号";
 "address.phone_placeholder" = "请输入手机号码";
+"address.phone_invalid" = "请输入有效的手机号码";
+"address.name_invalid" = "收货人姓名不能包含数字";
 "address.region" = "所在地区";
 "address.region_placeholder" = "选择省市区";
 "address.locate" = "定位";
 "address.detail" = "详细地址";
 "address.detail_placeholder" = "小区、门牌号等";
+"address.country" = "国家/地区";
+"address.phone_country" = "手机号国家/地区";
+"address.state" = "州/省";
+"address.state_placeholder" = "请输入州/省";
+"address.city" = "城市";
+"address.district" = "区/县";
+"address.city_placeholder" = "城市";
+"address.street1" = "地址行 1";
+"address.street1_placeholder" = "街道地址或邮政信箱";
+"address.street2" = "地址行 2";
+"address.street2_placeholder" = "公寓、套房、单元、大楼、楼层等";
+"address.zip" = "邮编";
+"address.state_only" = "州";
+"address.province" = "省";
+"address.prefecture" = "都道府县";
+"address.zip_only" = "邮编";
+"address.postal_code" = "邮政编码";
+"address.zip_placeholder" = "请输入邮编";
+"address.select" = "请选择";
+"address.locate_fill" = "定位自动填写";
+"address.picker_search" = "搜索";
+"address.name_required" = "请填写收件人姓名";
+"address.state_required" = "请选择州/省";
+"address.city_required" = "请填写城市";
+"address.street_required" = "请填写街道地址";
+"address.zip_invalid" = "请输入有效的邮编";
 "address.set_default" = "设为默认地址";
 "address.confirm" = "确认";
 "address.default_tag" = "默认";
@@ -593,37 +737,13 @@
 
 // MARK: - Explore
 "explore.greeting.hi" = "Hi,";
-"explore.intro.data" = "嗨，昨晚你的身体进入了一个稳定、放松且高度可恢复的睡眠状态。从入睡节律到整夜结构，你的多项关键指标都优于你近期的平均水平。这不是“偶然睡得好”，而是一次神经系统与睡眠结构协同良好的夜晚。";
-"explore.intro.default" = "在你入睡、醒来、再次进入深眠的每一个阶段，Mindora都在持续观察你的睡眠节律，并根据你的状态调整陪伴方式。这些洞察并不只是数据的变化，它们来自你正在使用的睡眠场景、声音节奏，以及你身体给出的真实反馈。";
-"explore.intro.default_detail" = "向下看看，我们会为你解释：\n昨晚发生了什么，哪些方式对你最有帮助，以及Mindora为你做了哪些调整。";
 
-"explore.section.efficiency" = "入睡效率";
-"explore.section.structure" = "睡眠结构";
-"explore.section.fluctuation" = "夜间波动";
-"explore.section.preference" = "场景偏好";
-"explore.section.advice" = "睡眠建议";
 
-"explore.metric.onset_time" = "入睡用时：%@分钟";
-"explore.metric.continuous_sleep" = "连续睡眠时长：%@分钟";
-"explore.metric.smart_intervention" = "智能干预：%@";
 
-"explore.efficiency.first_sleep" = "首次入睡时间";
-"explore.efficiency.pre_hr" = "入睡前心率";
-"explore.efficiency.pre_resp" = "入睡前呼吸频率";
 
-"explore.structure.rem" = "快速动眼睡眠";
-"explore.structure.deep" = "深度睡眠";
-"explore.structure.light" = "核心睡眠";
 
-"explore.fluctuation.awake_count" = "夜间觉醒";
-"explore.fluctuation.awake_duration" = "觉醒时长";
-"explore.fluctuation.awake_type" = "觉醒类型";
-"explore.fluctuation.hr_range" = "心率波动";
 "explore.fluctuation.resp_range" = "呼吸波动";
 
-"explore.status.health_range" = "健康区间";
-"explore.status.average" = "平均水平";
-"explore.status.fluctuation_high" = "波动偏多";
 
 "explore.mock.efficiency_desc" = "心率与呼吸趋势均为「平稳」，这通常意味着：副交感神经已开始占主导，身体处于可自然放松的状态，大脑不需要额外“降速”即可入睡。\n\n在睡前30分钟内，心率与呼吸维持在相对稳定或缓慢下降区间，通常与更短的入睡潜伏期相关，这也是睡眠医学中判断“入睡准备完成度”的常用生理信号之一。";
 "explore.mock.structure_desc" = "这组数据并不指向“结构异常”，昨晚的睡眠阶段顺序没有缺失，只是每一段关键睡眠被切得较碎，是典型的：夜间被多次打断「深睡与REM被压缩」。\n\n这是压力夜晚中最常见、也最可修复的一种模式。";
@@ -633,25 +753,11 @@
 "explore.mock.intervention" = "场景介入";
 "explore.mock.awake_type" = "焦虑型";
 
-"explore.preference.recent" = "最近使用";
-"explore.preference.cocos_island.title" = "可可岛月光漂浮";
-"explore.preference.cocos_island.subtitle" = "音场类型：海洋/粉噪/棕噪";
 
-"explore.quote.text" = "Mindora 不只是记录你的睡眠\n而是在理解你的状态后\n选择更合适的方式陪你继续睡下去";
 "explore.quote.open" = "“";
 "explore.quote.close" = "”";
 
-"explore.article.1.title" = "文章标题";
-"explore.article.1.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
-"explore.article.2.title" = "文章标题";
-"explore.article.2.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
-"explore.article.3.title" = "文章标题";
-"explore.article.3.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
-"explore.article.4.title" = "文章标题";
-"explore.article.4.subtitle" = "文章简介文章简介文章简介文章简介文章简介文章简介文章简介";
 
-"explore.placeholder.efficiency" = "- -%";
-"explore.placeholder.label" = "状态区间";
 "explore.placeholder.number" = "- -";
 "explore.placeholder.time" = "- -:- -";
 "explore.placeholder.hr" = "- -次/分钟";
@@ -668,21 +774,14 @@
 "explore.value.hr_format" = "%@ bpm";
 "explore.value.hr_range_format" = "%@ bpm";
 
-"explore.default.efficiency_desc" = "这里会展示你的入睡过程。Mindora会基于你的入睡时间、入睡时长、入睡前的心率和呼吸变化分析出你的入睡习惯，让你更了解你自己的睡眠如何更自然地开始。";
-"explore.default.structure_desc" = "这里会呈现你的睡眠阶段分布。你可以看到浅睡、深睡与快速眼动睡眠的比例与连续性，了解自己的睡眠结构有助于你调整作息和睡眠习惯，而无需评判好坏。";
-"explore.default.fluctuation_desc" = "这里会记录在夜间Mindora的每一次陪伴干预和你睡眠中的反应。在夜间，如果你在睡眠过程中出现波动，Mindora会基于生理指标精准判断你的波动情况，在合理范围内陪伴，在必要时干预，守护你的睡眠节律。";
-"explore.default.preference_desc" = "这里会总结你偏好的声音类型与场景。通过这些分析你可以更了解哪些因素更有效地帮助了你的睡眠。Mindora会学习你的睡眠习惯和对声音场景的偏好，并为你推荐更有效、更个性化的睡眠陪伴方案。";
 
-"explore.empty.score" = "0";
-"explore.empty.title" = "睡眠评分";
-"explore.empty.message" = "完成首次监测后，\n你将在这里获得睡眠质量的深度分析。\n让我们开始你的第一次睡眠监测吧。";
-"explore.bottom.description" = "通过感知你的整夜睡眠状态，关注你的各项生理指标变化并在需要时主动通过AI调节提供介入，帮助你获得更连贯、更优质的好睡眠。当你开始使用后，这里会显示你的深度睡眠洞察。包括入睡过程、睡眠结构、夜间波动以及我们为你推荐的声场。";
 "subscription.restore.no_purchases" = "未发现有效订阅";
+"subscription.bound_to_another" = "此订阅已绑定其他账号，请用原账号登录后使用。";
 
 // Renewal Management
-"renewal.title" = "续费管理";
+"renewal.title" = "订阅管理";
 "renewal.your_subscription" = "你的订阅";
-"renewal.product_name" = "我的MIDORA";
+"renewal.product_name" = "My Mindora";
 "renewal.plan" = "订阅方案";
 "renewal.plan.monthly" = "连续包月";
 "renewal.renewal_date" = "续期时间";
@@ -696,14 +795,42 @@
 "subscription.renewal_management" = "续费管理";
 "faq.title" = "Mindora 常见问题解答";
 "faq.subtitle" = "Mindora是一款智能助眠设备，旨在通过多感官协同和AI帮助您改善睡眠质量。它并非医疗设备。以下是一些常见问题的解答。";
-"faq.section.getting_started" = "入门指南";
-"faq.section.core_ai" = "核心功能与AI";
-"faq.q.packaging" = "我的Mindora产品包装内包含什么？";
-"faq.a.packaging" = "每套Mindora产品包含一个Mindora助眠主机、一个电源适配器和一根USB充电线。部分套餐可能包含额外的配件（如天然香薰补充装）。";
-"faq.q.accuracy" = "Mindora的睡眠环境监测数据准确吗？";
-"faq.a.accuracy" = "Mindora采用经过验证的传感器（如温湿度、光敏、声压传感器）和算法来评估您的睡眠环境，提供睡眠阶段（浅睡、深睡、REM）、心率和睡眠环境等数据评估，其数据适用于追踪您卧室环境的长期趋势和模式，并据此提供改善建议。请注意，它并非医疗级诊断设备。请注意，单个数据的绝对值可能受设备具体摆放位置影响。";
-"faq.q.ai" = "什么是“AI智能干预”功能？它是如何工作的？";
-"faq.a.ai" = "Mindora利用AI技术实时监测您的睡眠状态，并自动调节声光环境以帮助您维持深度睡眠或平稳唤醒。";
+"faq.footer.prefix" = "如有其他问题，可前往Mindora官网";
+"faq.footer.link" = "帮助中心";
+"faq.footer.suffix" = "查看。";
+
+"faq.q1" = "如何选择订阅服务？";
+"faq.a1" = "月度订阅：价格为 2.99 美元/月。\n\n年度订阅：价格为 29.99 美元/年，相当于节省约 2 个月的费用。\n\n具体价格可能因您所在的国家或地区以及税费而略有不同，请在订阅页面查看最终金额。\n\n如果你在Mindora在线商店购买设备，还可以选择在订单中添加预付费年度会员计划。\n\n2026年12月25日前购买设备的新成员可获得首年Mindora会员资格。在这段免费期之后，会员需自行购买。\n\nMindora会员是绑定在你的Mindora账户上，而不是你的实体Mindora设备。如果你用现有的Mindora账户购买额外的设备，将不会再获得一个免费的会员月。";
+
+"faq.q2" = "如何激活会员服务？";
+"faq.a2" = "如果您购买的是内含会员期的硬件套装，在首次成功连接设备并登录App后，系统将自动激活赠送的会员资格。\n\n如果您是单独购买会员，只需在Mindora App内点击“升级账户”或“订阅会员”，选择计划并完成支付即可立即激活。";
+
+"faq.q3" = "哪些手机系统可以兼容Mindora App？";
+"faq.a3" = "Mindora App支持运行iOS 15及以上的iPhone，以及运行Android 11及以上并支持蓝牙5.0的安卓手机。";
+
+"faq.q4" = "需要一直打开手机蓝牙吗？";
+"faq.a4" = "是的，为保持设备与App的数据同步和远程控制，需要开启手机蓝牙。但设备本身可独立运行预设的助眠程序。";
+
+"faq.q5" = "如何连接/配对设备？";
+"faq.a5" = "打开手机蓝牙，启动Mindora App，在主界面点击“添加设备”并按照屏幕指示操作即可。详细图文步骤可查看[此处链接至具体帮助文章]。";
+
+"faq.q6" = "Mindora可以和其他健康App（如Apple Health、Google Fit）同步数据吗？";
+"faq.a6" = "可以。您可以在Mindora App的“设置”>“应用与服务”中，授权将您的睡眠数据同步至Apple Health或Google Fit等平台。";
+
+"faq.q7" = "需要付费订阅才能使用所有功能吗？";
+"faq.a7" = "Mindora的核心助眠功能（如基础声音、灯光场景、香氛扩散）和AI睡眠监测在购买硬件后即可使用。高级会员订阅（如适用）将解锁更丰富的音效库、个性化睡眠分析报告、进阶睡眠课程、独家ASMR内容以及更精细的AI算法个性化等内容。";
+
+"faq.q8" = "如何管理或取消我的订阅？";
+"faq.a8" = "您可以随时在Mindora App的“账户设置”中管理订阅。对于通过iOS App Store或Google Play Store进行的购买，也需在相应的商店订阅页面进行管理。";
+
+"faq.q9" = "我的睡眠数据安全吗？Mindora如何保护我的隐私？";
+"faq.a9" = "您的数据安全至关重要。我们采用行业标准加密技术保护数据传输与存储。您可以查阅详细的《Mindora隐私政策》以了解我们如何收集、使用和保护您的个人信息。";
+
+"faq.q10" = "我可以删除我的账户和数据吗？";
+"faq.a10" = "可以。您可以在Mindora App的“账户设置”中找到“删除账户”选项，或联系我们的客服提出请求。删除后，您的个人数据将从我们的活动服务器中移除。";
+
+"faq.q11" = "我在哪里可以管理或取消我的Mindora会员？";
+"faq.a11" = "App内管理：您可以在Mindora App的“账户设置” > “我的订阅”中，随时查看下次续费日期、更改付款方式或取消自动续订。\n\n应用商店管理：如果您是通过iOS或Android应用商店订阅的，也需在相应商店的订阅管理页面进行取消。取消操作将在当前订阅周期结束后生效。";
 
 
 // MARK: - Health Refactor
@@ -714,6 +841,7 @@
 "health.sleep.performance" = "睡眠表现";
 "health.sleep.time_in_bed" = "卧床时间";
 "health.sleep.resting_heart_rate" = "静息心率";
+"health.sleep.sleep_heart_rate" = "睡眠心率";
 "health.sleep.overnight_vitals" = "夜间生命体征";
 "health.sleep.respiratory_rate" = "呼吸频率";
 "health.sleep.body_temperature" = "体温";
@@ -737,10 +865,8 @@
 "subscription.go_to_subscribe" = "前往订阅";
 
 // MARK: - Explore
-"explore.title" = "探索";
+"explore.title" = "洞察";
 "explore.greeting" = "嗨，%@";
-"explore.intro.default" = "在你入睡、醒来、再次进入深眠的每一个阶段，Mindora 都在持续观察你的睡眠节律，并根据你的状态调整陪伴方式。这些洞察并不只是数据的变化，它们来自你正在使用的睡眠场景、声音节奏，以及你身体给出的真实反馈。";
-"explore.intro.default_detail" = "向下看看，我们会为你解释：\n昨晚发生了什么，哪些方式对你最有帮助，以及 Mindora 为你做了哪些调整。";
 "explore.intro.data" = "嗨，昨晚你的身体进入了一个稳定、放松且高度可恢复的睡眠状态。从入睡节律到整夜结构，你的多项关键指标都优于你近期的平均水平。这不是“偶然睡得好”，而是一次神经系统与睡眠结构协同良好的夜晚。";
 "explore.section.efficiency" = "入睡效率";
 "explore.section.structure" = "睡眠结构";
@@ -782,6 +908,13 @@
 "explore.empty.message" = "完成首次监测后，\n你将在这里获得睡眠质量的深度分析。\n让我们开始你的第一次睡眠监测吧。";
 
 
+"explore.empty.intro" = "在你入睡、醒来、再次进入深眠的每一个阶段，Mindora都在持续观察你的睡眠节律，并根据你的状态调整陪伴方式。这些洞察并不只是数据的变化，它们来自你正在使用的睡眠场景、声音节奏，以及你身体给出的真实反馈。";
+"explore.empty.intro_detail" = "向下看看，我们会为你解释：\n昨晚发生了什么，哪些方式对你最有帮助，以及Mindora为你做了哪些调整。";
+"explore.empty.desc.efficiency" = "这里会展示你的入睡过程。Mindora会基于你的入睡时间、入睡时长、入睡前的心率和呼吸变化分析出你的入睡习惯，让你更了解你自己的睡眠如何更自然的开始。";
+"explore.empty.desc.structure" = "这里会呈现你的睡眠阶段分布。你可以看到浅睡、深睡与快速眼动睡眠的比例与连续性，了解自己的睡眠结构有助于你调整作息和睡眠习惯，而无需评判好坏。";
+"explore.empty.desc.fluctuation" = "这里会记录在夜间Mindora的每一次陪伴干预和你睡眠中的反应。在夜间，如果你在睡眠过程中出现波动，Mindora会基于生理指标精准判断你的波动情况，在合理范围内陪伴，在必要时干预，守护你的睡眠节律。";
+"explore.empty.desc.preference" = "这里会总结你偏好的声音类型与场景。通过这些分析你可以更了解哪些因素更有效地帮助了你的睡眠。Mindora会学习你的睡眠习惯和对声音场景的偏好，并为你推荐更有效、更个性化的睡眠陪伴方案。";
+"explore.empty.desc.advice" = "通过感知你的整夜睡眠状态，关注你的各项生理指标变化并在需要时主动通过AI调节提供介入，帮助你获得更连贯、更优质的好睡眠。当你开始使用后，这里会显示你的深度睡眠洞察。包括入睡过程、睡眠结构、夜间波动以及我们为你推荐的声场。";
 // MARK: - Store
 "store.coming_soon" = "商店即将上线";
 "store.banner.title" = "选择你喜欢的\n混合精油和组合";
@@ -801,3 +934,331 @@
 "store.search.placeholder" = "输入搜索内容";
 "store.search.cancel" = "取消";
 "store.search.history" = "历史记录";
+
+"auth.session_expired" = "登录已过期，请重新登录。";
+
+/* MARK: - 首页弹窗（活动 / 广告 / 参与调研） */
+"popup.badge.survey" = "参与调研";
+"popup.action.detail" = "查看详情";
+"popup.mock.survey.title" = "帮助我们做得更好";
+"popup.mock.survey.subtitle" = "完成 3 分钟睡眠体验问卷，提交后可获得会员积分。";
+
+/* MARK: - 调查问卷 */
+"survey.title" = "睡眠体验问卷";
+"survey.next" = "下一题";
+"survey.submit" = "提交";
+"survey.submit.note" = "提交即表示同意将答案用于产品体验改进";
+"survey.choice.hint" = "请选择一个最符合你感受的答案";
+"survey.q1.title" = "最近 7 天，你对自己的整体睡眠满意度如何？";
+"survey.q2.title" = "最近 7 天，你对 Mindora 的整体满意度如何？";
+"survey.q3.title" = "你对 Mindora 有什么改进意见吗？";
+"survey.q3.hint" = "请填写你的建议";
+"survey.q3.placeholder" = "请输入…";
+"survey.scale.very_satisfied" = "非常满意";
+"survey.scale.satisfied" = "比较满意";
+"survey.scale.neutral" = "一般";
+"survey.scale.dissatisfied" = "不太满意";
+"survey.scale.very_dissatisfied" = "非常不满意";
+"survey.validation.choose" = "请选择一个答案";
+"survey.validation.input" = "请填写你的建议";
+"survey.error.generic" = "出错了，请稍后重试。";
+"survey.already_submitted" = "该问卷已提交，感谢参与";
+"survey.completed" = "已完成";
+"survey.reward.title" = "问卷奖励";
+"survey.reward.desc" = "礼品会在 10 个工作日内发出，我们会以邮件的方式通知您。";
+"survey.success.title" = "提交成功";
+"survey.success.line1" = "感谢你的真实反馈";
+"survey.success.line2" = "礼品会在 10 个工作日内发出";
+"survey.success.line3" = "我们会以邮件的方式通知您";
+"survey.success.back_home" = "返回首页";
+
+/* MARK: - 站内消息：参与调研 */
+"notifications.source.survey" = "参与调研";
+"notifications.source.promo" = "活动";
+"notifications.promo.action" = "查看详情";
+"notifications.survey.title" = "帮助我们做得更好";
+"notifications.survey.valid_until" = "有效期至 %@";
+"notifications.survey.action" = "填写问卷";
+
+/* MARK: - 陪伴足迹 */
+"footprint.title" = "陪伴足迹";
+"footprint.explain" = "说明";
+"footprint.stat.companion" = "助眠陪伴";
+"footprint.stat.app_active" = "App活跃";
+"footprint.stat.continuous" = "连续使用";
+"footprint.stat.month_total" = "本月累计";
+"footprint.stat.year_total" = "全年累计";
+"footprint.unit.day" = "天";
+"footprint.milestones.title" = "里程碑记录";
+"footprint.milestones.empty" = "暂无里程碑记录";
+"footprint.milestone.sleep_plan" = "睡眠计划";
+"footprint.milestone.days_completed" = "%d日睡眠目标·已完成";
+"footprint.legend.app_active" = "App活跃";
+"footprint.legend.companion" = "助眠陪伴";
+"footprint.legend.plan" = "完成计划/连续陪伴";
+"footprint.weekday.sun" = "日";
+"footprint.weekday.mon" = "一";
+"footprint.weekday.tue" = "二";
+"footprint.weekday.wed" = "三";
+"footprint.weekday.thu" = "四";
+"footprint.weekday.fri" = "五";
+"footprint.weekday.sat" = "六";
+"footprint.weekday.full.mon" = "周一";
+"footprint.weekday.full.tue" = "周二";
+"footprint.weekday.full.wed" = "周三";
+"footprint.weekday.full.thu" = "周四";
+"footprint.weekday.full.fri" = "周五";
+"footprint.weekday.full.sat" = "周六";
+"footprint.weekday.full.sun" = "周日";
+"footprint.month_selector" = "%d年 %d月";
+"footprint.month_label" = "%d月";
+"footprint.anchor_date" = "%d年%d月%d日·%@";
+"footprint.annual.title" = "%d年陪伴足迹";
+"footprint.info.title" = "指标说明";
+"footprint.info.companion.desc" = "设备与 App 同时有效使用；同一自然日最多记 1 日。显示当月累计。";
+"footprint.info.app_active.desc" = "当天打开 App 即记 1 日；重复打开不重复计次。显示当月累计。";
+"footprint.info.continuous.desc" = "从首次下载或使用以来，本自然年累计产生使用记录的自然日。";
+"footprint.info.marks.title" = "日历标记";
+"footprint.picker.title" = "选择月份";
+"footprint.picker.annual" = "全年";
+"footprint.picker.confirm" = "确认";
+
+"notifications.survey.body" = "诚邀您完成 3 分钟睡眠体验问卷，提交后可以获得一份品牌礼品。";
+
+/* MARK: - Gift Claim */
+"gift.title" = "礼品领取";
+"gift.confirm" = "确认";
+"gift.physical.desc" = "我们将会把「%@」寄往已填写绑定的地址，如下：";
+"gift.physical.change_hint" = "如要更改为其他地址，请联系客服修改";
+"gift.virtual.desc" = "我们将会把「%@」发往已填写绑定的邮箱，如要更改请重新填写。";
+"gift.email.placeholder" = "请输入邮箱";
+"gift.validation.email" = "请输入有效的邮箱";
+"gift.no_address" = "尚未填写收货地址，请先在个人中心添加";
+"gift.no_address.title" = "抱歉，我们未能获取到你的地址";
+"gift.no_address.hint" = "请先填写收货地址";
+"gift.fill_address" = "填写地址";
+"gift.address.title" = "填写地址";
+"survey.reward.demo_gift" = "品牌睡眠好礼";
+
+"device_scan.stale_pairing.title" = "需要在系统设置中忽略设备";
+"device_scan.stale_pairing.message" = "本机保存的蓝牙配对信息已失效，无法连接「%@」。请前往「设置 → 蓝牙」，找到该设备并点击右侧 ⓘ，选择「忽略此设备」，然后返回重试。";
+"settings.follow_system" = "跟随系统";
+
+// MARK: - Sleep Plan（睡眠计划 Tab，2026-08-12）
+"tab.plan" = "计划";
+"common.got_it" = "知道了";
+"subscription.section.title.premium" = "高级会员";
+"subscription.action.upgrade" = "升级";
+"subscription.desc.premium.monthly.prefix" = "订阅到期前一天将以";
+"subscription.desc.premium.monthly.suffix" = "/月续期，可在费用扣除前随时取消订阅。";
+"subscription.desc.premium.yearly" = "自开通日期起可享受一整年的高级会员服务，可在下次续费前随时取消订阅。";
+"renewal.tier" = "会员等级";
+"renewal.tier.basic" = "普通会员";
+"renewal.tier.premium" = "高级会员";
+"renewal.tier.none" = "无";
+"renewal.environment" = "环境";
+"renewal.environment.sandbox" = "测试环境（不扣费）";
+"sleepplan.title" = "睡眠计划";
+"sleepplan.intro" = "制定一个睡眠目标，App与设备会按时提醒并协同执行。让改善睡眠变成可执行的计划。";
+"sleepplan.section.training" = "睡眠训练";
+"sleepplan.section.training.subtitle" = "结合科学理论制定的睡眠调节计划，快速选择一个开始吧。";
+"sleepplan.section.my_plans" = "我的睡眠计划";
+"sleepplan.my_plans.empty" = "还没有睡眠计划";
+"sleepplan.my_plans.quota" = "%@ · %d/%d";
+"sleepplan.kind.custom.default_name" = "新建睡眠计划01";
+"sleepplan.kind.habit_formation.name" = "睡眠习惯养成";
+"sleepplan.kind.habit_formation.summary" = "21天习惯训练";
+"sleepplan.kind.habit_formation.description" = "帮助你用21天建立稳定、可持续的睡眠习惯。规律作息有助于稳定睡眠节律，提升睡眠质量。";
+"sleepplan.kind.jet_lag.name" = "时差修正";
+"sleepplan.kind.jet_lag.summary" = "7天睡眠调整";
+"sleepplan.kind.jet_lag.description" = "帮助你用7天逐步调整入睡与起床时间，适应目标时区。循序调整作息节律，减轻跨时区带来的睡眠不适。";
+"sleepplan.kind.anxiety_relief.name" = "焦虑修复";
+"sleepplan.kind.anxiety_relief.summary" = "14天睡前减压";
+"sleepplan.kind.anxiety_relief.description" = "帮助你用14天建立稳定的睡前放松节奏。通过减压训练，缓解焦虑引起的入睡困难。";
+"sleepplan.status.active" = "已开启";
+"sleepplan.status.not_enabled" = "未开启";
+"sleepplan.status.completed" = "已完成";
+"sleepplan.status.stopped" = "已停止";
+"sleepplan.list.target_sleep_time" = "%@ 目标入睡";
+"sleepplan.tier.basic" = "普通会员";
+"sleepplan.tier.premium" = "高级会员";
+"sleepplan.action.create_plan" = "新建计划 +";
+"sleepplan.action.edit" = "编辑";
+"sleepplan.action.plan_detail" = "计划详情 →";
+"sleepplan.action.save" = "保存设置";
+"sleepplan.action.discard" = "放弃修改";
+"sleepplan.action.keep_editing" = "继续编辑";
+"sleepplan.action.tap_to_set" = "点击设置";
+"sleepplan.action.upgrade_premium" = "升级高级会员";
+"sleepplan.alert.locked_tonight.title" = "今晚计划已开始";
+"sleepplan.alert.locked_tonight.message" = "暂不可关闭，请等到明天再切换。";
+"sleepplan.alert.plan_full.title" = "睡眠计划已满";
+"sleepplan.alert.plan_full.message" = "当前保存的睡眠计划数量已达到上限。请删除已有计划后再试。";
+"sleepplan.alert.plan_full.basic_message" = "普通会员最多保存或开启1条睡眠计划。请删除当前计划后再试。";
+"sleepplan.alert.premium_required.title" = "高级会员功能";
+"sleepplan.alert.premium_required.message" = "升级为高级会员后，可调整官方睡眠训练的提前入睡提醒时间和闹钟声音。";
+"sleepplan.alert.custom_plan_required.message" = "普通会员最多保存或开启1条睡眠计划。升级为高级会员后，可新建自定义计划并恢复列表中的全部计划。";
+"sleepplan.alert.switch_plan.title" = "是否切换睡眠计划？";
+"sleepplan.alert.switch_plan.message" = "将停止「%@」并开启当前计划，确认切换吗？";
+"sleepplan.alert.exit_new.title" = "退出新建计划？";
+"sleepplan.alert.exit_new.message" = "当前计划尚未保存，退出后已设置的内容将不会保留。";
+"sleepplan.alert.unsaved_edit.title" = "修改尚未保存";
+"sleepplan.alert.unsaved_edit.message" = "返回后，本次修改将不会生效。";
+"sleepplan.editor.name_hint" = "点击计划名称即可修改，方便管理个性化方案。";
+"sleepplan.editor.sleep_goal" = "睡眠目标";
+"sleepplan.editor.sleep_goal_hint" = "按住端点拖动色带设置入睡或起床时间。或点击时间数字，编辑精确时间。";
+"sleepplan.editor.sleep_time" = "入睡时间";
+"sleepplan.editor.wake_time" = "起床时间";
+"sleepplan.editor.options" = "计划选项";
+"sleepplan.editor.cycle" = "执行周期";
+"sleepplan.editor.cycle.hint" = "训练周期由系统固定配置，完成后可再次开启。";
+"sleepplan.editor.reminder" = "入睡提醒";
+"sleepplan.editor.reminder.hint" = "提前提醒你准备入睡，并提前开启氛围灯与香薰，营造睡眠氛围。";
+"sleepplan.editor.sleep_aid" = "助眠方案";
+"sleepplan.editor.sleep_aid.hint" = "根据睡眠数据，每晚智能匹配合适的助眠场景。";
+"sleepplan.editor.alarm" = "闹钟方案";
+"sleepplan.editor.alarm.hint" = "起床时播放的闹钟声音，帮助你更自然地醒来。";
+"sleepplan.editor.save_hint" = "请完成全部必填项后保存。保存后计划进入列表，但不会立即开启。";
+"sleepplan.editor.save_hint.edit" = "保存后计划进入列表并显示为未开启，不影响当前正在执行的计划。";
+"sleepplan.editor.save_hint.official" = "保存后，计划将显示在“我的睡眠计划”列表中，但不会立即开启。\n请返回计划首页手动开启。";
+"sleepplan.sheet.reminder.title" = "入睡提醒";
+"sleepplan.sheet.reminder.minutes_before" = "%d分钟";
+"sleepplan.sheet.alarm_sound.title" = "闹钟方案";
+"sleepplan.sheet.sleep_aid.title" = "助眠方案";
+"sleepplan.sheet.sleep_aid.readonly_title" = "智能助眠方案";
+"sleepplan.sheet.sleep_aid.readonly_message" = "基于睡眠科学与您的睡眠数据，AI 每晚智能匹配合适的助眠场景。方案由系统配置，不支持手动修改。";
+"sleepplan.sheet.cycle.title" = "执行周期";
+"sleepplan.sheet.cycle.instruction" = "请选择计划执行的星期";
+"sleepplan.sheet.cycle.repeat_weekly" = "每周重复";
+"sleepplan.sheet.cycle.repeat_hint" = "关闭时仅执行所选日期一轮";
+"sleepplan.sheet.cycle.warning" = "请至少选择连续3天，以保证睡眠计划的连续性。";
+"sleepplan.sheet.cycle.hint" = "至少选择连续3天，不支持间隔日期。周六、周日、周一视为连续。开启后，每周仅按所选星期循环执行。";
+"sleepplan.sheet.cycle.readonly_message" = "该训练计划的执行周期为 %d 天，每天执行。周期由官方固定配置，不支持修改；完成后可再次开启。";
+"sleepplan.sheet.goal.title" = "睡眠目标设置";
+"sleepplan.sheet.goal.duration" = "目标睡眠时长";
+"sleepplan.sheet.goal.sleep_time" = "入睡时间";
+"sleepplan.sheet.goal.wake_time" = "起床时间";
+"sleepplan.sheet.goal.too_short" = "睡眠时间过短，请设置至少1小时。";
+"sleepplan.sheet.rename.title" = "修改计划名称";
+"sleepplan.sheet.rename.hint" = "最多10个字符";
+"sleepplan.cycle.fixed_daily" = "%d天·每天";
+"sleepplan.cycle.repeats_weekly" = "每周重复";
+"sleepplan.cycle.once" = "仅一轮";
+"sleepplan.duration.hours" = "%d小时";
+"sleepplan.duration.hours_half" = "%d.5小时";
+"sleepplan.duration.hours_minutes" = "%d小时%d分";
+"sleepplan.unit.hour" = "小时";
+"sleepplan.unit.minute" = "分";
+"sleepplan.duration.hours_short" = "%d小时";
+"sleepplan.reminder.minutes_before_short" = "提前%d分钟";
+"sleepplan.reminder.off" = "未开启";
+"sleepplan.reminder.notification_title" = "该准备睡觉了";
+"sleepplan.reminder.notification_body" = "「%@」计划的入睡时间快到了，开始放松准备入睡吧。";
+"sleepplan.sound.temple_bell" = "寺庙晨钟";
+"sleepplan.sound.sunlit_coast" = "日光海岸";
+"sleepplan.sound.rainforest_mist" = "雨林晨雾";
+"sleepplan.sleep_aid.smart.name" = "智能推荐";
+"sleepplan.sleep_aid.smart.desc" = "根据睡眠数据和当前状态，智能匹配助眠内容。";
+"sleepplan.sleep_aid.preference.name" = "偏好推荐";
+"sleepplan.sleep_aid.preference.desc" = "根据历史使用和内容偏好，推荐更符合个人喜好的助眠内容。";
+"sleepplan.sleep_aid.trending.name" = "热度推荐";
+"sleepplan.sleep_aid.trending.desc" = "根据多数用户的使用与反馈，推荐当前热门的助眠内容。";
+"weekday.mon" = "周一";
+/* List separator used to join items such as weekday names. */
+"common.list_separator" = "、";
+
+"weekday.short.1" = "周一";
+"weekday.tue" = "周二";
+"weekday.short.2" = "周二";
+"weekday.wed" = "周三";
+"weekday.short.3" = "周三";
+"weekday.thu" = "周四";
+"weekday.short.4" = "周四";
+"weekday.fri" = "周五";
+"weekday.short.5" = "周五";
+"weekday.sat" = "周六";
+"weekday.short.6" = "周六";
+"weekday.sun" = "周日";
+"weekday.short.7" = "周日";
+"sleepplan.action.confirm_exit" = "确认退出";
+
+/* 健康周/月视图：服务端分析缺失时的兜底文案（原为硬编码英文） */
+"health.chart.tooltip.duration" = "%1$@ 小时 %2$@ 分";
+
+/* 会员订阅卡（20260818 设计）*/
+"subscription.plan.subheader" = "选择会员等级与付费周期";
+"subscription.plan.tier.basic" = "普通会员";
+"subscription.plan.tier.premium" = "AI 高级会员";
+"subscription.plan.monthly.note" = "按月续订，可随时取消";
+"subscription.plan.yearly.note" = "按年自动续费";
+"subscription.plan.monthly.tag" = "灵活订阅";
+"subscription.plan.yearly.tag" = "立省 16-17%";
+"subscription.plan.cta.basic" = "订阅 Basic · %@";
+"subscription.plan.cta.premium" = "订阅 AI Premium · %@";
+"subscription.plan.current" = "当前套餐";
+"subscription.plan.footnote" = "自动续费，可随时取消。最终金额以 App Store 为准。";
+"subscription.benefit.basic.1.title" = "完整睡眠数据";
+"subscription.benefit.basic.1.desc" = "查看历史睡眠记录，浏览睡眠评分数据，追踪睡眠变化趋势";
+"subscription.benefit.basic.2.title" = "个人睡眠模型";
+"subscription.benefit.basic.2.desc" = "基于用户长期睡眠数据持续迭代学习";
+"subscription.benefit.basic.3.title" = "AI 动态监测";
+"subscription.benefit.basic.3.desc" = "根据睡眠状态做基础动态调整，并输出可执行的睡眠改善建议";
+"subscription.benefit.basic.4.title" = "睡眠计划";
+"subscription.benefit.basic.4.desc" = "可保存并启用 1 条计划";
+"subscription.benefit.premium.1.title" = "包含 Basic 全部权益";
+"subscription.benefit.premium.1.desc" = "完整数据、趋势分析与个人睡眠模型";
+"subscription.benefit.premium.2.title" = "AI 生成助眠流程";
+"subscription.benefit.premium.2.desc" = "根据当天状态，动态生成个性化方案";
+"subscription.benefit.premium.3.title" = "深度睡眠洞察";
+"subscription.benefit.premium.3.desc" = "分析睡眠数据，识别长期睡眠问题及核心影响因素";
+"subscription.benefit.premium.4.title" = "睡眠计划";
+"subscription.benefit.premium.4.desc" = "可保存并启用 5 条计划";
+
+/* 订阅卡：已订阅态与套餐切换 */
+"subscription.plan.cta.switch" = "更换为%@";
+"subscription.plan.cta.upgrade" = "升级 AI Premium · %@";
+"subscription.plan.cta.downgrade" = "改用普通会员 · %@";
+"subscription.plan.cta.scheduled" = "已排期";
+"subscription.plan.status.current" = "当前：%1$@ · %2$@";
+"subscription.plan.period.redeemed" = "兑换码";
+"subscription.plan.status.renew" = "%@ 续费";
+"subscription.plan.status.expire" = "%@ 到期";
+"subscription.plan.status.pending" = "已切换为 %1$@，将于 %2$@ 生效";
+"subscription.plan.manage" = "管理订阅";
+
+/* 资料卡会员状态行（带等级）*/
+"subscription.status.active" = "生效中 · %1$@ · %2$@";
+"subscription.status.trial" = "体验中 · %@";
+"subscription.status.granted" = "生效中 · %@";
+
+/* 订阅日期行标题：随续订状态变 */
+"subscription.date.next_billing" = "下次扣费日";
+"subscription.date.expiry" = "到期日";
+"subscription.date.grace" = "需更新付款方式";
+"subscription.date.retry" = "扣费重试中";
+"subscription.date.expired" = "已到期";
+
+/* 设计校对表（2026-10）新增：英文按设计稿，其他语言沿用原显示 */
+"sleepplan.editor.options.custom" = "计划选项";
+"sleepplan.editor.cycle.custom" = "执行周期";
+"sleepplan.editor.cycle.hint.custom" = "训练周期由系统固定配置，完成后可再次开启。";
+"sleepplan.sheet.cycle.readonly_title" = "执行周期";
+"subscription.prompt.title" = "您还不是会员";
+"explore.gate.title" = "您还不是会员";
+"explore.gate.hint" = "订阅后可以查看";
+"explore.gate.action" = "前往订阅";
+"survey.progress" = "%1$d / %2$d";
+"unit.duration.hr_min" = "%1$dh %2$dmin";
+"unit.duration.hr" = "%dh";
+"unit.duration.min" = "%dmin";
+"unit.duration.under_1_min" = "<1min";
+"unit.bpm" = "%dbpm";
+"unit.bpm_range" = "%1$d-%2$dbpm";
+"unit.breaths_per_min" = "%d 次/分";
+"unit.days_tracked" = "%1$d/%2$ddays";
+"unit.duration.compact.hr_min" = "%1$dh%2$dmin";
+"unit.duration.compact.hr" = "%dh";
+"health.sleep.stage_card.rem" = "快速动眼";
+"health.sleep.stage_card.core" = "核心睡眠";
+"health.sleep.stage_card.deep" = "深度睡眠";
+"sleepplan.cycle.range" = "%1$@至%2$@";

@@ -9,6 +9,26 @@ struct LocationItem {
     let coordinate: CLLocationCoordinate2D
     let region: String // State + City + District
     let detail: String // Street + Name
+
+    // 结构化字段：地址要发到商城，承运商按 state + zip 分区，
+    // 只给一串 region 文本对面拆不出来。CLPlacemark 本来就带这些值，之前白白丢掉了。
+    var countryCode: String = ""
+    var state: String = ""
+    var city: String = ""
+    var street: String = ""
+    var zip: String = ""
+}
+
+/// 从系统地标里取出结构化字段。
+private func structuredFields(from placemark: CLPlacemark) -> (country: String, state: String, city: String, street: String, zip: String) {
+    let street = [placemark.subThoroughfare, placemark.thoroughfare]
+        .compactMap { $0 }
+        .joined(separator: " ")
+    return (placemark.isoCountryCode ?? "",
+            placemark.administrativeArea ?? "",
+            placemark.locality ?? placemark.subAdministrativeArea ?? "",
+            street,
+            placemark.postalCode ?? "")
 }
 
 class AddressMapPickerViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate {
@@ -192,12 +212,18 @@ class AddressMapPickerViewController: UIViewController, MKMapViewDelegate, CLLoc
             if detail.isEmpty { detail = region } // Fallback
             
             // Create item for "Current Map Center"
+            let fields = structuredFields(from: placemark)
             self.centerLocationItem = LocationItem(
                 name: L("address.current_location"), 
                 address: region,
                 coordinate: coordinate,
                 region: region,
-                detail: detail
+                detail: detail,
+                countryCode: fields.country,
+                state: fields.state,
+                city: fields.city,
+                street: fields.street.isEmpty ? detail : fields.street,
+                zip: fields.zip
             )
             self.tableView.reloadData()
         }
@@ -269,12 +295,18 @@ class AddressMapPickerViewController: UIViewController, MKMapViewDelegate, CLLoc
             let region = regionParts.joined(separator: " ")
             let detail = item.name ?? placemark.thoroughfare ?? ""
             
+            let fields = structuredFields(from: placemark)
             selectedItem = LocationItem(
                 name: item.name ?? "",
                 address: placemark.title ?? "",
                 coordinate: placemark.coordinate,
                 region: region,
-                detail: detail
+                detail: detail,
+                countryCode: fields.country,
+                state: fields.state,
+                city: fields.city,
+                street: fields.street.isEmpty ? detail : fields.street,
+                zip: fields.zip
             )
         }
         

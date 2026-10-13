@@ -19,7 +19,14 @@ struct HealthMetrics {
     var bodyTemperature: MetricValue?      // degC
     var sleepSummary: SleepValue?
     var lastUpdated: Date?            // 最后一次采集数据的时间
-    
+    /// 睡眠期间的心率区间（min–max），对应苹果健康「睡眠 → 比较 → 心率」。
+    /// 只在需要展示它的入口（首页顶部 / 日视图 Sleep Performance）填充。
+    var sleepHeartRateRange: HealthDataManager.HeartRateRangePoint?
+
+    /// 全空的生命体征。视图拿不到生命体征时用它继续渲染睡眠部分 ——
+    /// 「读到什么就展示什么」，不允许一项失败拖垮整页。
+    static let empty = HealthMetrics()
+
     struct MetricValue {
         let value: Double
         let date: Date
@@ -56,6 +63,9 @@ extension HealthDataManager {
         let awakeMinutes: Double
         let timeInBedHours: Double
         let sleepOnsetMinutes: Double?
+        /// 不分期来源写的「睡着」（asleepUnspecified）。计入 totalSleepHours，
+        /// 但**不计入 coreSleepHours** —— 苹果健康的 Core 也只算真正的 asleepCore。
+        var unspecifiedSleepHours: Double = 0
 
         var hasData: Bool {
             totalSleepHours > 0 || timeInBedHours > 0
@@ -67,9 +77,36 @@ extension HealthDataManager {
         }
     }
 
+    /// 周/月生命体征卡的口径：全部**限定在睡眠期间**，再按「晚」等权平均。
+    /// 不按样本数加权 —— 否则睡得久的那晚会被放大。
+    struct SleepVitalsAverages {
+        /// 每晚睡眠跨度内心率均值的平均
+        var sleepHeartRate: Double?
+        /// 周期内所有晚的睡眠心率最低/最高
+        var sleepHeartRateMin: Double?
+        var sleepHeartRateMax: Double?
+        /// 各睡眠日的静息心率日值的平均（苹果按日算好的基线，本身不分睡眠/清醒）
+        var restingHeartRate: Double?
+        /// 每晚睡眠跨度内呼吸频率均值的平均
+        var respiratoryRate: Double?
+        /// 睡眠腕温（苹果本就只在睡眠时产出，一晚一个值）的平均；无则退回睡眠跨度内的体温
+        var wristTemperature: Double?
+        /// 参与统计的晚数
+        var nights: Int = 0
+
+        var hasData: Bool {
+            sleepHeartRate != nil || restingHeartRate != nil || respiratoryRate != nil || wristTemperature != nil
+        }
+    }
+
     struct HealthSeriesData {
         struct SamplePoint { let timestamp: Int; let value: Double }
+        /// 心率原始序列。**不再上传**，只作为图表和推导睡眠心率区间的中间产物。
         var heartRate: [SamplePoint] = []            // bpm
+        /// 睡眠心率区间（min–max），对应苹果健康「睡眠 → 比较 → 心率」。
+        /// 上传的是这个区间，不是心率序列本身。
+        struct SleepHeartRateRangePoint { let startTs: Int; let endTs: Int; let min: Double; let max: Double }
+        var sleepHeartRateRange: SleepHeartRateRangePoint?
         var hrv: [SamplePoint] = []                  // ms
         var respiratoryRate: [SamplePoint] = []      // breaths/min
         var restingHeartRate: [SamplePoint] = []     // bpm
@@ -79,9 +116,26 @@ extension HealthDataManager {
         struct SleepStagePoint { let startTs: Int; let endTs: Int; let duration: Double }
         var deepSleep: [SleepStagePoint] = []
         var remSleep: [SleepStagePoint] = []
-        var lightSleep: [SleepStagePoint] = []       // core/light
+        var lightSleep: [SleepStagePoint] = []       // core
+        /// asleepUnspecified：不分期的来源（iPhone 睡眠专注、部分第三方 App）写的「睡着」。
+        /// 苹果健康把它计入 Duration 但**不计入 Core**，所以不能并进 lightSleep。
+        var unspecifiedSleep: [SleepStagePoint] = []
+        var awakeSleep: [SleepStagePoint] = []       // 夜间清醒片段
+        /// 上床区间。和睡眠阶段是重叠的两条轨，服务端要靠它算 Time in Bed / 睡眠效率 / 入睡用时
+        var inBed: [SleepStagePoint] = []
         // 可以按需扩展其它指标
     }
+
+    /// fetchSleepStages 的返回。前四条轨互斥（同一时刻只归属一个阶段），
+    /// inBed 按设计与它们重叠，单独一条轨。
+    typealias SleepStageSeries = (
+        deep: [HealthSeriesData.SleepStagePoint],
+        rem: [HealthSeriesData.SleepStagePoint],
+        light: [HealthSeriesData.SleepStagePoint],
+        unspecified: [HealthSeriesData.SleepStagePoint],
+        awake: [HealthSeriesData.SleepStagePoint],
+        inBed: [HealthSeriesData.SleepStagePoint]
+    )
 
     /// 心率范围数据点结构体
     struct HeartRateRangePoint {

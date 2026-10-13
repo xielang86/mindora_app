@@ -9,7 +9,7 @@ class PhoneEditViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Scaled Metrics Helper
     // Base design width is 375pt
     private var scale: CGFloat {
-        return UIScreen.main.bounds.width / 375.0
+        return iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0
     }
     
     private func s(_ value: CGFloat) -> CGFloat {
@@ -90,7 +90,8 @@ class PhoneEditViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         setupUI()
         setupActions()
-        
+        installTapToDismissKeyboard()
+
         if let phone = currentPhone {
             phoneTextField.text = phone
         }
@@ -185,9 +186,17 @@ class PhoneEditViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc private func handleSave() {
-        if let text = phoneTextField.text {
-             onSave?(text)
+        let text = (phoneTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        // 留空 = 用户不想填，允许；填了就得是个像样的号码，别再放行「1111」。
+        if !text.isEmpty {
+            let hint = AddressCatalog.defaultCountryCode()
+            let (country, national) = AddressCatalog.splitE164(text, hintCountry: hint)
+            guard AddressCatalog.isValidPhone(national: national, countryCode: country) else {
+                Toast.show(L("address.phone_invalid"), in: view)
+                return
+            }
         }
+        onSave?(text)
         dismiss(animated: true, completion: nil)
     }
     

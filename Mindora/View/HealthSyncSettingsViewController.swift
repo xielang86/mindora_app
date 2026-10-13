@@ -57,7 +57,8 @@ final class HealthSyncSettingsViewController: UIViewController {
     
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - Properties
@@ -182,7 +183,47 @@ final class HealthSyncSettingsViewController: UIViewController {
     
     // 指标项容器
     private var metricItems: [UIView] = []
-    
+
+    #if DEBUG
+    // 调试 · 上传记录面板（release 包不参与编译）
+    private let debugHistoryContainer: UIView = {
+        let v = UIView()
+        v.backgroundColor = .black
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    private let debugHistoryTopSeparator: UIView = {
+        let v = UIView()
+        v.backgroundColor = DesignConstants.separatorColor
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    private let debugHistoryTitleLabel: UILabel = {
+        let l = UILabel()
+        l.text = "DEBUG · 上传记录"
+        l.textColor = UIColor(white: 0.55, alpha: 1.0)
+        l.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let debugTodayLabel: UILabel = {
+        let l = UILabel()
+        l.textColor = UIColor(white: 0.88, alpha: 1.0)
+        l.font = UIFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+        l.numberOfLines = 0
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let debugHistoryLabel: UILabel = {
+        let l = UILabel()
+        l.textColor = UIColor(white: 0.88, alpha: 1.0)
+        l.font = UIFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+        l.numberOfLines = 0
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    #endif
+
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -191,11 +232,17 @@ final class HealthSyncSettingsViewController: UIViewController {
         setupActions()
         loadConfigIntoUI()
         registerNotifications()
+        #if DEBUG
+        refreshDebugHistory()
+        #endif
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        #if DEBUG
+        refreshDebugHistory()
+        #endif
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -245,6 +292,15 @@ final class HealthSyncSettingsViewController: UIViewController {
         
         setupStyles()
         createMetricItems()
+
+        #if DEBUG
+        contentView.addSubview(debugHistoryContainer)
+        debugHistoryContainer.addSubview(debugHistoryTopSeparator)
+        debugHistoryContainer.addSubview(debugHistoryTitleLabel)
+        debugHistoryContainer.addSubview(debugTodayLabel)
+        debugHistoryContainer.addSubview(debugHistoryLabel)
+        #endif
+
         setupConstraints()
     }
     
@@ -564,9 +620,37 @@ final class HealthSyncSettingsViewController: UIViewController {
         
         // 设置 contentView 的底部约束
         if let lastItem = metricItems.last {
+            #if DEBUG
+            let sepMargin = scale(DesignConstants.separatorHorizontalMargin, basedOn: view.bounds.width, designDimension: designWidth)
+            NSLayoutConstraint.activate([
+                debugHistoryContainer.topAnchor.constraint(equalTo: lastItem.bottomAnchor, constant: 12),
+                debugHistoryContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                debugHistoryContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                debugHistoryContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
+
+                debugHistoryTopSeparator.topAnchor.constraint(equalTo: debugHistoryContainer.topAnchor),
+                debugHistoryTopSeparator.leadingAnchor.constraint(equalTo: debugHistoryContainer.leadingAnchor, constant: sepMargin),
+                debugHistoryTopSeparator.trailingAnchor.constraint(equalTo: debugHistoryContainer.trailingAnchor, constant: -sepMargin),
+                debugHistoryTopSeparator.heightAnchor.constraint(equalToConstant: 1),
+
+                debugHistoryTitleLabel.topAnchor.constraint(equalTo: debugHistoryTopSeparator.bottomAnchor, constant: 16),
+                debugHistoryTitleLabel.leadingAnchor.constraint(equalTo: debugHistoryContainer.leadingAnchor, constant: sepMargin),
+                debugHistoryTitleLabel.trailingAnchor.constraint(equalTo: debugHistoryContainer.trailingAnchor, constant: -sepMargin),
+
+                debugTodayLabel.topAnchor.constraint(equalTo: debugHistoryTitleLabel.bottomAnchor, constant: 10),
+                debugTodayLabel.leadingAnchor.constraint(equalTo: debugHistoryContainer.leadingAnchor, constant: sepMargin),
+                debugTodayLabel.trailingAnchor.constraint(equalTo: debugHistoryContainer.trailingAnchor, constant: -sepMargin),
+
+                debugHistoryLabel.topAnchor.constraint(equalTo: debugTodayLabel.bottomAnchor, constant: 14),
+                debugHistoryLabel.leadingAnchor.constraint(equalTo: debugHistoryContainer.leadingAnchor, constant: sepMargin),
+                debugHistoryLabel.trailingAnchor.constraint(equalTo: debugHistoryContainer.trailingAnchor, constant: -sepMargin),
+                debugHistoryLabel.bottomAnchor.constraint(equalTo: debugHistoryContainer.bottomAnchor, constant: -16)
+            ])
+            #else
             NSLayoutConstraint.activate([
                 lastItem.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
             ])
+            #endif
         }
     }
     
@@ -682,6 +766,59 @@ final class HealthSyncSettingsViewController: UIViewController {
         // 状态更新逻辑（如果需要显示状态信息可在此添加）
     }
 
+    #if DEBUG
+    private static let debugDayFmt: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f
+    }()
+    private static let debugDayTimeFmt: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd HH:mm"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f
+    }()
+
+    private func refreshDebugHistory() {
+        let todayStartTs = Int(Calendar.current.startOfDay(for: Date()).timeIntervalSince1970)
+
+        // 今日各指标最新一条已上传 ts（UploadStateStore 是 per-metric 的 lastTs）
+        let allTs = UploadStateStore.shared.getAll().sorted { $0.key < $1.key }
+        let todayLines: [String]
+        if allTs.isEmpty {
+            todayLines = ["今日各指标最近上传：（UploadStateStore 为空，未上传过任何样本）"]
+        } else {
+            var lines = ["今日各指标最近上传："]
+            for (key, ts) in allTs {
+                let date = Date(timeIntervalSince1970: TimeInterval(ts))
+                let marker = ts >= todayStartTs ? "[今]" : "[旧]"
+                lines.append("  \(marker) \(key)  →  \(Self.debugDayTimeFmt.string(from: date))")
+            }
+            lines.append("  ([今]=ts 落在今天 00:00 之后；[旧]=更早，等下次同步补)")
+            todayLines = lines
+        }
+        debugTodayLabel.text = todayLines.joined(separator: "\n")
+
+        // 历史完整日（SyncSliceRecord，新→旧，最多 30 条）
+        let records = Array(SyncSliceRecord.shared.getAll().reversed().prefix(30))
+        let historyLines: [String]
+        if records.isEmpty {
+            historyLines = ["历史完整日：（SyncSliceRecord 为空）"]
+        } else {
+            var lines = ["历史完整日（最近 \(records.count) 条，新→旧）："]
+            for r in records {
+                let day = Self.debugDayFmt.string(from: Date(timeIntervalSince1970: TimeInterval(r.dayStartTs)))
+                let uploadedAt = Self.debugDayTimeFmt.string(from: Date(timeIntervalSince1970: TimeInterval(r.uploadedAt)))
+                let metricsBadge = r.metrics.isEmpty ? "空（数据源无数据）" : "\(r.metrics.count) metrics"
+                lines.append("  \(day)  ·  \(metricsBadge)  ·  上传于 \(uploadedAt)")
+            }
+            historyLines = lines
+        }
+        debugHistoryLabel.text = historyLines.joined(separator: "\n")
+    }
+    #endif
+
     // MARK: - Actions
     
     @objc private func backButtonTapped() {
@@ -735,6 +872,9 @@ final class HealthSyncSettingsViewController: UIViewController {
     @objc private func progress(_ note: Notification) {
         guard let p = note.object as? HealthSyncService.SyncProgress else { return }
         lastProgress = p
+        #if DEBUG
+        refreshDebugHistory()
+        #endif
     }
 
     @objc private func configExternalChanged(_ note: Notification) {

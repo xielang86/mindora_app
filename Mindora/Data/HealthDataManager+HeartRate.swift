@@ -2,9 +2,52 @@ import Foundation
 import HealthKit
 
 extension HealthDataManager {
-    
+
+    // MARK: - Sleep Heart Rate
+
+    /// 睡眠期间的心率区间（min–max），对应苹果健康「睡眠 → 比较 → 心率」那一栏。
+    ///
+    /// 取的是**最近一晚实际入睡到醒来的跨度**，不是整个 6pm–6pm 睡眠日窗口 ——
+    /// 后者会把白天清醒时的心率也算进来，区间会被拉得毫无意义。
+    func fetchSleepHeartRateRange(forceLive: Bool = false) async throws -> HeartRateRangePoint {
+        if HealthDataSimulator.shared.isEnabled {
+            return HealthDataSimulator.shared.sleepHeartRateRange()
+        }
+        guard let span = try await fetchMostRecentSleepSessionSpan() else { return .empty }
+        return try await fetchHeartRateRange(start: span.start, end: span.end)
+    }
+
+    /// 指定区间内的心率 min–max。区间内无样本返回 `.empty`。
+    func fetchHeartRateRange(start: Date, end: Date) async throws -> HeartRateRangePoint {
+        guard let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate), end > start else {
+            return .empty
+        }
+        let unit = HKUnit.count().unitDivided(by: .minute())
+        return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<HeartRateRangePoint, Error>) in
+            #if swift(>=5.7)
+            let predicateSendable = _SendablePredicate(value: HKQuery.predicateForSamples(withStart: start, end: end, options: []))
+            #else
+            let predicateSendable = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
+            #endif
+            let query = HKStatisticsQuery(
+                quantityType: heartRateType,
+                quantitySamplePredicate: predicateSendable.value,
+                options: [.discreteMin, .discreteMax]
+            ) { _, statistics, error in
+                if let error = error { cont.resume(throwing: error); return }
+                guard let minValue = statistics?.minimumQuantity()?.doubleValue(for: unit),
+                      let maxValue = statistics?.maximumQuantity()?.doubleValue(for: unit) else {
+                    cont.resume(returning: .empty)
+                    return
+                }
+                cont.resume(returning: HeartRateRangePoint(min: minValue, max: maxValue))
+            }
+            self.healthStore.execute(query)
+        }
+    }
+
     // MARK: - Heart Rate Range Data
-    
+
     /// 获取每天的心率范围（最小/最大值）
     /// - Parameters:
     ///   - startDate: 开始日期

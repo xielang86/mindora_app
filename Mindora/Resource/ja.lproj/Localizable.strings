@@ -1,15 +1,17 @@
-// (Removed duplicate sync metrics block)
-/* 
+/*
   Localizable.strings
   mindora
 
   Created by gao chao on 2025/9/18.
-  
+
 */
 
 // MARK: - Tab Bar Titles
 "tab.home" = "ホーム";
 "tab.health" = "健康";
+"tab.sleep" = "睡眠";
+"tab.explore" = "探索";
+"tab.store" = "ストア";
 "tab.settings" = "設定";
 
 // MARK: - Theme Modes
@@ -17,8 +19,18 @@
 "theme.light" = "ライトモード";
 "theme.dark" = "ダークモード";
 
+// MARK: - Register P3
+
+// MARK: - Register P4
+"register.p4.title" = "Mindora を接続";
+"register.p4.subtitle" = "Mindora を充電器に接続して、次のステップに進んでください。  スマートフォンの Bluetooth が有効になっていることを確認してください。";
+"register.p4.button.set_mindor" = "Mindora をセットアップ";
+"register.p4.no_mindora" = "まだ Mindora をお持ちではありませんか？";
+
 // MARK: - Home Screen
 "home.title" = "ホーム";
+"home.device.status.connected" = "接続済み";
+"home.device.status.offline" = "オフライン";
 "home.nearby_devices" = "近くのデバイス";
 "home.scan" = "スキャン";
 "home.scanning" = "近くのデバイスをスキャン中…";
@@ -35,6 +47,19 @@
 "home.search_finished_one" = "1台のデバイスが見つかりました";
 "home.search_finished_many" = "%d台のデバイスが見つかりました";
 
+// MARK: - Home Dashboard
+"home.metric.sleep_onset" = "入眠時間";
+"home.metric.deep_sleep" = "深い睡眠";
+"home.tab.sleep" = "睡眠";
+"home.tab.overall_score" = "総合スコア";
+"home.tab.activity" = "アクティビティ";
+"home.insights.title" = "睡眠インサイト";
+"home.insights.subtitle" = "睡眠データの分析に基づく";
+"home.best.title" = "今週のベスト";
+"home.best.subtitle" = "最高の睡眠をお届けするために";
+"home.best.used_times" = "使用回数";
+"home.best.score" = "スコア";
+
 // MARK: - Health Screen
 "health.title" = "健康";
 "health.page_title" = "すべての健康データ";
@@ -42,6 +67,7 @@
 "health.time.past_7_days" = "過去7日間";
 "health.time.past_12_months" = "過去12か月";
 "health.time.earlier" = "さらに前";
+
 // MARK: - Health Metrics
 "health.status.initial" = "ヘルスアクセスを要求";
 "health.status.loading" = "健康データを読み込み中";
@@ -95,6 +121,42 @@
 "health.weekday.fri" = "金";
 "health.weekday.sat" = "土";
 
+// MARK: - Health Week View
+"health.week.avg_score" = "平均睡眠スコア";
+"health.week.good" = "良好";
+"health.week.insights" = "睡眠インサイト";
+"health.week.insights_sub" = "睡眠データの分析に基づく";
+"health.week.insights_title" = "睡眠トレンド";
+"health.week.insights.body" = "優れた深い\n睡眠パフォーマンス";
+"health.week.insights.desc" = "深い睡眠は総睡眠の29.8%を占めており、\n標準レベルを上回っています。\n規則正しい睡眠習慣を維持しましょう。";
+
+"health.week.best" = "今週のベスト";
+"health.week.best_title" = "入眠効率";
+"health.week.best_sub" = "最高の睡眠をお届けするために";
+"health.week.best.used_times" = "使用回数";
+"health.week.best.score" = "スコア";
+"health.week.sedona" = "セドナ砂漠の静けさ";
+"health.week.respiratory_rate" = "呼吸数";
+"health.week.avg_heart_rate" = "平均心拍数";
+"health.week.avg_wrist_temp" = "手首温度";
+"health.week.avg_awake" = "平均覚醒時間";
+"health.week.avg_rem" = "平均REM";
+"health.week.avg_core" = "平均コア睡眠";
+"health.week.avg_deep" = "平均深い睡眠";
+"health.week.days_tracked" = "計測日数";
+"health.week.avg_total" = "平均総睡眠";
+"health.week.avg_onset" = "平均入眠時間";
+
+// MARK: - Health Week Expanded Headers
+"health.week.header.heart_rate" = "平均心拍数";
+"health.week.header.total_sleep" = "総睡眠";
+"health.week.header.time_in_bed" = "平均就床時間";
+"health.week.metric.from_baseline" = "（基準値との比較）";
+
+// MARK: - Health Month View
+"health.month.optimal" = "最適";
+
+
 // MARK: - Settings Screen
 "settings.title" = "設定";
 "settings.subtitle" = "Mindora をカスタマイズ";
@@ -105,6 +167,8 @@
 "settings.language" = "言語";
 "settings.theme" = "テーマモード";
 "settings.profile" = "プロフィール編集";
+"settings.profile_email_format" = "メール：%@";
+"settings.profile_email_placeholder" = "未ログイン";
 "settings.sync" = "健康データ同期";
 "settings.permission" = "権限管理";
 "settings.version" = "アプリバージョン";
@@ -113,6 +177,7 @@
 "settings.show_onboarding" = "ガイドページを再度表示";
 
 // Language and Theme Selection
+"settings.language_title" = "言語";
 "settings.select_language" = "言語を選択";
 "settings.select_theme" = "テーマモードを選択";
 
@@ -138,6 +203,46 @@
 "settings.syncing" = "同期中...";
 "settings.sync_success_title" = "同期成功";
 "settings.sync_success_message" = "サンプル健康データのバッチが送信されました。";
+
+// MARK: - Device Management
+"device_manage.status.connected" = "接続済み";
+"device_manage.status.not_connected" = "未接続";
+
+// MARK: - Device Scan (iOS Bluetooth-style scan & multi-bind page)
+"device_scan.title" = "デバイス";
+"device_scan.hint" = "デバイスが表示されない場合は、設定でローカルネットワークと Bluetooth の権限を有効にしてください。";
+"device_scan.open_settings" = "設定を開く";
+"device_scan.section.my_devices" = "マイデバイス";
+"device_scan.section.empty_footer" = "Mindora の電源が入っていて、スマートフォンが同じ Wi-Fi ネットワークに接続されていることを確認してください。Bluetooth はバックアップとして利用できます。";
+"device_scan.searching" = "デバイスを検索中...";
+"device_scan.no_devices_found" = "デバイスが見つかりません";
+"device_scan.tap_to_retry" = "タップして再試行";
+"device_scan.status.not_connected" = "未接続";
+"device_scan.status.connected" = "接続済み";
+
+// MARK: - Device Detail (tap ⓘ on the scan list)
+"device_detail.section.name" = "名前";
+"device_detail.section.model" = "モデル";
+"device_detail.section.device_id" = "デバイスID";
+"device_detail.value.unknown" = "不明";
+"device_detail.disconnect" = "切断";
+"device_detail.connect" = "接続";
+"device_manage.button.connect" = "デバイスを検索";
+"device_manage.button.connect_other" = "デバイスを検索";
+"device_manage.button.disconnect" = "切断";
+"device_manage.button.connect_device" = "接続";
+"device_manage.button.connect_other_device" = "別のデバイスを接続";
+"device_manage.button.search_device" = "デバイスを検索";
+"device_manage.subtitle" = "ログイン情報は30日間保存されます。期限を過ぎると再ペアリングが必要です\n下のデバイス画像をタップして詳細を表示";
+"device_manage.default_name" = "Mindora";
+"device_manage.empty.title" = "デバイスが接続されていません";
+"device_manage.empty.message" = "下のボタンをタップして Mindora をペアリングしてください。";
+"device_manage.action.disconnect" = "デバイスの接続を解除";
+"device_manage.action.disconnect_confirm" = "解除";
+"device_manage.action.disconnect_message" = "いつでも再度ペアリングできます。データはこのスマートフォンに保存されたままです。";
+"device_manage.button.delete_device" = "このデバイスを削除";
+"device_manage.delete.confirm_title" = "デバイス「%@」を削除しますか？";
+
 "settings.sync_error_title" = "同期失敗";
 
 // MARK: - Settings Sections
@@ -146,8 +251,45 @@
 "settings.section.other" = "その他";
 "settings.section.about" = "について";
 
-// MARK: - Device Selection
-"device_selection.title" = "接続したいMindoraデバイスを選択してください";
+// MARK: - Side Menu
+"sidemenu.title" = "マイアカウント";
+"sidemenu.user.name" = "ユーザー名";
+"sidemenu.subscription" = "サブスクリプション";
+"sidemenu.upgrade" = "Pro にアップグレード";
+"sidemenu.device" = "デバイス";
+"sidemenu.notifications" = "通知";
+"sidemenu.health_link" = "健康データ連携";
+"sidemenu.language" = "言語";
+"sidemenu.help" = "ヘルプ";
+"sidemenu.logout" = "ログアウト";
+"sidemenu.terms" = "利用規約";
+"sidemenu.privacy_policy" = "プライバシーポリシー";
+"sidemenu.not_logged_in" = "未ログイン";
+
+// MARK: - User Profile
+"user_profile.user_id" = "ユーザーID";
+"user_profile.nickname" = "ニックネーム";
+"user_profile.gender" = "性別";
+"user_profile.gender.male" = "男性";
+"user_profile.gender.female" = "女性";
+"user_profile.gender.other" = "その他";
+"user_profile.age" = "年齢";
+"user_profile.birthday" = "誕生日";
+"user_profile.weight_height" = "体重 / 身長";
+"user_profile.weight_unit" = "体重 / kg";
+"user_profile.height_unit" = "身長 / cm";
+"user_profile.weight_height_invalid" = "有効な値を入力してください：体重 20〜300 kg、身長 50〜250 cm。";
+"user_profile.email" = "メール";
+"user_profile.phone" = "電話";
+"user_profile.address" = "住所";
+"user_profile.update" = "プロフィールを更新";
+"user_profile.username_default" = "ユーザー名";
+"user_profile.take_photo" = "写真を撮る";
+"user_profile.choose_from_album" = "アルバムから選択";
+"user_profile.cancel" = "キャンセル";
+"user_profile.email_locked_title" = "メールアドレスを編集できません";
+"user_profile.email_locked_message" = "ソーシャルアカウントまたはSSOでログインしたユーザーは、メールアドレスを直接更新できません。\nサポートが必要ですか？お問い合わせ先：%@";
+"user_profile.email_locked_contact" = "お問い合わせ";
 
 // MARK: - Help Cards
 "help.title" = "接続ヘルプ";
@@ -165,9 +307,12 @@
 
 // MARK: - Common UI Elements
 "common.ok" = "OK";
-"common.cancel" = "キャンセル";
 "common.confirm" = "確認";
 "common.retry" = "再試行";
+"common.saved_to_photos" = "写真に保存しました";
+"common.save_success" = "保存しました";
+"common.share_success" = "共有しました";
+"common.copy_success" = "コピーしました";
 
 // MARK: - Onboarding
 "onboarding.start" = "開始";
@@ -178,9 +323,10 @@
 "onboarding.page3.bluetooth_card_text_authorized" = "Bluetooth権限が有効になっています\nデバイスは正常に接続できます";
 "onboarding.page4.scanning_title" = "近くのデバイスをスキャン";
 "onboarding.page4.searching" = "継続的に自動検索中";
-"onboarding.page4.device_found" = "Mindora が見つかりました";
+"onboarding.page4.device_found" = "%@ が見つかりました";
 "onboarding.page4.no_device_found" = "デバイスが見つかりません";
 "onboarding.page4.description" = "接続したいMindoraデバイスを選択してください。Bluetoothがオンになっていることを確認してください。";
+"onboarding.page4.multiple_found" = "%d台のデバイスが見つかりました。1台選択してください";
 "onboarding.page5.success_title" = "Mindora接続成功";
 "onboarding.page5.complete" = "完了";
 
@@ -215,6 +361,8 @@
 "health.sync.section.metrics" = "指標";
 "health.sync.section.action" = "操作";
 "health.sync.section.status" = "ステータス";
+
+// Sync Metrics Names
 "health.sync.metric.heart_rate" = "心拍数";
 "health.sync.metric.hrv" = "心拍変動";
 "health.sync.metric.spo2" = "血中酸素";
@@ -237,6 +385,7 @@
 "permission.section.health" = "健康データ権限";
 "permission.section.healthkit_footer_line1" = "アクセスが制限されている場合は、次の場所に移動してください";
 "permission.section.healthkit_footer_line2" = "*設定 > プライバシーとセキュリティ > ヘルスケア > Mindora。\n*「ヘルスケア」アプリを開く > 共有 > App > Mindora、必要なデータタイプを有効にします。";
+
 // Permission Status
 "permission.status.authorized" = "許可済み";
 "permission.status.partial" = "一部許可";
@@ -269,9 +418,842 @@
 // Health Permission CTA (avoid misleading status)
 "permission.health.confirm" = "設定";
 
-// Local Network Permission CTA
+// Local Network Permission CTA (cannot be accurately detected, prompt user to confirm in settings)
 "permission.local_network.confirm" = "設定で確認してください";
 
 // Local Network Permission Denied
 "permission.local_network.denied_title" = "デバイスを検索できません";
 "permission.local_network.denied_message" = "近くのMindoraデバイスを検索するにはローカルネットワークへのアクセスが必要です。設定でローカルネットワークアクセスを有効にしてください。";
+"permission.cellular.denied_title" = "モバイルデータ通信が無効です";
+"permission.cellular.denied_message" = "Mindoraはモバイルデータ通信の使用を許可されていないため、睡眠スコアなどのオンラインコンテンツを読み込めません。設定でMindoraのモバイルデータ通信を許可するか、Wi-Fiに接続してください。";
+
+// Bluetooth Permission Denied
+"permission.bluetooth.denied_title" = "Bluetoothでスキャンできません";
+"permission.bluetooth.denied_message" = "Wi-Fi が利用できないときに Mindora デバイスを発見するには Bluetooth へのアクセスが必要です。設定で Mindora の Bluetooth を有効にしてください。";
+
+// MARK: - Login
+"login.email_placeholder" = "メールアドレスを入力";
+"login.get_code" = "メールを確認";
+"login.toast.enter_email" = "メールアドレスを入力してください";
+"login.toast.invalid_email" = "メールの形式が正しくありません";
+"login.toast.network_error_prefix" = "ネットワークエラー：";
+"login.toast.no_data" = "データを受信できませんでした";
+"login.toast.send_code_failed" = "コードの送信に失敗しました";
+"login.toast.invalid_response" = "無効な応答";
+"login.toast.login_failed" = "ログインに失敗しました";
+"login.verify_alert.title" = "メールを確認";
+
+// Login Success
+"login.success.title" = "ログイン成功";
+"login.success.message" = "メール %@ の確認に成功しました";
+"login.verify_alert.message_format" = "%@ に送信されたコードを入力してください";
+"login.verify_alert.code_placeholder" = "認証コード";
+"login.verify_alert.login_action" = "ログイン";
+"login.code_sent_title" = "認証コードを送信しました";
+"login.code_sent_message" = "認証コードをメール：%@ に送信しました。受信トレイをご確認ください。";
+
+// MARK: - User Profile
+"user_profile.title" = "プロフィール";
+"user_profile.change_avatar" = "アバターを変更";
+"user_profile.email_title" = "メール";
+"user_profile.logout" = "ログアウト";
+"user_profile.logout_confirm_title" = "ログアウトしますか？";
+"user_profile.logout_confirm_message" = "ログアウトするとローカルデータが消去されます。";
+"user_profile.logout_success" = "ログアウトしました";
+"user_profile.delete" = "アカウントを削除";
+"user_profile.delete_confirm_title" = "アカウントを削除しますか？";
+"user_profile.delete_confirm_message" = "この操作を行うと、アカウントとデータが完全に削除され、元に戻せません。確認のため、メールまたは電話番号に認証コードを送信します。";
+"user_profile.delete_success" = "アカウントを削除しました";
+"user_profile.delete_failed" = "アカウントの削除に失敗しました";
+"user_profile.delete_confirm_send" = "コードを送信";
+"user_profile.delete_code_sent" = "認証コードを送信しました";
+"user_profile.delete_code_prompt_title" = "認証コードを入力";
+"user_profile.delete_code_prompt_message" = "アカウントを完全に削除するには、メールまたは電話番号に送信されたコードを入力してください。この操作は元に戻せません。";
+"user_profile.delete_confirm_message_email" = "この操作を行うと、アカウントとデータが完全に削除され、元に戻せません。確認のため、メール %@ に認証コードを送信します。";
+"user_profile.delete_confirm_message_phone" = "この操作を行うと、アカウントとデータが完全に削除され、元に戻せません。確認のため、電話番号 %@ に認証コードを送信します。";
+"user_profile.delete_code_prompt_message_email" = "アカウントを完全に削除するには、メール %@ に送信されたコードを入力してください。この操作は元に戻せません。";
+"user_profile.delete_code_prompt_message_phone" = "アカウントを完全に削除するには、電話番号 %@ に送信されたコードを入力してください。この操作は元に戻せません。";
+"user_profile.delete_code_placeholder" = "認証コード";
+"user_profile.delete_code_empty" = "認証コードを入力してください";
+"user_profile.delete_submit" = "アカウントを削除";
+"user_profile.delete_err_no_contact" = "アカウントにメールまたは電話番号が登録されていないため、コードを送信できません。";
+"user_profile.delete_err_send_failed" = "コードを送信できませんでした。しばらくしてからもう一度お試しください。";
+"user_profile.delete_err_bad_code" = "認証コードが正しくないか、有効期限が切れています。";
+"user_profile.delete_err_user_gone" = "このアカウントは存在しないか、すでに削除されています。";
+"user_profile.token_missing" = "先にログインしてください";
+"user_profile.photo_unavailable" = "写真へのアクセスができません";
+"user_profile.update_success" = "プロフィールを更新しました";
+"user_profile.update_failed" = "プロフィールの更新に失敗しました";
+
+// MARK: - Login Start
+"login_start.tagline" = "あなたの毎日を\n支えるパーソナル\nインサイト。";
+"login_start.button.start" = "開始";
+"login_start.button.no_device" = "まだ Mindora をお持ちではありませんか？";
+
+
+// MARK: - Register P1
+"register.welcome" = "ようこそ！";
+"register.email_label" = "メールアドレス";
+"register.email_placeholder" = "メールアドレス";
+"register.info.create" = "アカウントを作成するにはメールアドレスを入力してください。";
+"register.info.signin" = "すでに会員の方は、Mindora アカウントのメールアドレスを入力してサインインしてください。";
+"register.button.continue" = "続ける";
+
+// MARK: - Register P3
+"register.p3.title" = "利用規約とプライバシーポリシー";
+"register.p3.subtitle" = "続けるには以下をご確認ください：";
+"register.p3.agree_prefix" = "私は以下を読み、同意します ";
+"register.p3.terms" = "利用規約";
+"register.p3.and" = " および ";
+"register.p3.privacy" = "Mindora プライバシーポリシー。";
+"register.p3.marketing" = "Mindora 体験を最大限に活用するための、限定の健康情報やヒント、特別オファーを受け取る。";
+"register.p3.button.save" = "保存して続ける";
+
+// MARK: - Register P2
+"register.p2.title" = "確認コードを入力";
+"register.p2.subtitle" = "4桁のコードを送信しました：";
+"register.p2.resend" = "コードを再送信";
+
+"register.p2.resend_countdown" = "%d 秒後に再送信できます";
+// MARK: - Common Alerts
+"common.error" = "エラー";
+"common.notice" = "お知らせ";
+"register.verification_code_sent" = "認証コードを送信しました";
+
+// MARK: - Auth Errors
+"auth.error.invalid_url" = "無効なURL";
+"auth.error.serialization_error" = "データ処理エラー";
+"auth.error.no_data" = "データを受信できませんでした";
+"auth.error.api_error_default" = "APIエラー：%d";
+"auth.error.invalid_response" = "無効な応答";
+"auth.error.missing_data" = "応答データが不足しています";
+"auth.error.network" = "ネットワークに接続できません。接続を確認して再試行してください。";
+"auth.error.timeout" = "リクエストがタイムアウトしました。再試行してください。";
+"auth.error.server" = "サービスが一時的に利用できません。しばらくしてから再試行してください。";
+"auth.error.send_failed" = "認証コードを送信できませんでした。再試行してください。";
+"auth.error.verify_failed" = "認証に失敗しました。再試行してください。";
+"auth.error.code_invalid" = "認証コードが正しくありません。再試行してください。";
+"auth.error.code_expired" = "認証コードの有効期限が切れました。新しいコードをリクエストしてください。";
+
+// MARK: - Subscription
+
+// MARK: - Explore
+"explore.greeting.hi" = "こんにちは、";
+
+
+
+
+"explore.fluctuation.resp_range" = "呼吸の変動";
+
+
+
+
+"explore.quote.open" = "“";
+"explore.quote.close" = "”";
+
+
+"explore.placeholder.number" = "- -";
+"explore.placeholder.hr" = "- - bpm";
+"explore.placeholder.resp" = "- - 回/分";
+"explore.placeholder.duration" = "- - 分";
+"explore.placeholder.count" = "- - 回";
+"explore.placeholder.text" = "- -";
+"explore.placeholder.hr_fluctuation" = "- - bpm";
+"explore.placeholder.percent" = "- -%";
+
+"explore.value.count_format" = "%@ 回";
+"explore.value.duration_format" = "%@ 分";
+"explore.value.resp_rate_format" = "%@ 回/分";
+"explore.value.hr_format" = "%@ bpm";
+"explore.value.hr_range_format" = "%@ bpm";
+
+
+"explore.empty.score" = "0";
+"explore.empty.title" = "睡眠スコア";
+"explore.empty.message" = "初回のモニタリングが完了すると、\nここで睡眠の質に関するより詳しい分析を確認できます。\n最初の睡眠モニタリングを始めましょう。";
+
+"explore.empty.intro" = "眠りにつくとき、夜中に目覚めたとき、再び深い眠りに入るとき。Mindoraはそのすべての段階で睡眠リズムを見守り、あなたの状態に合わせてサポートの仕方を調整します。\nこれらのインサイトは単なるデータの変化ではありません。使用中のシーン、サウンドのリズム、そして体の反応から生まれたものです。";
+"explore.empty.intro_detail" = "下にスクロールすると、次のことを説明します：\n昨夜何が起きたのか、どの方法が最も役立ったのか、そしてMindoraが何を調整したのか。";
+"explore.empty.desc.efficiency" = "ここには入眠の過程が表示されます。Mindoraは入眠時刻、寝つくまでの時間、入眠前の心拍と呼吸の変化から入眠の習慣を分析し、眠りがどのように自然に始まるのかを理解できるようにします。";
+"explore.empty.desc.structure" = "ここには一晩の睡眠段階の分布が表示されます。浅い睡眠・深い睡眠・レム睡眠の割合と連続性がわかり、良し悪しを判断することなく睡眠の構造を理解し、生活リズムや睡眠習慣の調整に役立てられます。";
+"explore.empty.desc.fluctuation" = "ここには夜間のMindoraによるサポートと、睡眠中のあなたの反応が記録されます。睡眠中に変動があると、Mindoraは生理指標をもとに状態を判断し、適切な範囲で寄り添い、必要なときにはサポートして睡眠リズムを守ります。";
+"explore.empty.desc.preference" = "ここにはあなたが好むサウンドの種類とシーンがまとめられます。どの要素が睡眠に効果的だったのかを知ることができます。Mindoraは睡眠習慣やサウンドシーンの好みを学習し、より効果的でパーソナルな睡眠サポートを提案します。";
+"explore.empty.desc.advice" = "Mindoraは一晩を通して睡眠状態と生理指標の変化を見守り、必要なときにはAIによる調整でサポートし、より途切れにくく質の高い眠りへ導きます。\n使い始めると、ここに入眠の過程、睡眠構造、夜間の変動、おすすめのサウンドスケープなど、より深い睡眠インサイトが表示されます。";
+// MARK: - Subscription
+"subscription.nav.title" = "会員";
+"subscription.my_midora" = "My Mindora";
+"subscription.not_member" = "まだ会員ではありません";
+"subscription.not_member_desc" = "必要なプランに登録して限定特典をお楽しみください";
+"subscription.section.title" = "会員サブスクリプション";
+"subscription.my.title" = "マイサブスクリプション";
+"subscription.monthly" = "月額";
+"subscription.yearly" = "年額";
+"subscription.price.monthly" = "/月";
+"subscription.price.yearly" = "/年";
+"subscription.action.subscribe" = "登録する";
+"subscription.action.cancel" = "キャンセル";
+"subscription.action.switch" = "プラン変更";
+"subscription.desc.monthly.prefix" = "更新：";
+"subscription.desc.monthly.suffix" = "/月で有効期限の前日に更新されます。請求前であればいつでもキャンセルできます。";
+"subscription.desc.yearly" = "1年間のサービスをお楽しみいただけます。次回更新前であればいつでもキャンセルできます。";
+"subscription.auto_renew" = "自動更新日時：";
+"subscription.desc.cancelled" = "特典はサブスクリプションの有効期限まで継続します。お早めに更新してください。";
+"subscription.exclusive" = "会員限定";
+"subscription.feature.1" = "360°全方位の睡眠分析、あなた専用の睡眠データベース";
+"subscription.feature.2" = "スマートな睡眠インサイト、データから解決策へ";
+"subscription.feature.3" = "専用の快眠プラン、パーソナライズされた睡眠改善";
+"subscription.help.faq" = "よくある質問";
+"subscription.help.message" = "メッセージセンター";
+"subscription.help.renewal" = "サブスクリプション管理";
+"subscription.help.restore" = "購入を復元";
+"subscription.help.community" = "コミュニティに参加";
+"subscription.help.contact" = "お問い合わせ";
+"subscription.giftcard.entry" = "ギフトカードと引き換えコード";
+
+// Redeem Code
+"redeem.placeholder" = "引き換えコードを入力";
+"redeem.action" = "今すぐ引き換える";
+"redeem.rules.entry" = "利用規則";
+"redeem.submitted" = "引き換えコードを送信しました";
+"redeem.success" = "引き換えに成功しました。会員が有効になりました。";
+"redeem.success.title" = "引き換え成功";
+"redeem.success.detail" = "%1$@ 会員を引き換えました。有効期限：%2$@。";
+"redeem.success.detail.no_date" = "%1$@ 会員を引き換えました。";
+"redeem.success.detail.generic" = "会員を引き換えました。有効期限：%1$@。";
+"redeem.period.yearly" = "年額";
+"redeem.period.monthly" = "月額";
+"redeem.error.generic" = "引き換えに失敗しました。しばらくしてから再試行してください。";
+"redeem.error.not_logged_in" = "引き換える前にサインインしてください。";
+"redeem.rules.title" = "利用規則";
+"redeem.rules.ok" = "OK";
+"redeem.rules.body" = "1. Mindora の引き換えコードは、公式サイトで会員ギフトカードを購入するか、Mindora またはパートナーのイベントに参加することで取得できます。\n\n2. Mindora の引き換えコードを登録して得られる会員特典は、購入したものと完全に同一です。\n\n3. 不可抗力、ネットワークの問題、不正行為など Mindora 以外の要因によって異常が発生した場合、Mindora は会員サービスを調整または停止する権利を留保します。\n\n4. Mindora は法律の範囲内で本規則の最終解釈権を有します。ご不明な点は support@mindora316.com までお問い合わせください。";
+
+// Subscription Email
+"subscription.email.subject" = "Mindora サポート";
+"subscription.email.app_version" = "アプリバージョン";
+"subscription.email.ios_version" = "iOS バージョン";
+"subscription.email.device" = "デバイス";
+"subscription.email.error.title" = "メールエラー";
+"subscription.email.error.message" = "このデバイスにメールが設定されていません。";
+
+// Subscription Status
+"subscription.tide_days" = "Mindora 日数";
+"subscription.active.plan_prefix" = "有効 · ";
+"subscription.active.plan_suffix" = " サブスクリプション";
+"subscription.plan_name.monthly" = "月額";
+"subscription.plan_name.yearly" = "年額";
+"subscription.expires_prefix" = "有効期限：";
+
+// MARK: - Notifications
+"notifications.title" = "通知";
+"notifications.empty" = "メッセージはありません";
+"notifications.history.divider" = "以下は過去のメッセージ";
+"notifications.delete" = "削除";
+"notifications.permission.title" = "通知を許可";
+"notifications.permission.desc" = "システム通知をオンにしてメッセージをタイムリーに受け取りましょう";
+"notifications.permission.status" = "システム設定で Mindora の通知を無効にしています";
+"notifications.permission.keep" = "このまま";
+"notifications.permission.open" = "設定へ";
+"notifications.mock.system" = "システムメッセージ";
+"notifications.mock.title" = "会員リマインダー";
+"notifications.mock.body" = "サブスクリプションは7日後に期限切れになります。中断を避けるためお早めに更新してください。";
+"notifications.mock.action" = "会員ページを見る";
+
+// 消息通知 · 动态生成
+"notifications.source.membership" = "会員メッセージ";
+"notifications.source.system" = "システムメッセージ";
+"notifications.source.health" = "睡眠リマインダー";
+"notifications.subscription.expiring.title" = "会員まもなく期限切れ";
+"notifications.subscription.expiring.body" = "会員の有効期限まであと %1$d 日です。ご利用に支障をきたさないよう、お早めに更新してください。";
+"notifications.subscription.expiring.action" = "会員ページを見る";
+"notifications.subscription.expired.title" = "会員の有効期限が切れました";
+"notifications.subscription.expired.body" = "会員の有効期限が切れました。更新するとすべての特典が復元されます。";
+"notifications.subscription.expired.action" = "今すぐ更新";
+"notifications.subscription.activated.title" = "会員が有効化されました";
+"notifications.subscription.activated.body" = "ご登録ありがとうございます！会員特典は %1$@ まで有効です。";
+"notifications.subscription.activated.action" = "会員特典を確認";
+"notifications.subscription.renewed.title" = "会員が更新されました";
+"notifications.subscription.renewed.body" = "更新が完了しました。会員の有効期限は %1$@ まで延長されました。";
+"notifications.subscription.renewed.action" = "会員特典を確認";
+"notifications.redeem.title" = "引き換え成功";
+"notifications.redeem.body" = "引き換えに成功しました。会員の有効期限は %1$@ です。";
+"notifications.redeem.body_days" = "引き換えに成功しました。%1$d 日分の会員が追加されました。有効期限は %2$@ です。";
+"notifications.redeem.action" = "会員特典を確認";
+"notifications.permission.off.title" = "通知がオフになっています";
+"notifications.permission.off.body" = "設定で Mindora の通知をオフにしています。会員の有効期限や睡眠レポートなどのリマインダーを見逃す可能性があります。";
+"notifications.permission.off.action" = "設定を開く";
+"notifications.sleep.low.title" = "睡眠スコアが低下しています";
+"notifications.sleep.low.body" = "最近の睡眠スコアは %1$d です。睡眠の質に影響した要因を詳しく確認できます。";
+"notifications.sleep.low.action" = "睡眠詳細を見る";
+"notifications.weargap.title" = "%1$d 日間、睡眠データがありません";
+"notifications.weargap.body" = "%1$d 日間、睡眠データを受信していません。デバイスを装着して眠ることで睡眠分析を続けることができます。";
+"notifications.weargap.action" = "睡眠詳細を見る";
+
+
+// MARK: - Terms & Privacy
+
+
+// MARK: - Help Page
+"help.page.title" = "ヘルプ";
+"help.page.description" = "製品についてご質問がある場合は、\n上記の公式QRコードをスキャンするか、メールでお問い合わせください。";
+"help.page.email" = "support@mindora316.com";
+
+// MARK: - Logout Alert
+"logout.alert.title" = "ログアウト";
+"logout.alert.message" = "本当にログアウトしますか？アプリを使用するには再度ログインが必要です。";
+"logout.alert.cancel" = "キャンセル";
+"logout.alert.confirm" = "ログアウト";
+
+// MARK: - Health Link Alert
+"health_link.alert.title" = "Apple ヘルスケアのデータ連携に移動します";
+"health_link.alert.cancel" = "キャンセル";
+"health_link.alert.confirm" = "確定";
+"common.save" = "保存";
+"user_profile.label_date" = "日付";
+
+// MARK: - Address
+
+// MARK: - Address
+"address.title" = "住所一覧";
+"address.empty" = "まだ住所が追加されていません";
+"address.add_new" = "新しい住所を追加";
+"address.paste_tip" = "テキストを貼り付けると自動認識します";
+"address.paste" = "貼り付け";
+"address.name" = "氏名";
+"address.name_placeholder" = "氏名を入力してください";
+"address.phone" = "電話番号";
+"address.phone_placeholder" = "電話番号を入力してください";
+"address.phone_invalid" = "有効な電話番号を入力してください";
+"address.name_invalid" = "受取人名に数字は使えません";
+"address.region" = "地域";
+"address.region_placeholder" = "地域を選択";
+"address.locate" = "位置情報";
+"address.detail" = "詳細住所";
+"address.detail_placeholder" = "番地、建物名など";
+"address.country" = "国・地域";
+"address.phone_country" = "電話番号の国";
+"address.state" = "州・都道府県";
+"address.state_placeholder" = "州・都道府県を入力";
+"address.city" = "市区町村";
+"address.district" = "区";
+"address.city_placeholder" = "市区町村";
+"address.street1" = "住所 1";
+"address.street1_placeholder" = "番地または私書箱";
+"address.street2" = "住所 2";
+"address.street2_placeholder" = "建物名、部屋番号、階など";
+"address.zip" = "郵便番号";
+"address.state_only" = "州";
+"address.province" = "省";
+"address.prefecture" = "都道府県";
+"address.zip_only" = "郵便番号";
+"address.postal_code" = "郵便番号";
+"address.zip_placeholder" = "郵便番号を入力";
+"address.select" = "選択してください";
+"address.locate_fill" = "現在地から入力";
+"address.picker_search" = "検索";
+"address.name_required" = "受取人名を入力してください";
+"address.state_required" = "州・都道府県を選択してください";
+"address.city_required" = "市区町村を入力してください";
+"address.street_required" = "番地・町名を入力してください";
+"address.zip_invalid" = "有効な郵便番号を入力してください";
+"address.set_default" = "デフォルトの住所に設定";
+"address.confirm" = "確定";
+"address.default_tag" = "デフォルト";
+"address.delete" = "削除";
+"permission.location_needed" = "Mindora が住所の入力を補助するには位置情報へのアクセスが必要です。設定で有効にしてください。";
+"common.tips" = "ヒント";
+"common.settings" = "設定";
+"common.cancel" = "キャンセル";
+"address.select_title" = "住所を選択";
+"address.search_placeholder" = "場所を検索";
+"address.current_location" = "[現在地]";
+
+// Subscription Restore
+"subscription.restore.loading" = "復元中...";
+"subscription.restore.success" = "復元成功";
+"subscription.restore.no_purchases" = "有効なサブスクリプションが見つかりません。";
+"subscription.bound_to_another" = "このサブスクリプションは別のアカウントに紐付けられています。そのアカウントでサインインしてご利用ください。";
+
+// Renewal Management
+"renewal.title" = "サブスクリプション管理";
+"renewal.your_subscription" = "あなたのサブスクリプション";
+"renewal.product_name" = "My Mindora";
+"renewal.plan" = "プラン";
+"renewal.plan.monthly" = "月額サブスクリプション";
+"renewal.renewal_date" = "更新日";
+"renewal.amount" = "金額";
+"renewal.manage" = "管理";
+"renewal.plan.yearly" = "年額サブスクリプション";
+"renewal.plan.none" = "サブスクリプションがありません";
+
+
+// MARK: - FAQ
+"subscription.renewal_management" = "サブスクリプション管理";
+"faq.title" = "Mindora よくある質問";
+"faq.subtitle" = "Mindora は、多感覚の相乗効果と AI を通じて睡眠の質を改善するために設計されたスマート睡眠補助デバイスです。医療機器ではありません。以下によくある質問への回答をまとめました。";
+"faq.footer.prefix" = "その他のご質問は、Mindora ウェブサイトの";
+"faq.footer.link" = "ヘルプセンター";
+"faq.footer.suffix" = "をご覧ください。";
+
+"faq.q1" = "サブスクリプションプランの選び方は？";
+"faq.a1" = "月額サブスクリプション：2.99 ドル/月。\n\n年額サブスクリプション：29.99 ドル/年で、約2か月分の料金を節約できます。\n\n実際の価格は、お住まいの国や地域、適用される税金によって多少異なる場合があります。最終的な金額はサブスクリプションページでご確認ください。\n\nMindora オンラインストアでデバイスを購入する場合は、注文時に前払いの年間会員プランを追加することもできます。\n\n2026年12月25日までにデバイスを購入した新規会員には、Mindora 会員の初年度が無料で付与されます。この無料期間の終了後は、会員を別途購入する必要があります。\n\nMindora 会員は、実物の Mindora デバイスではなく、お客様の Mindora アカウントに紐づけられます。既存の Mindora アカウントで追加のデバイスを購入しても、追加の無料会員月は付与されません。";
+
+"faq.q2" = "会員はどうやって有効化しますか？";
+"faq.a2" = "会員期間が含まれるハードウェアセットを購入した場合、初めてデバイスの接続に成功してアプリにサインインした時点で、付与された会員資格が自動的に有効になります。\n\n会員を単体で購入した場合は、Mindora アプリで「アカウントをアップグレード」または「登録する」をタップし、プランを選択して支払いを完了すれば、すぐに有効になります。";
+
+"faq.q3" = "Mindora アプリはどのスマートフォンOSに対応していますか？";
+"faq.a3" = "Mindora アプリは、iOS 15 以降を搭載した iPhone、および Bluetooth 5.0 に対応した Android 11 以降の Android スマートフォンに対応しています。";
+
+"faq.q4" = "スマートフォンの Bluetooth を常にオンにしておく必要がありますか？";
+"faq.a4" = "はい。デバイスとアプリのデータ同期やリモート操作を維持するには、Bluetooth をオンにしておく必要があります。ただし、デバイス自体はあらかじめ設定された睡眠プログラムを単独で実行できます。";
+
+"faq.q5" = "デバイスの接続/ペアリング方法は？";
+"faq.a5" = "スマートフォンの Bluetooth をオンにし、Mindora アプリを起動して、ホーム画面で「デバイスを追加」をタップし、画面の指示に従ってください。詳しい手順については、[具体的なヘルプ記事へのリンク] をご覧ください。";
+
+"faq.q6" = "Mindora は他の健康アプリ（Apple ヘルスケアや Google Fit など）とデータを同期できますか？";
+"faq.a6" = "はい。Mindora アプリの「設定」>「アプリとサービス」から、睡眠データを Apple ヘルスケアや Google Fit などのプラットフォームへ同期する許可を設定できます。";
+
+"faq.q7" = "すべての機能を使うには有料サブスクリプションが必要ですか？";
+"faq.a7" = "Mindora の主要な睡眠補助機能（基本的なサウンド、ライトシーン、アロマ拡散など）と AI 睡眠モニタリングは、ハードウェアを購入すればご利用いただけます。プレミアム会員（該当する場合）では、より充実したサウンドライブラリ、パーソナライズされた睡眠分析レポート、上級者向けの睡眠コース、限定の ASMR コンテンツ、よりきめ細かくパーソナライズされた AI アルゴリズムなどがアンロックされます。";
+
+"faq.q8" = "サブスクリプションの管理または解約はどうすればよいですか？";
+"faq.a8" = "Mindora アプリの「アカウント設定」からいつでもサブスクリプションを管理できます。iOS App Store または Google Play ストアを通じて購入した場合は、各ストアのサブスクリプションページでも管理する必要があります。";
+
+"faq.q9" = "私の睡眠データは安全ですか？Mindora はどのようにプライバシーを保護していますか？";
+"faq.a9" = "お客様のデータの安全性は最優先事項です。当社は業界標準の暗号化を用いて、転送中および保存中のデータを保護しています。当社がどのように個人情報を収集、利用、保護しているかについては、Mindora プライバシーポリシー全文をご確認いただけます。";
+
+"faq.q10" = "アカウントとデータを削除できますか？";
+"faq.a10" = "はい。Mindora アプリの「アカウント設定」にある「アカウントを削除」オプションから、またはカスタマーサポートへのご連絡によりリクエストできます。削除後、お客様の個人データは当社の稼働中のサーバーから削除されます。";
+
+"faq.q11" = "Mindora 会員はどこで管理または解約できますか？";
+"faq.a11" = "アプリ内管理：Mindora アプリの「アカウント設定」>「マイサブスクリプション」から、次回の更新日の確認、お支払い方法の変更、自動更新の解除をいつでも行えます。\n\nアプリストア管理：iOS または Android のアプリストアを通じて登録した場合は、各ストアのサブスクリプション管理ページでも解約する必要があります。解約は現在の請求サイクルの終了時に有効になります。";
+
+
+// MARK: - Health Refactor
+"health.segment.day" = "日";
+"health.segment.week" = "週";
+"health.segment.month" = "月";
+"health.sleep.efficiency" = "睡眠効率";
+"health.sleep.performance" = "睡眠パフォーマンス";
+"health.sleep.time_in_bed" = "就床時間";
+"health.sleep.resting_heart_rate" = "安静時心拍数";
+"health.sleep.sleep_heart_rate" = "睡眠時心拍数";
+"health.sleep.overnight_vitals" = "夜間バイタル";
+"health.sleep.respiratory_rate" = "呼吸数";
+"health.sleep.body_temperature" = "体温";
+"health.sleep.scenarios" = "睡眠シーン";
+"health.sleep.onset" = "入眠";
+"health.sleep.awake_time" = "覚醒時間";
+
+
+// MARK: - Health Month View
+"health.month.trends_title" = "睡眠トレンド";
+"health.month.trends_subtitle" = "睡眠データの分析に基づく";
+"health.month.trends_body" = "今月は安定した睡眠量を維持し、夜間の覚醒もごくわずかでした。";
+"health.month.trends_desc" = "過去30日間で、深い睡眠は総睡眠の29.8%を占め、標準レベルを上回りました。\n就寝時刻は平均32分早まりました。\n規則正しい睡眠習慣を維持しましょう。";
+"health.month.best_title" = "入眠効率";
+"health.month.best_subtitle" = "最高の睡眠をお届けするために";
+"health.month.best_desc" = "今月は「セドナ・レッドロックの静寂」が最も頻繁に使用された睡眠シーンで、最も優れた入眠効果を示しました。「ココア島の月光ドリフト」は安定した睡眠の維持で際立っていました……";
+"health.month.avg_heart_rate" = "平均心拍数";
+"health.month.total_sleep" = "総睡眠";
+"health.month.days_tracked" = "計測日数";
+
+"subscription.view_content_hint" = "登録して表示";
+"subscription.go_to_subscribe" = "登録する";
+
+// MARK: - Explore
+"explore.title" = "探索";
+"explore.greeting" = "こんにちは、%@";
+"explore.intro.data" = "こんにちは。昨夜、あなたの体は安定してリラックスし、回復力の高い睡眠状態に入りました。入眠リズムから一晩の構造まで、多くの主要指標が最近の平均を上回っています。これは「たまたまよく眠れた」のではなく、神経系と睡眠構造がうまく連携した一夜でした。";
+"explore.section.efficiency" = "入眠効率";
+"explore.status.health_range" = "健康範囲";
+"explore.metric.onset_time" = "入眠時間：%@ 分";
+"explore.section.structure" = "睡眠構造";
+"explore.status.average" = "平均レベル";
+"explore.metric.continuous_sleep" = "連続睡眠：%@ 分";
+"explore.section.fluctuation" = "夜間の変動";
+"explore.status.fluctuation_high" = "変動が多い";
+"explore.metric.smart_intervention" = "スマート介入：%@";
+"explore.section.preference" = "シーンの好み";
+"explore.section.advice" = "睡眠アドバイス";
+"explore.placeholder.efficiency" = "- -%";
+"explore.placeholder.time" = "- - 分";
+"explore.placeholder.label" = "状態範囲";
+"explore.efficiency.first_sleep" = "入眠時間";
+"explore.efficiency.pre_hr" = "入眠前心拍数";
+"explore.efficiency.pre_resp" = "入眠前呼吸数";
+"explore.structure.rem" = "REM睡眠";
+"explore.structure.deep" = "深い睡眠";
+"explore.structure.light" = "浅い睡眠";
+"explore.fluctuation.awake_count" = "覚醒回数";
+"explore.fluctuation.awake_duration" = "持続時間";
+"explore.fluctuation.awake_type" = "タイプ";
+"explore.fluctuation.hr_range" = "心拍数範囲";
+"explore.preference.recent" = "最近使用";
+"explore.preference.cocos_island.title" = "ココア島の月光ドリフト";
+"explore.preference.cocos_island.subtitle" = "音場：海/ピンクノイズ/ブラウンノイズ";
+"explore.quote.text" = "Mindora は単にあなたの睡眠を記録するだけではありません。あなたの状態を理解したうえで、より適した方法を選び、あなたが眠り続けられるようにサポートします。";
+"explore.article.1.title" = "記事タイトル";
+"explore.article.1.subtitle" = "記事概要記事概要記事概要記事概要";
+"explore.article.2.title" = "記事タイトル";
+"explore.article.2.subtitle" = "記事概要記事概要記事概要記事概要";
+"explore.article.3.title" = "記事タイトル";
+"explore.article.3.subtitle" = "記事概要記事概要記事概要記事概要……";
+"explore.article.4.title" = "記事タイトル";
+"explore.article.4.subtitle" = "記事概要記事概要記事概要記事概要";
+
+"explore.mock.efficiency_desc" = "心拍数と呼吸のトレンドはどちらも「安定」しており、副交感神経が優位になっていることを示唆しています。体は自然にリラックスした状態にあり、脳は入眠のために余分な「減速」を必要としません。\n\n就寝前30分以内に心拍数と呼吸が比較的安定しているか、ゆるやかに低下している状態を保つことは、より短い入眠潜時と相関します。これは睡眠医学において「入眠準備の整い具合」を判断する一般的な生理信号の一つでもあります。";
+"explore.mock.structure_desc" = "このデータは「構造的な異常」を示すものではありません。昨夜は睡眠ステージの欠落はありませんでしたが、主要な睡眠区間が断片化していました。これは、夜間に何度も中断され「深い睡眠と REM が圧縮される」典型的なパターンです。\n\nこれはストレスの多い夜に見られる、最も一般的で回復しやすいパターンの一つです。";
+"explore.mock.fluctuation_desc" = "これらの信号は、夜間の神経系が高反応状態にあり、外部からの刺激にも内的な不安にも敏感であったことを示唆しています。午前3時25分、Mindora は心拍数/呼吸の変動を検知し、覚醒が生理的な調整の閾値を超えて続きました。そこで Mindora は「アマルフィ海岸のそよ風」——低周波でリズミカルかつ連続的な海のサウンドスケープ——を用いて15分間の介入を開始し、神経系を副交感神経優位へと切り替える手助けをしました。これにより、目覚めてから15分後に再び落ち着いて眠りにつくことができました。";
+"explore.mock.preference_desc" = "昨夜、あなたは「ココア島の月光ドリフト」の環境の中で眠りにつきました。この音場は、海に包み込まれるようなアンビエンスにピンク/ブラウンノイズを加えたものが主体です。\n\nその構造は低周波で連続的な海の波が中心となっています。全体のリズムは安定しており、鋭い急変もなく——積極的に注意を引くことはないものの、確かに存在し続ける環境です。\n\n研究によれば、低周波で連続的な自然のサウンドスケープは、環境変化への警戒を下げ、入眠前の「安全確認」を減らすとされています。波のゆるやかなリズムは呼吸とも同期しやすく、神経系を休息モードへと移行させる助けになります。";
+"explore.mock.advice_desc" = "数晩分のデータを見ると、あなたの全体的な睡眠状態はかなり安定しています。夜間の変動をさらに減らしたい場合は、就寝1時間前に外部からの刺激を抑えたり、これからの数晩はサウンドの再生を早めに終了したりしてみてください。\n\n睡眠は一本の直線ではなく、邪魔されることもあれば自己修復もするシステムです。これらの変化を記録するのは、あなたがよく眠れたかどうかを判断するためではなく、あなたにとって最も労力が少なく、最も安定した眠り方を見つけるためです。\n\n昨夜、あなたの体はまさにそれをやり遂げました。";
+"explore.mock.intervention" = "シーン介入";
+"explore.mock.awake_type" = "不安型";
+
+// MARK: - Store
+"store.coming_soon" = "ストアは近日公開";
+"store.banner.title" = "お気に入りの\nブレンドとセットを選ぼう";
+"store.banner.discount_prefix" = "3点 ";
+"store.banner.discount_value" = "9.5";
+"store.banner.discount_suffix" = " OFF";
+"store.banner.learn_more" = "詳しく見る";
+"store.section.member_exclusive" = "会員限定";
+"store.section.new_arrivals" = "新着";
+"store.badge.hot" = "人気";
+"store.badge.new" = "新着";
+"store.product.combo_oil" = "エッセンシャルオイルセット";
+"store.product.frankincense_oil" = "フランキンセンスオイル";
+"store.product.calming_oil" = "植物リラックスオイル";
+"store.product.silk_pajama" = "シルクパジャマセット";
+"store.product.gift_set" = "シルクスリープギフト…";
+"store.search.placeholder" = "商品を検索";
+"store.search.cancel" = "キャンセル";
+"store.search.history" = "検索履歴";
+
+"auth.session_expired" = "セッションが期限切れです。再度サインインしてください。";
+
+/* MARK: - Home Popup (activity / ad / survey invite) */
+"popup.badge.survey" = "アンケート";
+"popup.action.detail" = "詳細を見る";
+"popup.mock.survey.title" = "より良くするためにご協力ください";
+"popup.mock.survey.subtitle" = "3分の睡眠アンケートにご回答いただくと、送信後に会員ポイントを獲得できます。";
+
+/* MARK: - Survey */
+"survey.title" = "睡眠体験アンケート";
+"survey.next" = "次へ";
+"survey.submit" = "送信";
+"survey.submit.note" = "送信すると、回答を製品体験の改善に使用することに同意したものとみなされます。";
+"survey.choice.hint" = "あなたの感覚に最も近い回答を選んでください";
+"survey.q1.title" = "この7日間で、全体的な睡眠にどの程度満足していますか？";
+"survey.q2.title" = "この7日間で、Mindora 全体にどの程度満足していますか？";
+"survey.q3.title" = "Mindora を改善するためのご提案はありますか？";
+"survey.q3.hint" = "ご提案をお聞かせください";
+"survey.q3.placeholder" = "ここに入力…";
+"survey.scale.very_satisfied" = "非常に満足";
+"survey.scale.satisfied" = "満足";
+"survey.scale.neutral" = "普通";
+"survey.scale.dissatisfied" = "不満";
+"survey.scale.very_dissatisfied" = "非常に不満";
+"survey.validation.choose" = "回答を選択してください";
+"survey.validation.input" = "ご提案を入力してください";
+"survey.error.generic" = "エラーが発生しました。もう一度お試しください。";
+"survey.already_submitted" = "このアンケートは送信済みです。ご協力ありがとうございます";
+"survey.completed" = "回答済み";
+"survey.reward.title" = "アンケート特典";
+"survey.reward.desc" = "特典は10営業日以内に発送し、メールでお知らせします。";
+"survey.success.title" = "送信しました";
+"survey.success.line1" = "率直なフィードバックをありがとうございます";
+"survey.success.line2" = "特典は10営業日以内に発送します";
+"survey.success.line3" = "メールでお知らせします";
+"survey.success.back_home" = "ホームに戻る";
+
+/* MARK: - Notifications: survey invite */
+"notifications.source.survey" = "アンケート";
+"notifications.source.promo" = "アクティビティ";
+"notifications.promo.action" = "詳細を見る";
+"notifications.survey.title" = "より良くするためにご協力ください";
+"notifications.survey.valid_until" = "有効期限：%@";
+"notifications.survey.action" = "アンケートに回答";
+
+/* MARK: - Companion Footprint */
+"footprint.title" = "寄り添いの記録";
+"footprint.explain" = "説明";
+"footprint.stat.companion" = "睡眠サポート";
+"footprint.stat.app_active" = "App 利用";
+"footprint.stat.continuous" = "連続利用";
+"footprint.stat.month_total" = "今月";
+"footprint.stat.year_total" = "今年";
+"footprint.unit.day" = "日";
+"footprint.milestones.title" = "マイルストーン";
+"footprint.milestones.empty" = "まだマイルストーンはありません";
+"footprint.milestone.sleep_plan" = "睡眠プラン";
+"footprint.milestone.days_completed" = "%d日間の睡眠目標・達成";
+"footprint.legend.app_active" = "App 利用";
+"footprint.legend.companion" = "睡眠サポート";
+"footprint.legend.plan" = "プラン / 連続";
+"footprint.weekday.sun" = "日";
+"footprint.weekday.mon" = "月";
+"footprint.weekday.tue" = "火";
+"footprint.weekday.wed" = "水";
+"footprint.weekday.thu" = "木";
+"footprint.weekday.fri" = "金";
+"footprint.weekday.sat" = "土";
+"footprint.weekday.full.mon" = "月曜";
+"footprint.weekday.full.tue" = "火曜";
+"footprint.weekday.full.wed" = "水曜";
+"footprint.weekday.full.thu" = "木曜";
+"footprint.weekday.full.fri" = "金曜";
+"footprint.weekday.full.sat" = "土曜";
+"footprint.weekday.full.sun" = "日曜";
+"footprint.month_selector" = "%d年 %d月";
+"footprint.month_label" = "%d月";
+"footprint.anchor_date" = "%d年%d月%d日・%@";
+"footprint.annual.title" = "%d年 寄り添いの記録";
+"footprint.info.title" = "指標について";
+"footprint.info.companion.desc" = "デバイスと App を同時に有効に使用した場合；同一暦日につき最大1日としてカウント。当月の累計を表示します。";
+"footprint.info.app_active.desc" = "その日に App を開くと1日としてカウント；同じ日に再度開いても重複してカウントしません。当月の累計を表示します。";
+"footprint.info.continuous.desc" = "初回ダウンロードまたは利用以降、本暦年内に利用記録が発生した暦日の累計です。";
+"footprint.info.marks.title" = "カレンダーの記号";
+"footprint.picker.title" = "月を選択";
+"footprint.picker.annual" = "通年";
+"footprint.picker.confirm" = "確定";
+
+"notifications.survey.body" = "3分間の睡眠体験アンケートにご協力ください。送信後、ブランドギフトを差し上げます。";
+
+/* MARK: - Gift Claim */
+"gift.title" = "ギフトの受け取り";
+"gift.confirm" = "確認";
+"gift.physical.desc" = "「%@」を登録済みの住所へお届けします：";
+"gift.physical.change_hint" = "住所を変更する場合はカスタマーサポートにご連絡ください。";
+"gift.virtual.desc" = "「%@」を登録済みのメールアドレスへお送りします。変更する場合は下に再入力してください。";
+"gift.email.placeholder" = "メールアドレスを入力";
+"gift.validation.email" = "有効なメールアドレスを入力してください";
+"gift.no_address" = "配送先住所が未登録です。プロフィールで追加してください。";
+"gift.no_address.title" = "住所を取得できませんでした";
+"gift.no_address.hint" = "配送先住所を入力してください";
+"gift.fill_address" = "住所を入力";
+"gift.address.title" = "住所を入力";
+"survey.reward.demo_gift" = "ブランド睡眠ギフト";
+
+"device_scan.stale_pairing.title" = "設定でこのデバイスの登録を解除してください";
+"device_scan.stale_pairing.message" = "この iPhone に保存されている Bluetooth ペアリング情報が無効になっているため、「%@」に接続できません。「設定 → Bluetooth」を開き、デバイス右側の ⓘ をタップして「このデバイスの登録を解除」を選択してから、もう一度お試しください。";
+"settings.follow_system" = "システムに合わせる";
+
+// MARK: - Sleep Plan（睡眠计划 Tab，2026-08-12）
+"tab.plan" = "プラン";
+"common.got_it" = "了解しました";
+"subscription.section.title.premium" = "プレミアム会員";
+"subscription.action.upgrade" = "アップグレード";
+"subscription.desc.premium.monthly.prefix" = "有効期限の前日に";
+"subscription.desc.premium.monthly.suffix" = "/月で自動更新されます。課金前ならいつでも解約できます。";
+"subscription.desc.premium.yearly" = "開通日から1年間プレミアム特典をご利用いただけます。次回更新前ならいつでも解約できます。";
+"renewal.tier" = "会員ランク";
+"renewal.tier.basic" = "ベーシック会員";
+"renewal.tier.premium" = "プレミアム会員";
+"renewal.tier.none" = "なし";
+"renewal.environment" = "環境";
+"renewal.environment.sandbox" = "テスト環境（課金なし）";
+"sleepplan.title" = "睡眠プラン";
+"sleepplan.intro" = "睡眠目標を設定すると、アプリとデバイスが時間通りにリマインドし、連携して実行をサポートします。睡眠改善を実行可能な計画に変えましょう。";
+"sleepplan.section.training" = "睡眠トレーニング";
+"sleepplan.section.training.subtitle" = "科学的理論に基づく睡眠調整プランです。すぐに一つ選んで始めましょう。";
+"sleepplan.section.my_plans" = "マイ睡眠プラン";
+"sleepplan.my_plans.empty" = "まだ睡眠プランがありません";
+"sleepplan.my_plans.quota" = "%@ · %d/%d";
+"sleepplan.kind.custom.default_name" = "新規睡眠プラン01";
+"sleepplan.kind.habit_formation.name" = "睡眠習慣づくり";
+"sleepplan.kind.habit_formation.summary" = "21日間の習慣トレーニング";
+"sleepplan.kind.habit_formation.description" = "21日間で安定した持続可能な睡眠習慣を築きます。規則正しい生活リズムは睡眠リズムを安定させ、睡眠の質を高めます。";
+"sleepplan.kind.jet_lag.name" = "時差調整";
+"sleepplan.kind.jet_lag.summary" = "7日間の睡眠調整";
+"sleepplan.kind.jet_lag.description" = "7日間かけて就寝・起床時間を段階的に調整し、新しいタイムゾーンに素早く適応します。";
+"sleepplan.kind.anxiety_relief.name" = "不安解消";
+"sleepplan.kind.anxiety_relief.summary" = "14日間の就寝前リラックス";
+"sleepplan.kind.anxiety_relief.description" = "14日間の就寝前リラックストレーニングで、入眠前の不安を和らげ、よりリラックスして眠りにつけるようサポートします。";
+"sleepplan.status.active" = "実行中";
+"sleepplan.status.not_enabled" = "未開始";
+"sleepplan.status.completed" = "完了";
+"sleepplan.status.stopped" = "停止中";
+"sleepplan.list.target_sleep_time" = "目標就寝 %@";
+"sleepplan.tier.basic" = "ベーシック会員";
+"sleepplan.tier.premium" = "プレミアム会員";
+"sleepplan.action.create_plan" = "新規プラン +";
+"sleepplan.action.edit" = "編集";
+"sleepplan.action.plan_detail" = "プラン詳細 →";
+"sleepplan.action.save" = "設定を保存";
+"sleepplan.action.discard" = "変更を破棄";
+"sleepplan.action.keep_editing" = "編集を続ける";
+"sleepplan.action.tap_to_set" = "タップして設定";
+"sleepplan.action.upgrade_premium" = "プレミアムにアップグレード";
+"sleepplan.alert.locked_tonight.title" = "今夜のプランはすでに開始しています";
+"sleepplan.alert.locked_tonight.message" = "現在は無効化できません。明日改めてお試しください。";
+"sleepplan.alert.plan_full.title" = "睡眠プランの上限に達しました";
+"sleepplan.alert.plan_full.message" = "保存できる睡眠プランの数が上限に達しました。既存のプランを削除してから再度お試しください。";
+"sleepplan.alert.plan_full.basic_message" = "ベーシック会員は睡眠プランを最大1件しか保存・有効化できません。現在のプランを削除してから再度お試しください。";
+"sleepplan.alert.premium_required.title" = "プレミアム会員機能";
+"sleepplan.alert.premium_required.message" = "プレミアム会員にアップグレードすると、公式睡眠トレーニングの入眠リマインダー時刻とアラーム音を調整できます。";
+"sleepplan.alert.custom_plan_required.message" = "ベーシック会員は睡眠プランを最大1件しか保存・有効化できません。プレミアム会員にアップグレードすると、カスタムプランを作成し、リスト内のすべてのプランを復元できます。";
+"sleepplan.alert.switch_plan.title" = "睡眠プランを切り替えますか？";
+"sleepplan.alert.switch_plan.message" = "「%@」を停止し、このプランを開始します。よろしいですか？";
+"sleepplan.alert.exit_new.title" = "新規プラン作成を終了しますか？";
+"sleepplan.alert.exit_new.message" = "このプランはまだ保存されていません。終了すると、設定した内容は保持されません。";
+"sleepplan.alert.unsaved_edit.title" = "未保存の変更があります";
+"sleepplan.alert.unsaved_edit.message" = "戻ると、この変更は保存されません。";
+"sleepplan.editor.name_hint" = "プラン名をタップすると変更でき、管理しやすくなります。";
+"sleepplan.editor.sleep_goal" = "睡眠目標";
+"sleepplan.editor.sleep_goal_hint" = "バーの端をドラッグして就寝・起床時間を設定するか、時刻の数字をタップして正確に編集できます。";
+"sleepplan.editor.sleep_time" = "就寝時間";
+"sleepplan.editor.wake_time" = "起床時間";
+"sleepplan.editor.options" = "プランオプション";
+"sleepplan.editor.cycle" = "実行周期";
+"sleepplan.editor.cycle.hint" = "トレーニング周期はシステムで固定設定されており、完了後に再度開始できます。";
+"sleepplan.editor.reminder" = "就寝リマインダー";
+"sleepplan.editor.reminder.hint" = "就寝準備の時間になるとリマインドし、あわせてムードライトとアロマをオンにして睡眠環境を整えます。";
+"sleepplan.editor.sleep_aid" = "入眠サポート";
+"sleepplan.editor.sleep_aid.hint" = "睡眠データに基づき、毎晩最適な入眠シーンをスマートにマッチングします。";
+"sleepplan.editor.alarm" = "アラーム音";
+"sleepplan.editor.alarm.hint" = "起床時に再生されるアラーム音で、より自然な目覚めをサポートします。";
+"sleepplan.editor.save_hint" = "すべての必須項目を入力してから保存してください。保存後プランはリストに追加されますが、すぐには開始されません。";
+"sleepplan.editor.save_hint.edit" = "保存したプランはリストに未開始の状態で表示され、現在実行中のプランには影響しません。";
+"sleepplan.editor.save_hint.official" = "保存すると、プランは「マイ睡眠プラン」リストに表示されますが、すぐには開始されません。\nプランのホーム画面に戻って手動でオンにしてください。";
+"sleepplan.sheet.reminder.title" = "就寝リマインダー";
+"sleepplan.sheet.reminder.minutes_before" = "%d分前";
+"sleepplan.sheet.alarm_sound.title" = "アラーム音";
+"sleepplan.sheet.sleep_aid.title" = "入眠サポート";
+"sleepplan.sheet.sleep_aid.readonly_title" = "スマート入眠サポート";
+"sleepplan.sheet.sleep_aid.readonly_message" = "睡眠科学とあなたの睡眠データに基づき、AIが毎晩最適な入眠シーンを自動でマッチングします。プランはシステムが設定するため、手動での変更はできません。";
+"sleepplan.sheet.cycle.title" = "実行周期";
+"sleepplan.sheet.cycle.instruction" = "プランを実行する曜日を選択してください";
+"sleepplan.sheet.cycle.repeat_weekly" = "毎週繰り返す";
+"sleepplan.sheet.cycle.repeat_hint" = "オフの場合、選択した曜日を1回のみ実行します。";
+"sleepplan.sheet.cycle.warning" = "睡眠プランの連続性を保つため、少なくとも3日連続で選択してください。";
+"sleepplan.sheet.cycle.hint" = "少なくとも3日連続で選択してください。間隔を空けることはできません。土曜・日曜・月曜は連続とみなされます。オンにすると、毎週選択した曜日のみプランが実行されます。";
+"sleepplan.sheet.cycle.readonly_message" = "このトレーニング周期は%d日間で固定されており、毎日実行されます。完了後に再度開始できます。";
+"sleepplan.sheet.goal.title" = "睡眠目標の設定";
+"sleepplan.sheet.goal.duration" = "目標睡眠時間";
+"sleepplan.sheet.goal.sleep_time" = "就寝時間";
+"sleepplan.sheet.goal.wake_time" = "起床時間";
+"sleepplan.sheet.goal.too_short" = "睡眠時間が短すぎます。1時間以上に設定してください。";
+"sleepplan.sheet.rename.title" = "プラン名の変更";
+"sleepplan.sheet.rename.hint" = "最大10文字";
+"sleepplan.cycle.fixed_daily" = "%d日間・毎日";
+"sleepplan.cycle.repeats_weekly" = "毎週繰り返す";
+"sleepplan.cycle.once" = "1回のみ";
+"sleepplan.duration.hours" = "%d時間";
+"sleepplan.duration.hours_half" = "%d.5時間";
+"sleepplan.duration.hours_minutes" = "%d時間%d分";
+"sleepplan.unit.hour" = "時間";
+"sleepplan.unit.minute" = "分";
+"sleepplan.duration.hours_short" = "%d時間";
+"sleepplan.reminder.minutes_before_short" = "%d分前";
+"sleepplan.reminder.off" = "オフ";
+"sleepplan.reminder.notification_title" = "そろそろ就寝準備の時間です";
+"sleepplan.reminder.notification_body" = "「%@」の就寝時間が近づいています。リラックスして眠る準備をしましょう。";
+"sleepplan.sound.temple_bell" = "寺院の朝の鐘";
+"sleepplan.sound.sunlit_coast" = "陽だまりの海岸";
+"sleepplan.sound.rainforest_mist" = "熱帯雨林の朝霧";
+"sleepplan.sleep_aid.smart.name" = "スマートおすすめ";
+"sleepplan.sleep_aid.smart.desc" = "睡眠データに基づき毎晩最適なシーンをスマートにマッチングします。";
+"sleepplan.sleep_aid.preference.name" = "好みに基づくおすすめ";
+"sleepplan.sleep_aid.preference.desc" = "過去の選択傾向に基づいてシーンをおすすめします。";
+"sleepplan.sleep_aid.trending.name" = "人気のおすすめ";
+"sleepplan.sleep_aid.trending.desc" = "多くのユーザーの利用状況とフィードバックに基づいておすすめします。";
+"weekday.mon" = "月";
+/* List separator used to join items such as weekday names. */
+"common.list_separator" = "、";
+
+"weekday.short.1" = "月";
+"weekday.tue" = "火";
+"weekday.short.2" = "火";
+"weekday.wed" = "水";
+"weekday.short.3" = "水";
+"weekday.thu" = "木";
+"weekday.short.4" = "木";
+"weekday.fri" = "金";
+"weekday.short.5" = "金";
+"weekday.sat" = "土";
+"weekday.short.6" = "土";
+"weekday.sun" = "日";
+"weekday.short.7" = "日";
+"sleepplan.action.confirm_exit" = "終了する";
+
+/* 健康周/月视图：服务端分析缺失时的兜底文案（原为硬编码英文） */
+"health.chart.tooltip.duration" = "%1$@ 時間 %2$@ 分";
+
+/* 会员订阅卡（20260818 设计）*/
+"subscription.plan.subheader" = "プランと支払い周期を選択";
+"subscription.plan.tier.basic" = "通常会員";
+"subscription.plan.tier.premium" = "AI プレミアム";
+"subscription.plan.monthly.note" = "毎月更新、いつでも解約可能";
+"subscription.plan.yearly.note" = "毎年自動更新";
+"subscription.plan.monthly.tag" = "柔軟なプラン";
+"subscription.plan.yearly.tag" = "16〜17% お得";
+"subscription.plan.cta.basic" = "Basic に登録 · %@";
+"subscription.plan.cta.premium" = "AI Premium に登録 · %@";
+"subscription.plan.current" = "現在のプラン";
+"subscription.plan.footnote" = "自動更新、いつでも解約できます。最終金額は App Store の表示に準じます。";
+"subscription.benefit.basic.1.title" = "睡眠データのすべて";
+"subscription.benefit.basic.1.desc" = "睡眠履歴とスコアを閲覧し、睡眠の変化を追跡できます";
+"subscription.benefit.basic.2.title" = "個人睡眠モデル";
+"subscription.benefit.basic.2.desc" = "長期の睡眠データから学習を続けます";
+"subscription.benefit.basic.3.title" = "AI モニタリング";
+"subscription.benefit.basic.3.desc" = "睡眠状態に合わせて調整し、実行できる改善提案を提示します";
+"subscription.benefit.basic.4.title" = "睡眠プラン";
+"subscription.benefit.basic.4.desc" = "1 件のプランを保存・実行できます";
+"subscription.benefit.premium.1.title" = "Basic の全特典を含む";
+"subscription.benefit.premium.1.desc" = "完全なデータ、トレンド分析、個人睡眠モデル";
+"subscription.benefit.premium.2.title" = "AI が入眠フローを生成";
+"subscription.benefit.premium.2.desc" = "その日の状態に合わせて個別のプランを生成します";
+"subscription.benefit.premium.3.title" = "深い睡眠インサイト";
+"subscription.benefit.premium.3.desc" = "長期的な睡眠の問題と、その主な要因を特定します";
+"subscription.benefit.premium.4.title" = "睡眠プラン";
+"subscription.benefit.premium.4.desc" = "最大 5 件のプランを保存・実行できます";
+
+/* 订阅卡：已订阅态与套餐切换 */
+"subscription.plan.cta.switch" = "%@に変更";
+"subscription.plan.cta.upgrade" = "AI Premium にアップグレード · %@";
+"subscription.plan.cta.downgrade" = "通常会員に変更 · %@";
+"subscription.plan.cta.scheduled" = "変更予約済み";
+"subscription.plan.status.current" = "現在：%1$@ · %2$@";
+"subscription.plan.period.redeemed" = "引き換えコード";
+"subscription.plan.status.renew" = "%@ に更新";
+"subscription.plan.status.expire" = "%@ に終了";
+"subscription.plan.status.pending" = "%1$@ に変更済み、%2$@ から適用";
+"subscription.plan.manage" = "管理";
+
+/* 资料卡会员状态行（带等级）*/
+"subscription.status.active" = "有効 · %1$@ · %2$@";
+"subscription.status.trial" = "体験中 · %@";
+"subscription.status.granted" = "有効 · %@";
+
+/* 订阅日期行标题：随续订状态变 */
+"subscription.date.next_billing" = "次回請求日";
+"subscription.date.expiry" = "有効期限";
+"subscription.date.grace" = "お支払い方法の更新が必要";
+"subscription.date.retry" = "請求を再試行中";
+"subscription.date.expired" = "期限切れ";
+
+/* 设计校对表（2026-10）新增：英文按设计稿，其他语言沿用原显示 */
+"sleepplan.editor.options.custom" = "プランオプション";
+"sleepplan.editor.cycle.custom" = "実行周期";
+"sleepplan.editor.cycle.hint.custom" = "トレーニング周期はシステムで固定設定されており、完了後に再度開始できます。";
+"sleepplan.sheet.cycle.readonly_title" = "実行周期";
+"subscription.prompt.title" = "まだ会員ではありません";
+"explore.gate.title" = "まだ会員ではありません";
+"explore.gate.hint" = "登録して表示";
+"explore.gate.action" = "登録する";
+"survey.progress" = "%1$d / %2$d";
+"unit.duration.hr_min" = "%1$dh %2$dmin";
+"unit.duration.hr" = "%dh";
+"unit.duration.min" = "%dmin";
+"unit.duration.under_1_min" = "<1min";
+"unit.bpm" = "%dbpm";
+"unit.bpm_range" = "%1$d-%2$dbpm";
+"unit.breaths_per_min" = "%d 回/分";
+"unit.days_tracked" = "%1$d/%2$ddays";
+"unit.duration.compact.hr_min" = "%1$dh%2$dmin";
+"unit.duration.compact.hr" = "%dh";
+"health.sleep.stage_card.rem" = "REM";
+"health.sleep.stage_card.core" = "コア";
+"health.sleep.stage_card.deep" = "深睡";
+"sleepplan.cycle.range" = "%1$@〜%2$@";

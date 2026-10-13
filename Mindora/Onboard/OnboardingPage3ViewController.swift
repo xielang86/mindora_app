@@ -65,7 +65,8 @@ final class OnboardingPage3ViewController: UIViewController {
     
     // 计算实际尺寸的辅助方法
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
     
     // MARK: - UI Components
@@ -325,7 +326,10 @@ final class OnboardingPage3ViewController: UIViewController {
         let cardWidth = scale(designCardWidth, basedOn: view.bounds.width, designDimension: designWidth)
         let cardHeight = scale(designCardHeight, basedOn: view.bounds.height, designDimension: designHeight)
         let cardSpacing = scale(designCardSpacing, basedOn: view.bounds.height, designDimension: designHeight)
-        let healthCardTop = scale(designHealthCardTop, basedOn: view.bounds.height, designDimension: designHeight)
+        // 卡片纵向位置用「按屏幕真实高度等比」而非 scale() 封顶：scale 封顶后卡片会浮在 iPad
+        // 屏幕上半部、跟底部按钮之间空一大块。等比定位让卡片落在跟 iPhone 相同的相对高度
+        // （≈65%），卡片尺寸仍用封顶的 scale 保持手机大小。iPhone 上二者数值完全相等（无回归）。
+        let healthCardTop = view.bounds.height * designHealthCardTop / designHeight
         
         // 卡片内图标尺寸和位置 - 按设计稿比例计算
         let cardIconWidth = scale(designCardIconWidth, basedOn: view.bounds.width, designDimension: designWidth)
@@ -516,19 +520,16 @@ final class OnboardingPage3ViewController: UIViewController {
     
     @objc private func connectAreaTapped() {
         self.bottomContainerView.animateButtonTap { [weak self] in
-            // 跳转到引导页4（扫描设备页面）
-            print("Connect Mindora tapped - Navigate to Page 4")
-            
-            let page4VC = OnboardingPage4ViewController()
-            
-            // 如果当前在导航控制器中，使用 push
-            if let navigationController = self?.navigationController {
-                navigationController.pushViewController(page4VC, animated: true)
+            // 跳转到新的扫描+多选页（iOS 蓝牙设置同款）。原先的 OnboardingPage4 自动选一个 +
+            // OnboardingPage5 庆祝页两步都被并到这一个页面里。
+            let scanVC = DeviceScanViewController(mode: .onboarding)
+
+            if let nav = self?.navigationController {
+                nav.pushViewController(scanVC, animated: true)
             } else {
-                // 否则使用模态展示
-                page4VC.modalPresentationStyle = .fullScreen
-                page4VC.modalTransitionStyle = .crossDissolve
-                self?.present(page4VC, animated: true)
+                scanVC.modalPresentationStyle = .fullScreen
+                scanVC.modalTransitionStyle = .crossDissolve
+                self?.present(scanVC, animated: true)
             }
         }
     }
@@ -542,8 +543,6 @@ final class OnboardingPage3ViewController: UIViewController {
             // 首先检查 HealthKit 是否可用
             guard HKHealthStore.isHealthDataAvailable() else {
                 print("[OnboardingPage3] HealthKit 不可用，跳过健康权限申请")
-                // 即使 HealthKit 不可用，仍然申请蓝牙权限
-                requestBluetoothPermissionIfNeeded()
                 return
             }
             
@@ -562,10 +561,6 @@ final class OnboardingPage3ViewController: UIViewController {
                 print("[OnboardingPage3] 健康权限状态: \(healthStatus.localizedDescription)")
             }
             
-            // 申请蓝牙权限
-            await MainActor.run {
-                requestBluetoothPermissionIfNeeded()
-            }
         }
     }
     

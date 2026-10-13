@@ -1,4 +1,5 @@
 import UIKit
+import SafariServices
 
 class SideMenuViewController: UIViewController {
 
@@ -131,7 +132,7 @@ class SideMenuViewController: UIViewController {
         }
         return button
     }()
-    
+
     // Section 12 Links
     private let linksContainer: UIView = {
         let view = UIView()
@@ -151,6 +152,7 @@ class SideMenuViewController: UIViewController {
         contentView.transform = CGAffineTransform(translationX: -UIScreen.main.bounds.width, y: 0)
 
         refreshProfileSummary()
+        refreshNotificationsBadge()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -191,23 +193,43 @@ class SideMenuViewController: UIViewController {
         // Actions
         closeButton.addTarget(self, action: #selector(handleClose), for: .touchUpInside)
         logoutButton.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
+
+        #if DEBUG
+        // 调试：长按 close (X) 1.5s = 把本地 token 标记为过期。杀掉 app 重启即可复现冷启动 re-auth。
+        let debugLongPress = UILongPressGestureRecognizer(target: self, action: #selector(debugTriggerExpired(_:)))
+        debugLongPress.minimumPressDuration = 1.5
+        closeButton.addGestureRecognizer(debugLongPress)
+
+        // 调试：长按标题 1.0s = 把 token 替换成无效串。下一次任意 API 调用 → 服务器 401 → 切 Start。
+        titleLabel.isUserInteractionEnabled = true
+        let debugCorruptPress = UILongPressGestureRecognizer(target: self, action: #selector(debugTriggerCorruptToken(_:)))
+        debugCorruptPress.minimumPressDuration = 1.0
+        titleLabel.addGestureRecognizer(debugCorruptPress)
+        #endif
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleClose))
+        tap.delegate = self
         view.addGestureRecognizer(tap)
         
-        let contentTap = UITapGestureRecognizer(target: self, action: nil)
-        contentView.addGestureRecognizer(contentTap) // Block tap propagation
-
         let profileTap = UITapGestureRecognizer(target: self, action: #selector(handleProfileTap))
         profileView.isUserInteractionEnabled = true
         profileView.addGestureRecognizer(profileTap)
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleAvatarUpdate), name: NSNotification.Name("UserProfileAvatarUpdated"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleProfileDataUpdate), name: .userProfileDidUpdate, object: nil)
+        // 未读红点变化（浏览消息 markAllRead）→ 侧栏消息行红点同步消除，和铃铛一致。
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshNotificationsBadge), name: UnreadBadgeCenter.didChangeNotification, object: nil)
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+
+    /// 侧栏「消息通知」行的红点引用，供 markAllRead 后实时消除。
+    private weak var notificationsRedDot: UIView?
+
+    @objc private func refreshNotificationsBadge() {
+        notificationsRedDot?.isHidden = !UnreadBadgeCenter.shared.hasUnread
     }
     
     @objc private func handleAvatarUpdate() {
@@ -241,12 +263,18 @@ class SideMenuViewController: UIViewController {
         // CSS group_4 width 596px -> 596/750 of screen width
         // Using multiplier to adapt to different screen sizes instead of fixed point width (298pt)
         let widthMultiplier: CGFloat = 596.0 / 750.0
-        
+        // On iPad the multiplier alone would produce a ~800pt+ panel; cap it to a normal
+        // sidebar width. Never binds on iPhone (widthMultiplier * screen width stays well under this).
+        let maxWidth: CGFloat = 400
+        let preferredWidthConstraint = contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: widthMultiplier)
+        preferredWidthConstraint.priority = .defaultHigh
+
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: view.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: widthMultiplier),
+            preferredWidthConstraint,
+            contentView.widthAnchor.constraint(lessThanOrEqualToConstant: maxWidth),
             
             // CSS section_2 margin-top: 45px -> 22.5pt
             headerView.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 10), // Safe area + slight margin
@@ -262,11 +290,11 @@ class SideMenuViewController: UIViewController {
             
             // Align CloseButton with list arrows (24pt margin)
             closeButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
-            closeButton.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -24),
+            closeButton.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -14),
             
-            // CSS label_14: 28px -> 14pt used as icon size
-            closeButton.widthAnchor.constraint(equalToConstant: 14),
-            closeButton.heightAnchor.constraint(equalToConstant: 14),
+            // 改进按钮点击区域（热区放大）
+            closeButton.widthAnchor.constraint(equalToConstant: 34),
+            closeButton.heightAnchor.constraint(equalToConstant: 44),
             
             // CSS section_3 (profile) margin-top: 74px (37pt)
             // But here we use scrollview for the rest
@@ -329,7 +357,6 @@ class SideMenuViewController: UIViewController {
             // But maybe force minimum width if design requires
             
             // Links
-            // Uniform spacing: 24pt
             linksContainer.topAnchor.constraint(equalTo: logoutButton.bottomAnchor, constant: 24),
             linksContainer.centerXAnchor.constraint(equalTo: scrollContentView.centerXAnchor),
             linksContainer.bottomAnchor.constraint(equalTo: scrollContentView.bottomAnchor, constant: -40)
@@ -349,12 +376,17 @@ class SideMenuViewController: UIViewController {
          addMenuItem(title: L("sidemenu.device"), tag: 2)
          addSeparator()
          
-         addMenuItem(title: L("sidemenu.notifications"), tag: 3)
+         // 红点跟随全局未读状态（浏览消息后不再显示）；侧边栏每次打开重建，读取即最新。
+         addMenuItem(title: L("sidemenu.notifications"), tag: 3, showRedDot: true)
          addSeparator()
          
-         addMenuItem(title: L("sidemenu.privacy_data"), tag: 4)
+         // 隐私政策 / 服务条款：两个独立菜单项（替换原「隐私 & 数据」），App 内浏览器打开。隐私优先。
+         addMenuItem(title: L("sidemenu.privacy_policy"), tag: 9)
          addSeparator()
-         
+
+         addMenuItem(title: L("sidemenu.terms"), tag: 8)
+         addSeparator()
+
          addMenuItem(title: L("sidemenu.health_link"), tag: 5)
          addSeparator()
          
@@ -366,7 +398,7 @@ class SideMenuViewController: UIViewController {
     }
     
     // Updated addMenuItem with strict styling
-    private func addMenuItem(title: String, subtitle: String? = nil, isPro: Bool = false, tag: Int) {
+    private func addMenuItem(title: String, subtitle: String? = nil, isPro: Bool = false, tag: Int, showRedDot: Bool = false) {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
         // CSS margin-top 46px -> 23pt (between separator and text?)
@@ -412,29 +444,56 @@ class SideMenuViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tag = tag
         button.addTarget(self, action: #selector(menuItemTapped), for: .touchUpInside)
+        #if DEBUG
+        if tag == 1 {
+            // 调试：长按「订阅」2s = 弹 StoreKit 退款申请表。沙盒里提交即退，用来验证 REFUND 通知与撤销上报。
+            let refundPress = UILongPressGestureRecognizer(target: self, action: #selector(debugTriggerRefund(_:)))
+            refundPress.minimumPressDuration = 2.0
+            button.addGestureRecognizer(refundPress)
+        }
+        #endif
 
         container.addSubview(label)
         container.addSubview(arrow)
         container.addSubview(button)
         // CSS margin-left 48px -> 24pt
         // CSS width 487px -> ~243.5pt content width
-        
+
         NSLayoutConstraint.activate([
             label.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 24),
-            
+
             arrow.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             arrow.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -24), // Margin right
             // CSS label_21: 28px -> 14pt
             arrow.widthAnchor.constraint(equalToConstant: 14),
             arrow.heightAnchor.constraint(equalToConstant: 14),
-            
+
             button.topAnchor.constraint(equalTo: container.topAnchor),
             button.bottomAnchor.constraint(equalTo: container.bottomAnchor),
             button.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             button.trailingAnchor.constraint(equalTo: container.trailingAnchor)
         ])
-        
+
+        // 消息通知红点：位于箭头左侧。始终创建，按未读状态显隐，并留引用供实时刷新
+        // （浏览消息 markAllRead 后，即使侧栏还压在消息页下方，也能同步消除，和铃铛状态一致）。
+        if showRedDot {
+            let redDot = UIView()
+            redDot.backgroundColor = UIColor(red: 1.0, green: 59/255, blue: 48/255, alpha: 1.0) // #FF3B30
+            redDot.layer.cornerRadius = 3
+            redDot.isHidden = !UnreadBadgeCenter.shared.hasUnread
+            redDot.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(redDot)
+            container.bringSubviewToFront(button)
+            NSLayoutConstraint.activate([
+                redDot.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+                redDot.trailingAnchor.constraint(equalTo: arrow.leadingAnchor, constant: -8),
+                redDot.widthAnchor.constraint(equalToConstant: 6),
+                redDot.heightAnchor.constraint(equalToConstant: 6)
+            ])
+            if tag == 3 { notificationsRedDot = redDot }
+        }
+
         menuStackView.addArrangedSubview(container)
     }
     
@@ -464,46 +523,9 @@ class SideMenuViewController: UIViewController {
     }
 
     private func setupLinks(in container: UIView) {
-        let termsBtn = UIButton()
-        termsBtn.translatesAutoresizingMaskIntoConstraints = false
-        termsBtn.setTitle(L("sidemenu.terms"), for: .normal)
-        termsBtn.setTitleColor(.white, for: .normal)
-        termsBtn.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 12)
-        termsBtn.addTarget(self, action: #selector(openTerms), for: .touchUpInside)
-        
-        // Separator icon between terms and privacy?
-        // CSS thumbnail_1: 1px width, 13px height.
-        let sepIcon = UIImageView()
-        sepIcon.translatesAutoresizingMaskIntoConstraints = false
-        sepIcon.backgroundColor = .white // Fallback or load image
-        sepIcon.alpha = 0.5
-        
-        let privacyBtn = UIButton()
-        privacyBtn.translatesAutoresizingMaskIntoConstraints = false
-        privacyBtn.setTitle(L("sidemenu.privacy_policy"), for: .normal)
-        privacyBtn.setTitleColor(.white, for: .normal)
-        privacyBtn.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 12)
-        privacyBtn.addTarget(self, action: #selector(openPrivacy), for: .touchUpInside)
-        
-        container.addSubview(termsBtn)
-        container.addSubview(sepIcon)
-        container.addSubview(privacyBtn)
-        
-        NSLayoutConstraint.activate([
-            sepIcon.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            sepIcon.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            sepIcon.widthAnchor.constraint(equalToConstant: 0.5),
-            sepIcon.heightAnchor.constraint(equalToConstant: 12),
-            
-            termsBtn.trailingAnchor.constraint(equalTo: sepIcon.leadingAnchor, constant: -10),
-            termsBtn.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            
-            privacyBtn.leadingAnchor.constraint(equalTo: sepIcon.trailingAnchor, constant: 10),
-            privacyBtn.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            
-            container.heightAnchor.constraint(equalToConstant: 30),
-            container.widthAnchor.constraint(equalToConstant: 250) // Enough for text
-        ])
+        // 服务条款 / 隐私政策已改为上方独立菜单项，底部链接不再需要（容器收 0 高，保持布局约束完整）。
+        container.heightAnchor.constraint(equalToConstant: 0).isActive = true
+        container.widthAnchor.constraint(equalToConstant: 0).isActive = true
     }
     
     // remove setupLinks() call duplication (old function)
@@ -520,6 +542,51 @@ class SideMenuViewController: UIViewController {
             self.dismiss(animated: false, completion: nil)
         }
     }
+
+    #if DEBUG
+    @objc private func debugTriggerRefund(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began, let scene = view.window?.windowScene else { return }
+        Log.info("SideMenu", "[DEBUG] long-press on subscription → begin refund request")
+        Task { @MainActor in
+            let msg = await SubscriptionManager.shared.debugBeginRefundRequest(in: scene)
+            if let window = self.view.window { Toast.show("[DEBUG] \(msg)", in: window) }
+        }
+    }
+
+    @objc private func debugTriggerExpired(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+        Log.info("SideMenu", "[DEBUG] long-press on close → mark token expired")
+        AuthStorage.shared.debugMarkExpired()
+        let presenter = self.view.window
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.backgroundColor = .clear
+            self.contentView.transform = CGAffineTransform(translationX: -self.contentView.frame.width, y: 0)
+        }) { _ in
+            self.dismiss(animated: false) {
+                if let window = presenter {
+                    Toast.show("[DEBUG] Token marked expired. Kill app & relaunch to test re-auth.", in: window)
+                }
+            }
+        }
+    }
+
+    @objc private func debugTriggerCorruptToken(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+        Log.info("SideMenu", "[DEBUG] long-press on title → corrupt token")
+        AuthStorage.shared.debugCorruptToken()
+        let presenter = self.view.window
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.backgroundColor = .clear
+            self.contentView.transform = CGAffineTransform(translationX: -self.contentView.frame.width, y: 0)
+        }) { _ in
+            self.dismiss(animated: false) {
+                if let window = presenter {
+                    Toast.show("[DEBUG] Token corrupted. Pull-to-refresh any tab to trigger 401.", in: window)
+                }
+            }
+        }
+    }
+    #endif
     
     @objc private func handleProfileTap() {
         let profileVC = UserProfileViewController()
@@ -555,9 +622,8 @@ class SideMenuViewController: UIViewController {
     }
 
     private func clearLocalUserData() {
-        UserDefaults.standard.removeObject(forKey: avatarStorageKey)
-        UserProfileStore.shared.clear()
-        AuthStorage.shared.clearLoginInfo()
+        // 退出登录：保留邮箱，登录页预填上次账号（注销删除账号才连邮箱一起清）。
+        SessionResetter.reset(.logout)
     }
 
     private func navigateToLogin() {
@@ -585,27 +651,24 @@ class SideMenuViewController: UIViewController {
             vc.modalPresentationStyle = .fullScreen
             self.present(vc, animated: true, completion: nil)
         case 2:
-            // Device
-            if DeviceSession.shared.isConnected {
-                let vc = DeviceManagementViewController()
-                let nav = UINavigationController(rootViewController: vc)
-                nav.setNavigationBarHidden(true, animated: false)
-                nav.modalPresentationStyle = .fullScreen
-                self.present(nav, animated: true, completion: nil)
-            } else {
-                let vc = RegisterP4Controller()
-                let nav = UINavigationController(rootViewController: vc)
-                nav.setNavigationBarHidden(true, animated: false)
-                nav.modalPresentationStyle = .fullScreen
-                self.present(nav, animated: true, completion: nil)
-            }
+            // Device：永远进 DM 列表。
+            // 已绑过 → 看到设备卡片；没绑过 → 看到 empty state + "搜索设备" 按钮，用户主动
+            // tap 按钮才进扫描页。之前的"未绑直接跳扫描页"是把"管理设备"和"添加新设备"两个
+            // 动作糅在一起，用户语义上是先进设备列表（即使是空的），再决定要不要添加新设备。
+            let nav = UINavigationController(rootViewController: DeviceManagementViewController())
+            nav.setNavigationBarHidden(true, animated: false)
+            nav.modalPresentationStyle = .fullScreen
+            self.present(nav, animated: true, completion: nil)
         case 3:
             // Notifications
             let vc = NotificationsViewController()
             vc.modalPresentationStyle = .fullScreen
             self.present(vc, animated: true, completion: nil)
-        case 4:
-            // Privacy & Data
+        case 8:
+            // 服务条款
+            openTerms()
+        case 9:
+            // 隐私政策
             openPrivacy()
         case 5:
             // Health Link
@@ -640,19 +703,15 @@ class SideMenuViewController: UIViewController {
     }
 
     @objc private func openTerms() {
-        let text = L("legal.terms.content")
-        let title = L("legal.terms.title")
-        let vc = LegalDocumentViewController(title: title, content: text)
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true)
+        // 用户协议：App 内浏览器打开（无自定义标题，URL 定义在 Constants）。
+        guard let url = URL(string: Constants.Network.termsOfUseURL) else { return }
+        present(SFSafariViewController(url: url), animated: true)
     }
 
     @objc private func openPrivacy() {
-        let text = L("legal.privacy.content")
-        let title = L("legal.privacy.title")
-        let vc = LegalDocumentViewController(title: title, content: text)
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true)
+        // 隐私政策：App 内浏览器打开（无自定义标题，URL 定义在 Constants）。
+        guard let url = URL(string: Constants.Network.privacyPolicyURL) else { return }
+        present(SFSafariViewController(url: url), animated: true)
     }
     
     // MARK: - Avatar Persistence
@@ -689,6 +748,16 @@ class MenuSeparatorView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         borderLayer.frame = bounds
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension SideMenuViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if let touchView = touch.view, touchView.isDescendant(of: contentView) {
+            return false
+        }
+        return true
     }
 }
 

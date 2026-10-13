@@ -79,18 +79,27 @@ class HealthLinkAlertView: UIView {
         alertContainer.addSubview(cancelButton)
         alertContainer.addSubview(confirmButton)
         
+        // Fill with 53.5pt side padding by default; on iPad this would exceed the 340pt
+        // cap below, so it's a lower-priority "fill" constraint rather than required —
+        // the required max-width + centerX constraints take over and center the alert
+        // instead of leaving two required constraints in direct conflict.
+        let leadingFill = alertContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 53.5)
+        let trailingFill = alertContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -53.5)
+        leadingFill.priority = .defaultHigh
+        trailingFill.priority = .defaultHigh
+
         NSLayoutConstraint.activate([
             // Background
             backgroundView.topAnchor.constraint(equalTo: topAnchor),
             backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor),
             backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
             backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            
+
             // Alert Container
             // Width: Dynamic based on screen width padding
             // Design: box_7 padding 107px -> 53.5pt
-            alertContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 53.5),
-            alertContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -53.5),
+            leadingFill,
+            trailingFill,
             alertContainer.centerXAnchor.constraint(equalTo: centerXAnchor),
             alertContainer.centerYAnchor.constraint(equalTo: centerYAnchor),
             // Max width constraint to prevent it from looking weird on iPads or landscape
@@ -123,22 +132,13 @@ class HealthLinkAlertView: UIView {
             cancelButton.bottomAnchor.constraint(equalTo: alertContainer.bottomAnchor, constant: -23),
             confirmButton.bottomAnchor.constraint(equalTo: alertContainer.bottomAnchor, constant: -23),
             
-            // Minimum gap
-            cancelButton.trailingAnchor.constraint(lessThanOrEqualTo: confirmButton.leadingAnchor, constant: -10),
-            
-            // Apply Content Insets implicitly via width constraint or min width?
-            // The design has huge padding (approx 40pt each side).
-            // Let's explicitly set width to respect design "visual" size if possible, 
-            // or use content insets.
-            // 164px (padding L+R) + text width. 
-            // "取消" ~24px. Total ~188px -> 94pt.
-            // 218pt available. 94pt * 2 = 188pt. 
-            // Gap = 30pt.
-            // So fixed width constraint ~94pt is safe for Chinese.
-            // For English "Cancel" -> ~100pt. 
-            // I will add a constraint for Minimum Width to match the visual look.
-            cancelButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 94),
-            confirmButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 94)
+            // Gap between the two buttons: design 12px -> 6pt
+            confirmButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 6),
+
+            // Both buttons split the remaining width evenly, so each lands on the
+            // design's 212px -> 106pt at the default 268pt container width
+            // (268 - 25*2 padding - 6 gap = 212, / 2 = 106).
+            cancelButton.widthAnchor.constraint(equalTo: confirmButton.widthAnchor)
         ])
         
         cancelButton.addTarget(self, action: #selector(handleCancel), for: .touchUpInside)

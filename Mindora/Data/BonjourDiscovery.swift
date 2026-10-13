@@ -1,48 +1,36 @@
 import Foundation
 import UIKit
 
-protocol BonjourDiscoveryDelegate: AnyObject {
-    func discoveryDidUpdate(_ discovery: BonjourDiscovery)
-    /// 搜索失败回调，errorCode 为 NetService 错误码
-    /// 常见错误：-72000 表示本地网络权限被拒绝
-    func discoveryDidFail(_ discovery: BonjourDiscovery, errorCode: Int)
-}
-
-// 提供默认空实现，避免强制所有遵循者实现
-extension BonjourDiscoveryDelegate {
-    func discoveryDidFail(_ discovery: BonjourDiscovery, errorCode: Int) {}
-}
-
 final class BonjourDiscovery: NSObject {
     static let shared = BonjourDiscovery(serviceType: "_mindora._tcp.")
+
+    /// Posted on main queue whenever the visible `services` list changes (debounced).
+    /// `object` is the `BonjourDiscovery` instance.
+    static let didUpdateNotification = Notification.Name("BonjourDiscovery.didUpdate")
+    /// Posted when the browser reports a search error (e.g. -72000 local-network permission denied).
+    /// `object` is the `Int` NetService error code.
+    static let didFailNotification = Notification.Name("BonjourDiscovery.didFail")
+
     private let browser = NetServiceBrowser()
-    private(set) var services: [NetService] = []
     private let serviceType: String
-    weak var delegate: BonjourDiscoveryDelegate?
+    private(set) var services: [NetService] = []
 
-    // 设备唯一性索引： uniqueKey -> index in services
-    // uniqueKey 优先使用 (device_id + ip)；其次 (ip)；最后 fallback 根名称
+    /// uniqueKey → index in `services`. Key prefers (device_id + ip), then device_id, then ip,
+    /// then service.name as a stable fallback.
     private var indexByUniqueKey: [String: Int] = [:]
-    
-    // 扫描超时（避免无结果时卡住 UI 状态）
+
+    /// True while the underlying NetServiceBrowser is actively searching.
+    /// NetServiceBrowser has no public `isSearching` query, so we track it.
+    private var isSearching = false
+    private var isContinuous = false
+
+    /// One-shot scan auto-stops after this many seconds. Continuous mode ignores it.
+    private let oneShotTimeout: TimeInterval = 3.0
     private var scanTimer: Timer?
-    private let defaultTimeout: TimeInterval = 3.0
 
-    // 连续扫描
-    private var isContinuous: Bool = false
-    private var rescanTimer: Timer?
-    private var rescanInterval: TimeInterval = 15.0
-
-    // 通知节流，避免频繁刷新导致 UI 抖动
-    private var lastNotifyAt: Date?
-    private let throttleInterval: TimeInterval = 0.3
-    private var pendingNotifyWork: DispatchWorkItem?
-    // 上次记录的服务签名（按名称排序后用","连接），用于抑制重复日志
-    private var lastServicesSignature: String = ""
-    // 记录各 service.name 最近一次已输出的 uniqueKey，避免重复刷屏
-    private var lastLoggedUniqueKeyByName: [String: String] = [:]
-    // 上次输出 timeout reached 的时间
-    private var lastTimeoutLogAt: Date = .distantPast
+    /// Coalesce bursts of didFind/didRemove/TXT-update into one notification.
+    private var notifyScheduled = false
+    private let debounceInterval: TimeInterval = 0.2
 
     init(serviceType: String) {
         self.serviceType = serviceType
@@ -50,235 +38,216 @@ final class BonjourDiscovery: NSObject {
         browser.delegate = self
     }
 
+    // MARK: - Public API
+
+    /// Run a single bounded scan. Clears any previously discovered services.
     func start() {
-        let signature = services.map { $0.name }.sorted().joined(separator: ",")
-        if signature != lastServicesSignature {
-            Log.info("Bonjour", "start search: type=\(serviceType) continuous=\(isContinuous) prevServices=\(services.count) signature=\(signature)")
+        Log.info("Bonjour", "start one-shot search type=\(serviceType)")
+        cancelTimer()
+        if isSearching {
+            browser.stop()
+            isSearching = false
         }
-        browser.stop()
-        // 在连续模式下，不主动清空已有列表，避免 UI 闪烁；单次扫描则清空
-        if !isContinuous {
-            services.removeAll()
-            indexByUniqueKey.removeAll()
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.delegate?.discoveryDidUpdate(self)
-            }
-        } else {
-            // 连续模式：仅重置索引（避免旧 key 残留），保留当前 services，用增量事件修正
-            indexByUniqueKey.removeAll()
-            for (i, s) in services.enumerated() { indexByUniqueKey[computeUniqueKey(s)] = i }
+        // Explicit one-shot semantics: cancel any continuous mode so the timeout
+        // actually stops the browser.
+        isContinuous = false
+        clearServices()
+        beginSearch()
+        scheduleOneShotTimeout()
+    }
+
+    /// Run a continuous scan. Safe to call repeatedly — no-ops if already running.
+    /// mDNS pushes Hello/Goodbye automatically, so we don't restart the browser periodically.
+    func startContinuous() {
+        if isContinuous && isSearching {
+            return
         }
-        scanTimer?.invalidate()
+        Log.info("Bonjour", "start continuous search type=\(serviceType)")
+        cancelTimer()
+        isContinuous = true
+        if isSearching {
+            // One-shot was already running, just upgrade to continuous semantics.
+            return
+        }
+        // Transitioning from "stopped" → "searching": purge stale services left over
+        // from a previous session. Otherwise devices that went offline during the
+        // stopped window stay ghosted in the list (no didRemove will ever fire).
+        clearServices()
+        beginSearch()
+    }
+
+    /// Stop all searching. Does not clear discovered services so the list survives a stop/start.
+    func stop() {
+        guard isSearching || isContinuous else { return }
+        Log.info("Bonjour", "stop search services=\(services.count)")
+        cancelTimer()
+        isContinuous = false
+        if isSearching {
+            for service in services { service.stopMonitoring() }
+            browser.stop()
+            isSearching = false
+        }
+        postUpdate()
+    }
+
+    /// Alias of `stop()`, kept for call-site clarity.
+    func stopContinuous() { stop() }
+
+    /// 返回某 device_id 对应服务「已解析」的可拨号 host：优先 mDNS hostName（去尾点），
+    /// 退回 IPv4。未解析到则 nil（调用方应等下一次 discovery 更新后重试）。
+    /// 必须在主线程调用（services 由主线程的 browser 回调维护）。
+    func resolvedHost(forDeviceID did: String) -> String? {
+        guard let svc = services.first(where: { $0.deviceID == did }) else {
+            let known = services.map { "\($0.name)[did=\($0.deviceID ?? "nil") host=\($0.hostName ?? "nil") ip=\($0.firstIPv4Address ?? "nil")]" }
+            Log.info("Bonjour", "resolvedHost miss did=\(did) known=\(known.joined(separator: ", "))")
+            return nil
+        }
+        if let hn = svc.hostName, !hn.isEmpty {
+            return hn.hasSuffix(".") ? String(hn.dropLast()) : hn
+        }
+        return svc.firstIPv4Address
+    }
+
+    // MARK: - Internals
+
+    private func beginSearch() {
+        isSearching = true
         browser.searchForServices(ofType: serviceType, inDomain: "local.")
-        DispatchQueue.main.async { [weak self] in
+    }
+
+    private func clearServices() {
+        for service in services { service.stopMonitoring() }
+        services.removeAll()
+        indexByUniqueKey.removeAll()
+        postUpdate()
+    }
+
+    private func scheduleOneShotTimeout() {
+        cancelTimer()
+        scanTimer = Timer.scheduledTimer(withTimeInterval: oneShotTimeout, repeats: false) { [weak self] _ in
             guard let self else { return }
-            self.scanTimer = Timer.scheduledTimer(withTimeInterval: self.defaultTimeout, repeats: false) { [weak self] _ in
-                guard let self else { return }
-                let now = Date()
-                let sig = self.services.map { $0.name }.sorted().joined(separator: ",")
-                // 60 秒内且签名未变，不重复打印 timeout
-                if now.timeIntervalSince(self.lastTimeoutLogAt) > 60 || sig != self.lastServicesSignature {
-                    Log.info("Bonjour", "timeout reached, stop search currentServices=\(self.services.count)")
-                    self.lastTimeoutLogAt = now
-                }
+            if !self.isContinuous {
+                Log.info("Bonjour", "one-shot timeout reached")
                 self.stop()
             }
         }
     }
 
-    func stop() {
-        let signature = services.map { $0.name }.sorted().joined(separator: ",")
-        if signature != lastServicesSignature {
-            Log.info("Bonjour", "stop search services=\(services.count) indexedKeys=\(indexByUniqueKey.count) signature=\(signature)")
-        }
+    private func cancelTimer() {
         scanTimer?.invalidate()
         scanTimer = nil
-        if !isContinuous { // 如果外部显式 stop（非连续循环中的 timeout），则清理重扫定时
-            rescanTimer?.invalidate()
-            rescanTimer = nil
-        }
-        browser.stop()
-        // 即使没有发现/移除事件，也要通知外界更新 UI（如结束“正在扫描”）
-        DispatchQueue.main.async { [weak self] in
+    }
+
+    private func scheduleNotify() {
+        if notifyScheduled { return }
+        notifyScheduled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + debounceInterval) { [weak self] in
             guard let self else { return }
-            self.delegate?.discoveryDidUpdate(self)
+            self.notifyScheduled = false
+            self.postUpdate()
         }
     }
 
-    // 连续后台扫描：以周期性“短扫 + 暂停”方式保持目录新鲜，期间节流 UI 更新
-    func startContinuous(rescanInterval: TimeInterval = 15.0) {
-        self.isContinuous = true
-        self.rescanInterval = rescanInterval
-        let signature = services.map { $0.name }.sorted().joined(separator: ",")
-        if signature != lastServicesSignature {
-            Log.info("Bonjour", "start continuous search: interval=\(rescanInterval)s existingServices=\(services.count) signature=\(signature)")
+    private func postUpdate() {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: Self.didUpdateNotification, object: self)
         }
-        // 立即开启一次短扫
-        start()
-        // 后续按间隔重复
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.rescanTimer?.invalidate()
-            self.rescanTimer = Timer.scheduledTimer(withTimeInterval: rescanInterval, repeats: true) { [weak self] _ in
-                guard let self else { return }
-                if self.isContinuous {
-                    self.start()
-                }
-            }
-        }
-    }
-
-    func stopContinuous() {
-    Log.info("Bonjour", "stop continuous mode")
-        isContinuous = false
-        rescanTimer?.invalidate()
-        rescanTimer = nil
-        stop()
     }
 }
 
+// MARK: - NetServiceBrowserDelegate
 extension BonjourDiscovery: NetServiceBrowserDelegate {
-    func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
-        // will search: 不再每次打印，保持安静（如需要调试可恢复）
-    }
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        // 仅在“列表中第一次出现这个名称”时打印 found；否则安静替换
-        let alreadyExistsByName = services.contains(where: { $0.name == service.name })
-        if !alreadyExistsByName {
-            Log.info("Bonjour", "found service name=\(service.name) type=\(service.type) more=\(moreComing) beforeCount=\(services.count)")
-        }
+        Log.info("Bonjour", "didFind name=\(service.name) more=\(moreComing) count=\(services.count)")
         service.delegate = self
-        service.startMonitoring() // 监听 TXT 变化
-        // 先放入，后续解析出更准确唯一键再调整
-        let provisionalKey = rootName(of: service.name)
-        // 1. 先按名称去重（连续模式可能未清空旧对象）
-        if let dupByNameIdx = services.firstIndex(where: { $0.name == service.name }) {
-            // duplicate silent
-            services[dupByNameIdx] = service
-            // 重建索引以确保 key->index 一致
-            rebuildIndex()
-        } else if let existingIdx = indexByUniqueKey[provisionalKey] {
-            // provisional key hit silent
-            services[existingIdx] = service
+        service.startMonitoring() // listen for TXT updates
+        // 同时解析地址/hostname（本类即 delegate，TXT 与解析回调可并存）。否则 hostName /
+        // firstIPv4Address 永远为空，上层（DeviceLoginPusher）就拿不到可拨号 host。
+        if service.hostName == nil {
+            service.resolve(withTimeout: 5.0)
+        }
+
+        // service.name is unique per (serviceType, domain) by Bonjour spec — safe as provisional key.
+        if let idx = services.firstIndex(where: { $0.name == service.name }) {
+            services[idx] = service
+            indexByUniqueKey[service.name] = idx
         } else {
             services.append(service)
-            indexByUniqueKey[provisionalKey] = services.count - 1
+            indexByUniqueKey[service.name] = services.count - 1
         }
-        let newSignature = services.map { $0.name }.sorted().joined(separator: ",")
-        if newSignature != lastServicesSignature {
-            Log.info("Bonjour", "added provisionalKey=\(provisionalKey) nowCount=\(services.count) signature=\(newSignature)")
-            lastServicesSignature = newSignature
-        }
-        if !moreComing { scheduleThrottledUpdate() }
+
+        if !moreComing { scheduleNotify() }
     }
+
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
-    Log.info("Bonjour", "remove service name=\(service.name) type=\(service.type) more=\(moreComing) beforeCount=\(services.count)")
-        // 通过遍历移除（服务对象比较）并同步索引
+        Log.info("Bonjour", "didRemove name=\(service.name) more=\(moreComing) count=\(services.count)")
+        service.stopMonitoring()
         if let idx = services.firstIndex(of: service) {
             services.remove(at: idx)
             rebuildIndex()
         }
-        let newSignature = services.map { $0.name }.sorted().joined(separator: ",")
-        if newSignature != lastServicesSignature {
-            Log.info("Bonjour", "after remove nowCount=\(services.count) signature=\(newSignature)")
-            lastServicesSignature = newSignature
-        }
-        if !moreComing { scheduleThrottledUpdate() }
+        if !moreComing { scheduleNotify() }
     }
+
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
-        // 确保停止时也让外部刷新 UI 状态
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.delegate?.discoveryDidUpdate(self)
-        }
+        postUpdate()
     }
+
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
         let code = errorDict[NetService.errorCode]?.intValue ?? -1
-        Log.error("Bonjour", "did not search, code=\(code) err=\(errorDict)")
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.delegate?.discoveryDidUpdate(self)
-            // 通知代理搜索失败，让 UI 层处理（如权限被拒绝时引导用户去设置）
-            self.delegate?.discoveryDidFail(self, errorCode: code)
-        }
-    }
-
-    private func scheduleThrottledUpdate() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            let now = Date()
-            let shouldNotifyNow: Bool
-            if let last = self.lastNotifyAt {
-                shouldNotifyNow = now.timeIntervalSince(last) >= self.throttleInterval
-            } else {
-                shouldNotifyNow = true
-            }
-            if shouldNotifyNow {
-                self.lastNotifyAt = now
-                self.delegate?.discoveryDidUpdate(self)
-            } else {
-                self.pendingNotifyWork?.cancel()
-                let delay = self.throttleInterval - (now.timeIntervalSince(self.lastNotifyAt ?? now))
-                let work = DispatchWorkItem { [weak self] in
-                    guard let self else { return }
-                    self.lastNotifyAt = Date()
-                    self.delegate?.discoveryDidUpdate(self)
-                }
-                self.pendingNotifyWork = work
-                DispatchQueue.main.asyncAfter(deadline: .now() + max(0.05, delay), execute: work)
-            }
+        Log.error("Bonjour", "didNotSearch code=\(code) err=\(errorDict)")
+        // Browser failed to start; both flags must reset so a later stop() / start()
+        // sees consistent state.
+        isSearching = false
+        isContinuous = false
+        cancelTimer()
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: Self.didUpdateNotification, object: self)
+            NotificationCenter.default.post(name: Self.didFailNotification, object: code)
         }
     }
 }
 
-// MARK: - Helper
-private func rootName(of name: String) -> String {
-    // 取第一个空格或括号前的部分作为根名称，全部小写
-    // 例如："Mindora 睡眠助手 (hzhy)"、"Mindora Sleep Assistant"、"Mindora" -> "mindora"
-    let separators = CharacterSet(charactersIn: " (\t\n")
-    if let range = name.rangeOfCharacter(from: separators) {
-        return String(name[..<range.lowerBound]).lowercased()
-    }
-    return name.lowercased()
-}
-
-// MARK: - NetService Delegate (unique key extraction)
+// MARK: - NetServiceDelegate (TXT / resolution → stable unique key)
+//
+// Known limitation: `NetService.delegate` is a single slot. When a selection UI calls
+// `service.resolve(withTimeout:)` it re-points `service.delegate = self` to receive the
+// resolve callback, which permanently steals TXT-update callbacks from this discovery.
+// In the current flows (selection → bind → done) the hijacked service is consumed
+// immediately, so we accept the trade-off rather than reference-count the delegate.
 extension BonjourDiscovery: NetServiceDelegate {
     func netServiceDidResolveAddress(_ sender: NetService) {
+        Log.info("Bonjour", "didResolve name=\(sender.name) host=\(sender.hostName ?? "nil") ip=\(sender.firstIPv4Address ?? "nil") did=\(sender.deviceID ?? "nil")")
         updateUniqueKey(for: sender)
     }
     func netService(_ sender: NetService, didUpdateTXTRecord data: Data) {
+        Log.info("Bonjour", "TXT update name=\(sender.name) did=\(sender.deviceID ?? "nil")")
         updateUniqueKey(for: sender)
     }
     func netService(_ sender: NetService, didNotResolve errorDict: [String : NSNumber]) {
-        // 忽略解析失败，仍使用临时键
+        // 解析失败要留痕：拿不到 host 时上层永远发不出 /login，静默会让问题很难查。
+        Log.error("Bonjour", "didNotResolve name=\(sender.name) err=\(errorDict)")
     }
 
     private func updateUniqueKey(for service: NetService) {
         guard let idx = services.firstIndex(of: service) else { return }
-        let oldKey = indexByUniqueKey.first(where: { $0.value == idx })?.key
-        let oldIP = extractIP(from: service) // 解析前的 IP（可能已经是新的，但下方会重新算）
-        let key = computeUniqueKey(service)
-        // 如果 key 已经对应当前 index，无需变动
-        if indexByUniqueKey[key] == idx {
-        // stable 不再重复打印
-            return
+        let newKey = computeUniqueKey(service)
+        if indexByUniqueKey[newKey] == idx { return }
+
+        // Conflict: the new key already points elsewhere. Do NOT delete the other service
+        // (it may be mid-resolve from a selection UI). We simply overwrite the dict entry;
+        // both services stay in `services`. Worst case the UI shows two cells for one
+        // physical device until the duplicate disappears via didRemove.
+        if let otherIdx = indexByUniqueKey[newKey], otherIdx != idx {
+            Log.info("Bonjour", "uniqueKey conflict key=\(newKey) prevIdx=\(otherIdx) newIdx=\(idx)")
         }
-        // 如果 key 指向其他 index，采用“保留更早”策略或替换，这里选择替换为最新并移除旧条目
-        if let otherIdx = indexByUniqueKey[key], otherIdx != idx, otherIdx < services.count {
-            Log.info("Bonjour", "uniqueKey conflict key=\(key) oldIdx=\(otherIdx) newIdx=\(idx) -> replacing old")
-            services.remove(at: otherIdx)
-            rebuildIndex()
+
+        // Drop our previous key so the index stays consistent.
+        if let oldKey = indexByUniqueKey.first(where: { $0.value == idx })?.key {
+            indexByUniqueKey.removeValue(forKey: oldKey)
         }
-        indexByUniqueKey[key] = services.firstIndex(of: service)
-        let name = service.name
-        let lastLoggedKey = lastLoggedUniqueKeyByName[name]
-        if lastLoggedKey != key {
-            Log.info("Bonjour", "uniqueKey updated name=\(name) key=\(key) oldKey=\(oldKey ?? "nil") ip=\(oldIP ?? "nil") total=\(services.count)")
-            lastLoggedUniqueKeyByName[name] = key
-        }
-        scheduleThrottledUpdate()
+        indexByUniqueKey[newKey] = idx
+        scheduleNotify()
     }
 
     private func computeUniqueKey(_ service: NetService) -> String {
@@ -289,63 +258,17 @@ extension BonjourDiscovery: NetServiceDelegate {
                 deviceID = s.trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }
-        let ip = firstIPv4Address(of: service)
-        if let deviceID, let ip { return "did=" + deviceID + "|ip=" + ip }
-        if let deviceID { return "did=" + deviceID }
-        if let ip { return "ip=" + ip }
-        return rootName(of: service.name) // fallback
+        let ip = service.firstIPv4Address
+        if let deviceID, let ip { return "did=\(deviceID)|ip=\(ip)" }
+        if let deviceID { return "did=\(deviceID)" }
+        if let ip { return "ip=\(ip)" }
+        return service.name // stable fallback (unique per service type)
     }
 
-    private func firstIPv4Address(of service: NetService) -> String? {
-        // 与 extractIP(from:) 相同逻辑，返回第一个 IPv4 字符串
-        guard let addresses = service.addresses else { return nil }
-        for data in addresses {
-            let ip = data.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) -> String? in
-                guard let addr = pointer.bindMemory(to: sockaddr.self).baseAddress else { return nil }
-                if addr.pointee.sa_family == sa_family_t(AF_INET) {
-                    // Use memory rebinding instead of unsafeBitCast to avoid undefined behavior
-                    let addrIn = addr.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee }
-                    var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
-                    var addrCopy = addrIn.sin_addr
-                    inet_ntop(AF_INET, &addrCopy, &buffer, socklen_t(INET_ADDRSTRLEN))
-                    return String(cString: buffer)
-                }
-                return nil
-            }
-            if let ip { return ip }
-        }
-        return nil
-    }
-
-    fileprivate func rebuildIndex() {
+    private func rebuildIndex() {
         indexByUniqueKey.removeAll(keepingCapacity: true)
         for (i, s) in services.enumerated() {
             indexByUniqueKey[computeUniqueKey(s)] = i
         }
-        let newSignature = services.map { $0.name }.sorted().joined(separator: ",")
-        if newSignature != lastServicesSignature {
-            Log.info("Bonjour", "rebuildIndex done services=\(services.count) keys=\(indexByUniqueKey.count) signature=\(newSignature)")
-            lastServicesSignature = newSignature
-        }
     }
-}
-
-private func extractIP(from service: NetService) -> String? {
-    guard let addresses = service.addresses else { return nil }
-    for data in addresses {
-        let ip = data.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) -> String? in
-            guard let addr = pointer.bindMemory(to: sockaddr.self).baseAddress else { return nil }
-            if addr.pointee.sa_family == sa_family_t(AF_INET) {
-                // Use memory rebinding instead of unsafeBitCast to avoid undefined behavior
-                let addrIn = addr.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee }
-                var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
-                var addrCopy = addrIn.sin_addr
-                inet_ntop(AF_INET, &addrCopy, &buffer, socklen_t(INET_ADDRSTRLEN))
-                return String(cString: buffer)
-            }
-            return nil
-        }
-        if let ip { return ip }
-    }
-    return nil
 }

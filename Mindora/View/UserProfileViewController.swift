@@ -2,13 +2,12 @@ import UIKit
 
 class UserProfileViewController: UIViewController {
 
-    private let addressStorageKey = "MindoraSavedAddresses"
-    private var isSyncingRemoteProfile = false
+    private lazy var deletionFlow = AccountDeletionFlow(presenter: self, actionButton: deleteAccountButton)
 
     // MARK: - Scaled Metrics Helper
     // Base design width is 375pt (750px)
     private var scale: CGFloat {
-        return UIScreen.main.bounds.width / 375.0
+        return iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0
     }
     
     private func s(_ value: CGFloat) -> CGFloat {
@@ -109,14 +108,18 @@ class UserProfileViewController: UIViewController {
         return stack
     }()
     
-    // Update Button
-    private let updateButton: UIButton = {
+    // 删除账号（App Store 5.1.1(v) / Google Play 强制）。放个人资料页最底部，
+    // 弱化为淡红文字，示意危险又不易误点。
+    //
+    // 设计稿（dev/侧边栏个人信息-新增身高体重）已经去掉了原来的「更新资料」按钮：
+    // 每行改完都会走 scheduleAutoUpload 自动上传，那个按钮只是重复入口。
+    private let deleteAccountButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(L("user_profile.update"), for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 14) ?? .systemFont(ofSize: 14)
-        button.backgroundColor = UIColor(red: 128/255, green: 84/255, blue: 254/255, alpha: 1.0)
+        button.setTitle(L("user_profile.delete"), for: .normal)
+        // 稿子里是 28px/750 = 14pt、Medium、#FF5A59 不透明（和各行标题同字号）。
+        button.setTitleColor(UIColor(red: 1.0, green: 90/255, blue: 89/255, alpha: 1.0), for: .normal)
+        button.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 14) ?? .systemFont(ofSize: 14, weight: .medium)
         return button
     }()
     
@@ -124,7 +127,7 @@ class UserProfileViewController: UIViewController {
     private var userIdRow: UserProfileRowView!
     private var nicknameRow: UserProfileRowView!
     private var genderRow: UserProfileRowView!
-    private var ageRow: UserProfileRowView!
+    private var weightHeightRow: UserProfileRowView!
     private var birthdayRow: UserProfileRowView!
     private var emailRow: UserProfileRowView!
     private var phoneRow: UserProfileRowView!
@@ -139,21 +142,36 @@ class UserProfileViewController: UIViewController {
         setupData()
         setupUI()
         updateVisibilityState()
+        // 资料现在可能在本页之外被改写（服务端拉取回填、自动上传成功后的回写、
+        // 地址页/问卷写地址簿），统一靠这个通知刷新，本页不再各处手动 refresh。
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleProfileDidUpdate),
+                                               name: .userProfileDidUpdate,
+                                               object: nil)
+    }
+
+    @objc private func handleProfileDidUpdate() {
+        refreshProfileState()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         refreshProfileState()
         syncRemoteProfileIfNeeded()
+        // 两件事：地址是在独立页面改的（改完只会走到这里，没有 onSave 回调），
+        // 以及上次自动上传失败留下的脏改动在这里重试。
+        UserProfileSync.scheduleAutoUpload(requireBaseline: true)
     }
     
     private func setupData() {
         userIdRow = UserProfileRowView(title: L("user_profile.user_id"), icon: "profile_detail")
         nicknameRow = UserProfileRowView(title: L("user_profile.nickname"), icon: "enter_icon")
         genderRow = UserProfileRowView(title: L("user_profile.gender"), icon: "enter_icon")
-        ageRow = UserProfileRowView(title: L("user_profile.age"), icon: "enter_icon")
+        weightHeightRow = UserProfileRowView(title: L("user_profile.weight_height"), icon: "enter_icon")
+        // 年龄不再单独展示：改由生日推导，避免年龄/生日两处并存自相矛盾。
         birthdayRow = UserProfileRowView(title: L("user_profile.birthday"), icon: "enter_icon")
-        emailRow = UserProfileRowView(title: L("user_profile.email"), icon: "enter_icon")
+        // 邮箱是用户 ID，不可修改，右侧展示锁定图标而非可进入的箭头。
+        emailRow = UserProfileRowView(title: L("user_profile.email"), icon: "lock_icon")
         phoneRow = UserProfileRowView(title: L("user_profile.phone"), icon: "enter_icon")
         addressRow = UserProfileRowView(title: L("user_profile.address"), icon: "enter_icon")
 
@@ -178,7 +196,7 @@ class UserProfileViewController: UIViewController {
         
         scrollContentView.addSubview(rowsStack)
         
-        let rows = [userIdRow, nicknameRow, genderRow, ageRow, birthdayRow, emailRow, phoneRow, addressRow]
+        let rows = [userIdRow, nicknameRow, genderRow, weightHeightRow, birthdayRow, emailRow, phoneRow, addressRow]
         
         for (_, row) in rows.enumerated() {
             guard let row = row else { continue }
@@ -193,11 +211,12 @@ class UserProfileViewController: UIViewController {
             rowsStack.addArrangedSubview(separator)
         }
         
-        scrollContentView.addSubview(updateButton)
-        
+        scrollContentView.addSubview(deleteAccountButton)
+
         setupConstraints()
-        
+
         backButton.addTarget(self, action: #selector(handleBack), for: .touchUpInside)
+        deleteAccountButton.addTarget(self, action: #selector(handleDeleteAccount), for: .touchUpInside)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleDetailsVisibility))
         userIdRow.isUserInteractionEnabled = true
@@ -207,10 +226,6 @@ class UserProfileViewController: UIViewController {
         nicknameRow.isUserInteractionEnabled = true
         nicknameRow.addGestureRecognizer(nicknameTap)
         
-        let ageTap = UITapGestureRecognizer(target: self, action: #selector(editAge))
-        ageRow.isUserInteractionEnabled = true
-        ageRow.addGestureRecognizer(ageTap)
-        
         let birthdayTap = UITapGestureRecognizer(target: self, action: #selector(editBirthday))
         birthdayRow.isUserInteractionEnabled = true
         birthdayRow.addGestureRecognizer(birthdayTap)
@@ -218,6 +233,10 @@ class UserProfileViewController: UIViewController {
         let genderTap = UITapGestureRecognizer(target: self, action: #selector(editGender))
         genderRow.isUserInteractionEnabled = true
         genderRow.addGestureRecognizer(genderTap)
+        
+        let weightHeightTap = UITapGestureRecognizer(target: self, action: #selector(editWeightHeight))
+        weightHeightRow.isUserInteractionEnabled = true
+        weightHeightRow.addGestureRecognizer(weightHeightTap)
         
         let emailTap = UITapGestureRecognizer(target: self, action: #selector(editEmail))
         emailRow.isUserInteractionEnabled = true
@@ -235,8 +254,6 @@ class UserProfileViewController: UIViewController {
         let avatarTap = UITapGestureRecognizer(target: self, action: #selector(handleAvatarTap))
         avatarContainer.isUserInteractionEnabled = true
         avatarContainer.addGestureRecognizer(avatarTap)
-
-        updateButton.addTarget(self, action: #selector(handleUpdateProfile), for: .touchUpInside)
     }
     
     @objc private func handleAvatarTap() {
@@ -287,11 +304,11 @@ class UserProfileViewController: UIViewController {
         present(vc, animated: true, completion: nil)
     }
     
-    @objc private func editAge() {
-        let vc = AgeEditViewController()
-        vc.currentAge = userDetails["age"]
-        vc.onSave = { [weak self] newAge in
-            self?.userDetails["age"] = newAge
+    @objc private func editBirthday() {
+        let vc = BirthdayEditViewController()
+        vc.currentBirthday = userDetails["birthday"]
+        vc.onSave = { [weak self] newBirthday in
+            self?.userDetails["birthday"] = newBirthday
             self?.persistCurrentDraft()
             self?.updateVisibilityState()
         }
@@ -299,11 +316,13 @@ class UserProfileViewController: UIViewController {
         present(vc, animated: true, completion: nil)
     }
     
-    @objc private func editBirthday() {
-        let vc = BirthdayEditViewController()
-        vc.currentBirthday = userDetails["birthday"]
-        vc.onSave = { [weak self] newBirthday in
-            self?.userDetails["birthday"] = newBirthday
+    @objc private func editWeightHeight() {
+        let vc = WeightHeightEditViewController()
+        vc.currentWeight = userDetails["weight"]
+        vc.currentHeight = userDetails["height"]
+        vc.onSave = { [weak self] weight, height in
+            self?.userDetails["weight"] = weight
+            self?.userDetails["height"] = height
             self?.persistCurrentDraft()
             self?.updateVisibilityState()
         }
@@ -323,14 +342,10 @@ class UserProfileViewController: UIViewController {
         present(vc, animated: true, completion: nil)
     }
     
+    // 邮箱是账号 ID，不可编辑：跳转到独立的「邮箱」页（锁定态 + 删除账号入口）。
     @objc private func editEmail() {
-        let vc = EmailEditViewController()
+        let vc = EmailViewController()
         vc.currentEmail = userDetails["email"]
-        vc.onSave = { [weak self] newEmail in
-            self?.userDetails["email"] = newEmail
-            self?.persistCurrentDraft()
-            self?.updateVisibilityState()
-        }
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true, completion: nil)
     }
@@ -352,7 +367,6 @@ class UserProfileViewController: UIViewController {
         
         // Avatar Container is 120px = 60pt
         avatarContainer.layer.cornerRadius = s(30)
-        updateButton.layer.cornerRadius = s(10)
         
         NSLayoutConstraint.activate([
             // Header
@@ -406,14 +420,11 @@ class UserProfileViewController: UIViewController {
             rowsStack.leadingAnchor.constraint(equalTo: scrollContentView.leadingAnchor, constant: s(30)),
             rowsStack.widthAnchor.constraint(equalToConstant: s(316.5)),
             
-            // Update Button
-            // Margin 50pt from last element.
-            // Last element is separator (9pt bottom spacing).
-            // 50 - 9 = 41.
-            updateButton.topAnchor.constraint(equalTo: rowsStack.bottomAnchor, constant: s(41)),
-            updateButton.leadingAnchor.constraint(equalTo: scrollContentView.leadingAnchor, constant: s(106.5)),
-            updateButton.trailingAnchor.constraint(equalTo: scrollContentView.trailingAnchor, constant: s(-110)),
-            updateButton.bottomAnchor.constraint(equalTo: scrollContentView.bottomAnchor, constant: s(-50))
+            // 删除账号：内容最底部。设计稿里它离最后一条分隔线 136px（68pt），
+            // 分隔线自带 9pt 下间距，所以这里补 59。
+            deleteAccountButton.topAnchor.constraint(equalTo: rowsStack.bottomAnchor, constant: s(59)),
+            deleteAccountButton.centerXAnchor.constraint(equalTo: scrollContentView.centerXAnchor),
+            deleteAccountButton.bottomAnchor.constraint(equalTo: scrollContentView.bottomAnchor, constant: s(-32))
         ])
     }
     
@@ -424,7 +435,13 @@ class UserProfileViewController: UIViewController {
         }
         dismiss(animated: true, completion: nil)
     }
-    
+
+    // MARK: - 删除账号
+
+    @objc private func handleDeleteAccount() {
+        deletionFlow.start()
+    }
+
     @objc private func toggleDetailsVisibility() {
         isDetailsHidden.toggle()
         updateVisibilityState()
@@ -435,7 +452,7 @@ class UserProfileViewController: UIViewController {
             userIdRow.valueLabel.text = userDetails["id"]
             nicknameRow.valueLabel.text = ""
             genderRow.valueLabel.text = ""
-            ageRow.valueLabel.text = ""
+            weightHeightRow.valueLabel.text = ""
             birthdayRow.valueLabel.text = ""
             emailRow.valueLabel.text = ""
             phoneRow.valueLabel.text = ""
@@ -443,9 +460,9 @@ class UserProfileViewController: UIViewController {
         } else {
             userIdRow.valueLabel.text = userDetails["id"]
             nicknameRow.valueLabel.text = userDetails["nickname"]
-            genderRow.valueLabel.text = userDetails["gender"]
-            ageRow.valueLabel.text = userDetails["age"]
-            birthdayRow.valueLabel.text = userDetails["birthday"]
+            genderRow.valueLabel.text = Self.genderDisplay(userDetails["gender"])
+            weightHeightRow.valueLabel.text = Self.weightHeightSummary(weight: userDetails["weight"], height: userDetails["height"])
+            birthdayRow.valueLabel.text = Self.birthdayDisplay(userDetails["birthday"])
             emailRow.valueLabel.text = userDetails["email"]
             phoneRow.valueLabel.text = userDetails["phone"]
             addressRow.valueLabel.text = userDetails["address"]
@@ -471,25 +488,16 @@ class UserProfileViewController: UIViewController {
         let addressSummary = formattedAddressSummary(from: savedAddresses)
         let resolvedAddress = addressSummary.isEmpty ? storedDraft.address : addressSummary
 
-        var fallbackID = ""
-        var fallbackNick = ""
-        var fallbackGender = ""
-        var fallbackAge = ""
-        var fallbackBirth = ""
-        var fallbackPhone = ""
-        var fallbackEmail = AuthStorage.shared.email ?? ""
-
-        #if DEBUG
-        fallbackID = "mIn111111"
-        fallbackNick = "DK"
-        fallbackGender = L("user_profile.gender.male")
-        fallbackAge = "18"
-        fallbackBirth = "1998.08.12"
-        fallbackPhone = "13866997600"
-        if fallbackEmail.isEmpty {
-            fallbackEmail = "emailexample@example.com"
-        }
-        #endif
+        // 注意：这里不再塞任何「示例数据」。曾经在 #if DEBUG 下用假数据（DK / 18 / 1998.08.12 …）
+        // 预览 UI，但那会让「注销 / 登出后重新登录」时空资料被假数据填满，误以为数据没清干净、
+        // 也无法验证删除逻辑。现统一：draft 为空就显示空，DEBUG 与 Release 表现一致。
+        let fallbackID = ""
+        let fallbackNick = ""
+        let fallbackGender = ""
+        let fallbackAge = ""
+        let fallbackBirth = ""
+        let fallbackPhone = ""
+        let fallbackEmail = AuthStorage.shared.email ?? ""
 
         userDetails = [
             "id": resolvedValue(AuthStorage.shared.preferredUserIdentifier, fallback: fallbackID),
@@ -497,12 +505,47 @@ class UserProfileViewController: UIViewController {
             "gender": resolvedValue(storedDraft.gender, fallback: fallbackGender),
             "age": resolvedValue(storedDraft.age, fallback: fallbackAge),
             "birthday": resolvedValue(storedDraft.birthday, fallback: fallbackBirth),
+            "weight": resolvedValue(storedDraft.weight, fallback: ""),
+            "height": resolvedValue(storedDraft.height, fallback: ""),
             "phone": resolvedValue(storedDraft.phone, fallback: fallbackPhone),
             "email": resolvedValue(storedDraft.email, fallback: fallbackEmail),
             "address": resolvedAddress
         ]
 
         updateVisibilityState()
+    }
+
+    /// 「75kg / 175cm」。只填了一项就只显示那一项，别出现「75kg / cm」这种半截文案。
+    /// 服务端资料里的性别是 `male` / `female` 这类原始值，展示时换成当前语言的文案；
+    /// 其他值（本地选过的、已是文案的）原样显示。
+    private static func genderDisplay(_ raw: String?) -> String? {
+        switch raw?.lowercased() {
+        case "male": return L("user_profile.gender.male")
+        case "female": return L("user_profile.gender.female")
+        default: return raw
+        }
+    }
+
+    /// 生日按存档格式 `yyyy.MM.dd` 存取，展示时按 locale 显示（`Aug 12, 1998` / `1998年8月12日`）。
+    /// 解析不了（历史数据格式不同）就原样显示，不丢内容。
+    private static func birthdayDisplay(_ raw: String?) -> String? {
+        guard let raw, !raw.isEmpty else { return raw }
+        let parser = DateFormatter()
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        for format in ["yyyy.MM.dd", "yyyy-MM-dd"] {
+            parser.dateFormat = format
+            if let date = parser.date(from: raw) { return DateDisplay.date(date) }
+        }
+        return raw
+    }
+
+    private static func weightHeightSummary(weight: String?, height: String?) -> String {
+        let weightText = (weight ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let heightText = (height ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        var parts: [String] = []
+        if !weightText.isEmpty { parts.append(UnitDisplay.weight(kilogramsText: weightText)) }
+        if !heightText.isEmpty { parts.append(UnitDisplay.height(centimetersText: heightText)) }
+        return parts.joined(separator: " / ")
     }
 
     private func resolvedValue(_ value: String?, fallback: String) -> String {
@@ -518,26 +561,25 @@ class UserProfileViewController: UIViewController {
             birthday: userDetails["birthday"] ?? "",
             email: userDetails["email"] ?? "",
             phone: userDetails["phone"] ?? "",
-            address: userDetails["address"] ?? ""
+            address: userDetails["address"] ?? "",
+            weight: userDetails["weight"] ?? "",
+            height: userDetails["height"] ?? ""
         )
     }
 
+    // MARK: - 自动上传
+
+    // 具体实现在 UserProfileSync：地址在独立页面改、问卷领奖也会写地址簿，
+    // 上传若只挂在本页就只能等用户下次打开资料页才补传。这里只负责「改完了，排一次」。
+
     private func persistCurrentDraft() {
         UserProfileStore.shared.save(currentDraft())
+        UserProfileSync.scheduleAutoUpload()
     }
 
-    private func loadSavedAddresses() -> [AddrModel] {
-        guard let data = UserDefaults.standard.data(forKey: addressStorageKey),
-              let addresses = try? JSONDecoder().decode([AddrModel].self, from: data) else {
-            return []
-        }
-        return addresses
-    }
-
-    private func saveAddresses(_ addresses: [AddrModel]) {
-        guard let data = try? JSONEncoder().encode(addresses) else { return }
-        UserDefaults.standard.set(data, forKey: addressStorageKey)
-    }
+    // 地址 / 头像的读写统一收在 UserProfileSync —— 登录时的拉取也要用同一份，
+    // 两处各写一份迟早写歪。
+    private func loadSavedAddresses() -> [AddrModel] { UserProfileSync.loadAddresses() }
 
     private func formattedAddressSummary(from addresses: [AddrModel]) -> String {
         guard !addresses.isEmpty else { return "" }
@@ -560,152 +602,17 @@ class UserProfileViewController: UIViewController {
             .joined(separator: " / ")
     }
 
-    private func loadAvatarJPEGData() -> Data? {
-        guard let url = avatarURL else { return nil }
-        return try? Data(contentsOf: url)
-    }
+    private func loadAvatarJPEGData() -> Data? { UserProfileSync.loadAvatarData() }
 
-    private func setUpdateButtonLoading(_ isLoading: Bool) {
-        updateButton.isEnabled = !isLoading
-        updateButton.alpha = isLoading ? 0.6 : 1.0
-    }
-
-    private func profileErrorMessage(for error: Error) -> String {
-        if let localizedError = error as? LocalizedError,
-           let description = localizedError.errorDescription,
-           !description.isEmpty {
-            return description
-        }
-        return L("user_profile.update_failed")
-    }
-
+    /// 打开资料页拉一次服务端资料。合并落地、以及合并后的补传都在 UserProfileSync 里，
+    /// 结果通过 `.userProfileDidUpdate` 回到本页刷新，不用本页自己再存一份状态。
     private func syncRemoteProfileIfNeeded() {
-          guard !isSyncingRemoteProfile,
-              let uid = AuthStorage.shared.preferredUserIdentifier, !uid.isEmpty,
-              let token = AuthStorage.shared.token, !token.isEmpty else {
-            return
-        }
-
-        _ = uid
-        _ = token
-        isSyncingRemoteProfile = true
-
-        Task { [weak self] in
-            guard let self else { return }
-
-            do {
-                let snapshot = try await UserProfileService.shared.queryProfile()
-                await MainActor.run {
-                    self.isSyncingRemoteProfile = false
-                    guard let snapshot else { return }
-                    self.applyRemoteSnapshot(snapshot)
-                }
-            } catch {
-                await MainActor.run {
-                    self.isSyncingRemoteProfile = false
-                }
-            }
-        }
+        UserProfileSync.pull(reason: "profile_page")
     }
 
-    private func applyRemoteSnapshot(_ snapshot: UserProfileSnapshot) {
-        let localDraft = UserProfileStore.shared.load(accountEmail: AuthStorage.shared.email)
-        let mergedDraft = mergeDraft(local: localDraft, remote: snapshot.draft)
-
-        let localAddresses = loadSavedAddresses()
-        if localAddresses.isEmpty, !snapshot.addresses.isEmpty {
-            saveAddresses(snapshot.addresses.map {
-                AddrModel(
-                    id: $0.id,
-                    isDefault: $0.isDefault,
-                    region: $0.region,
-                    detail: $0.detail,
-                    name: $0.name,
-                    phone: $0.phone
-                )
-            })
-        }
-
-        if loadAvatarImage() == nil,
-           let avatarData = snapshot.avatarJPEGData,
-           let image = UIImage(data: avatarData) {
-            saveAvatarImage(image)
-        }
-
-        UserProfileStore.shared.save(mergedDraft)
-        refreshProfileState()
-        NotificationCenter.default.post(name: .userProfileDidUpdate, object: nil)
-    }
-
-    private func mergeDraft(local: UserProfileDraft, remote: UserProfileDraft) -> UserProfileDraft {
-        UserProfileDraft(
-            nickname: preferredDraftValue(local.nickname, fallback: remote.nickname),
-            gender: preferredDraftValue(local.gender, fallback: remote.gender),
-            age: preferredDraftValue(local.age, fallback: remote.age),
-            birthday: preferredDraftValue(local.birthday, fallback: remote.birthday),
-            email: preferredDraftValue(local.email, fallback: remote.email),
-            phone: preferredDraftValue(local.phone, fallback: remote.phone),
-            address: preferredDraftValue(local.address, fallback: remote.address)
-        )
-    }
-
-    private func preferredDraftValue(_ current: String, fallback: String) -> String {
-        let currentTrimmed = current.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !currentTrimmed.isEmpty {
-            return currentTrimmed
-        }
-        return fallback.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    @objc private func handleUpdateProfile() {
-                guard let uid = AuthStorage.shared.preferredUserIdentifier, !uid.isEmpty,
-              let token = AuthStorage.shared.token, !token.isEmpty else {
-            Toast.show(L("user_profile.token_missing"), in: view)
-            return
-        }
-
-        _ = uid
-        _ = token
-
-        persistCurrentDraft()
-        let draft = currentDraft()
-        let avatarData = loadAvatarJPEGData()
-
-        setUpdateButtonLoading(true)
-
-        Task { [weak self] in
-            guard let self else { return }
-
-            do {
-                let updatedDraft = try await UserProfileService.shared.updateProfile(draft: draft, avatarJPEGData: avatarData)
-
-                await MainActor.run {
-                    UserProfileStore.shared.save(updatedDraft)
-                    self.refreshProfileState()
-                    self.setUpdateButtonLoading(false)
-                    NotificationCenter.default.post(name: .userProfileDidUpdate, object: nil)
-                    Toast.show(L("user_profile.update_success"), in: self.view)
-                }
-            } catch {
-                await MainActor.run {
-                    self.setUpdateButtonLoading(false)
-                    Toast.show(self.profileErrorMessage(for: error), in: self.view)
-                }
-            }
-        }
-    }
-    
     // MARK: - Avatar Persistence
-    private var avatarURL: URL? {
-        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
-        return documentsDirectory.appendingPathComponent("user_avatar.jpg")
-    }
+    private var avatarURL: URL? { UserProfileSync.avatarURL }
     
-    private func saveAvatarImage(_ image: UIImage) {
-        guard let url = avatarURL, let data = image.jpegData(compressionQuality: 0.8) else { return }
-        try? data.write(to: url)
-        NotificationCenter.default.post(name: NSNotification.Name("UserProfileAvatarUpdated"), object: nil)
-    }
     
     private func loadAvatarImage() -> UIImage? {
         guard let url = avatarURL, let data = try? Data(contentsOf: url) else { return nil }
@@ -755,8 +662,15 @@ class UserProfileRowView: UIView {
         addSubview(titleLabel)
         addSubview(valueLabel)
         addSubview(rightIconView)
+
+        // 标题不许被值挤没。地址这类值现在可能很长（国家+省+市+区+街道），
+        // 默认两个 label 的优先级相同，长值会把「地址」两个字压到零宽度整个消失。
+        titleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        titleLabel.setContentHuggingPriority(.required, for: .horizontal)
+        valueLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        valueLabel.lineBreakMode = .byTruncatingTail
         
-        let scale = UIScreen.main.bounds.width / 375.0
+        let scale = iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0
         
         NSLayoutConstraint.activate([
             // Reduced row height from 42 to 25 to reduce visual spacing
@@ -839,7 +753,8 @@ extension UserProfileViewController: UIImagePickerControllerDelegate, UINavigati
         
         if let image = selectedImage {
             avatarImageView.image = image
-            saveAvatarImage(image)
+            // 写盘 + 通知 + 自动上传都在 UserProfileSync.saveAvatar 里。
+            UserProfileSync.saveAvatar(image)
         }
     }
     

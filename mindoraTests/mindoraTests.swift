@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable import mindora
+@testable import Mindora
 
 struct mindoraTests {
 

@@ -6,7 +6,7 @@ class GenderEditViewController: UIViewController {
     
     // MARK: - Scaled Metrics Helper
     private var scale: CGFloat {
-        return UIScreen.main.bounds.width / 375.0
+        return iPadAdaptiveScale.capped(UIScreen.main.bounds.width, widthReference: UIScreen.main.bounds.width) / 375.0
     }
     
     private func s(_ value: CGFloat) -> CGFloat {

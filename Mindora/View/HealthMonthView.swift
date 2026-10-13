@@ -32,16 +32,6 @@ class HealthMonthView: UIView {
     }
     
     // MARK: - Date Helpers
-    private static func currentMonthDateString() -> String {
-        let now = Date()
-        let calendar = Calendar.current
-        let monthAgo = calendar.date(byAdding: .month, value: -1, to: now)!
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "MMM d, yyyy"
-        return "\(formatter.string(from: monthAgo)) – \(formatter.string(from: now))"
-    }
-    
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.text = "--"
@@ -95,7 +85,10 @@ class HealthMonthView: UIView {
     
     private let insightsBgImageView: UIImageView = {
         let iv = UIImageView()
-        iv.contentMode = .scaleToFill
+        // .scaleToFill would stretch this non-uniformly: the container's width tracks
+        // screen width (much wider on iPad) while its height stays content-driven.
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
         iv.image = UIImage(named: "sleep_month_sleep_bg")
         return iv
     }()
@@ -154,7 +147,10 @@ class HealthMonthView: UIView {
     
     private let bestBgImageView: UIImageView = {
         let iv = UIImageView()
-        iv.contentMode = .scaleToFill
+        // .scaleToFill would stretch this non-uniformly: the container's width tracks
+        // screen width (much wider on iPad) while its height stays content-driven.
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
         iv.image = UIImage(named: "sleep_week_onset_bg")
         return iv
     }()
@@ -184,7 +180,7 @@ class HealthMonthView: UIView {
     
     private let bestListLabel: UILabel = {
         let label = UILabel()
-        label.text = "Sedona Desert Calm\nMaldives Drift Sleep\nCanadian Forest Solace"
+        label.text = "Sedona Red Rocks\nMaldives Moonlit Drift\nCanadian Forest Solace"
         label.font = UIFont.systemFont(ofSize: 18, weight: .regular)
         label.textColor = .white
         label.numberOfLines = 0
@@ -247,15 +243,19 @@ class HealthMonthView: UIView {
         reloadData()
     }
     
+    /// 自增代号：每次 loadRealData 领号，异步回来只认最新一号。
+    /// 防止两次 reloadData（切 tab / 重新出现 / 订阅变化）并发时，旧任务的中间态把新任务
+    /// 已写好的真实评分覆盖回 "--"，造成「平均睡眠评分一会显示一会不显示」的闪烁。
+    private var realLoadGeneration = 0
+
     // MARK: - Reload Data
     func reloadData() {
         let showMock = Constants.Config.showMockData
         if showMock {
             let mockLocal = HealthMockDataService.shared.monthLocalData()
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: Date())
-            let startDay = calendar.date(byAdding: .day, value: -29, to: today) ?? today
-            let analysis = HealthAnalysisService.shared.mockMonthAnalysis(startDate: startDay, endDate: today)
+            // 假数据以今天收尾，走的仍是同一个窗口定义。
+            let window = HealthChartWindow.month(anchor: Date())
+            let analysis = HealthAnalysisService.shared.mockMonthAnalysis(startDate: window.start, endDate: window.end)
 
             dateLabel.text = mockLocal.dateText
             scoreValueLabel.text = analysis.scoreSummary?.score.map(String.init) ?? "--"
@@ -271,73 +271,143 @@ class HealthMonthView: UIView {
             bestContentLabel.text = analysis.onsetEfficiency?.description ?? ""
             chartView.setMockValues(mockLocal.chartValues)
         } else {
-            dateLabel.text = HealthMonthView.currentMonthDateString()
-            scoreValueLabel.text = "--"
-            scoreStateLabel.text = "--"
+            // 用同步缓存的锚点先算区间 + 填日期标签 + 用缓存评分即时渲染；loadRealData 再用最新锚点刷新。
+            let window = HealthChartWindow.month(anchor: currentAnchor())
+            dateLabel.text = window.displayText
+            if let cached = HealthAnalysisService.shared.cachedMonthAnalysis(startDate: window.start, endDate: window.end) {
+                scoreValueLabel.text = cached.scoreSummary?.score.map(String.init) ?? "--"
+                scoreStateLabel.text = cached.scoreSummary?.label ?? "--"
+                cachedSleepMetrics = cached.sleepMetrics
+            }
         }
         chartView.showMockData = showMock
-        rebuildContent(showMock: showMock)
+        rebuildContent(showMock: showMock, sleepMetrics: cachedSleepMetrics)
         if !showMock {
             loadRealData()
         }
     }
 
+    /// 同步取锚点：优先「最近睡眠日」缓存，没有则退回今天（首启或确无数据时）。
+    private func currentAnchor() -> Date {
+        HealthDataManager.shared.cachedMostRecentSleepDay ?? Calendar.current.startOfDay(for: Date())
+    }
+
     private func loadRealData() {
+        realLoadGeneration += 1
+        let gen = realLoadGeneration
         Task { @MainActor in
+            // 解析「最近睡眠日」作为锚点（拿不到就用今天），把月窗口对齐过去——像 Apple 那样
+            // 显示最近一段有数据的区间，而不是死锚今天导致全空。
+            // 用 do/catch 而不是 `try?`：要区分「查询报错」和「真的一条睡眠样本都没有」，
+            // 后面的权限引导判定全靠这个区分（报错时绝不能提醒用户去开权限）。
+            var recentSleepDay: Date?
+            var localQueryFailed = false
             do {
-                let calendar = Calendar.current
-                let today = calendar.startOfDay(for: Date())
-                let startDay = calendar.date(byAdding: .day, value: -29, to: today) ?? today
-
-                async let metricsTask = HealthDataManager.shared.fetchLatestMetrics(forceLive: true)
-                async let aggregatesTask = HealthDataManager.shared.fetchSleepDailyAggregates(startingFrom: startDay, days: 30)
-                async let analysisTask = HealthAnalysisService.shared.fetchMonthAnalysis(startDate: startDay, endDate: today)
-
-                let metrics = try await metricsTask
-                let aggregates = try await aggregatesTask
-                let analysis = try? await analysisTask
-
-                applyRealMonthData(metrics: metrics, aggregates: aggregates, analysis: analysis)
+                recentSleepDay = try await HealthDataManager.shared.fetchMostRecentSleepDay(forceLive: true)
             } catch {
+                localQueryFailed = true
+                Log.error("HealthMonthView", "最近睡眠日解析失败：\(error)")
+            }
+            let anchor = recentSleepDay ?? self.currentAnchor()
+            guard gen == self.realLoadGeneration else { return }
+            let window = HealthChartWindow.month(anchor: anchor)
+            dateLabel.text = window.displayText
+            // 锚点确定后，先用对齐后的缓存评分即时刷新。
+            let cachedAnalysis = HealthAnalysisService.shared.cachedMonthAnalysis(startDate: window.start, endDate: window.end)
+            if let cachedAnalysis {
+                scoreValueLabel.text = cachedAnalysis.scoreSummary?.score.map(String.init) ?? scoreValueLabel.text
+                scoreStateLabel.text = cachedAnalysis.scoreSummary?.label ?? scoreStateLabel.text
+                self.cachedSleepMetrics = cachedAnalysis.sleepMetrics
+            }
+
+            // 三态统一走 resolve（见 ServerDataResolution.swift）。
+            let analysisTask = Task {
+                await HealthAnalysisService.shared.resolveMonthAnalysis(startDate: window.start, endDate: window.end)
+            }
+
+            // 用非结构化 Task 而不是 `async let`：优化构建下 async let 的子任务栈回收
+            // 顺序会与内联后的调用帧错位，作用域一旦带着错误退出就撞上
+            // swift_task_dealloc 的致命断言直接 abort（见 HealthDataManager 里的说明）。
+            let metricsTask = Task { try await HealthDataManager.shared.fetchLatestSleepVitalsMetrics(forceLive: true) }
+            let aggregatesTask = Task { try await HealthDataManager.shared.fetchSleepDailyAggregates(startingFrom: window.start, days: window.dayCount) }
+
+            // 每项本地数据独立成败：读到什么就展示什么（原来一个 do 块连着 try，
+            // 生命体征一抛错，已取到的睡眠聚合连读都没读，月图整块空白）。
+            var metrics = HealthMetrics.empty
+            do {
+                metrics = try await metricsTask.value
+            } catch {
+                Log.error("HealthMonthView", "生命体征读取失败，降级后继续渲染睡眠数据：\(error)")
+            }
+            var aggregates: [HealthDataManager.SleepDailyAggregate] = []
+            do {
+                aggregates = try await aggregatesTask.value
+            } catch {
+                localQueryFailed = true
+                Log.error("HealthMonthView", "睡眠日聚合读取失败：\(error)")
+            }
+            let vitals = try? await HealthDataManager.shared.fetchSleepVitalsAverages(days: window.dayCount, endingAt: window.end)
+            guard gen == self.realLoadGeneration else { return }
+
+            // 第一遍带上缓存兜底值：本地读不到 Time in bed 时，先用上次服务端估算顶着，
+            // 等下面拿到最新 analysis 再覆盖。传 nil 会让这一格先空一下再填。
+            applyRealMonthData(window: window, metrics: metrics, aggregates: aggregates, vitals: vitals, analysis: nil, fallbackSleepMetrics: self.cachedSleepMetrics)
+
+            // 一条本地睡眠数据都没有 → 走「读不到健康数据」引导。
+            // 具体弹不弹由 PermissionManager 判：查询是否报过错、45 天内是否真的没有样本、
+            // 以及去重与冷却。这里只负责报告「这个窗口是空的」。
+            if !aggregates.contains(where: { $0.hasData }) {
+                PermissionManager.shared.promptIfHealthDataUnreadable(
+                    from: self,
+                    queryFailed: localQueryFailed,
+                    hasRecentSleepSamples: recentSleepDay != nil
+                )
+            }
+
+            let analysis = await analysisTask.value.displayValue
+            guard gen == self.realLoadGeneration else { return }
+            if let analysis { self.cachedSleepMetrics = analysis.sleepMetrics }
+            applyRealMonthData(window: window, metrics: metrics, aggregates: aggregates, vitals: vitals, analysis: analysis, fallbackSleepMetrics: self.cachedSleepMetrics)
+            // 评分以最终分析为准：拿到分数就显示；分析缺失时保留已渲染的缓存评分，没缓存才回退 "--"。
+            if let analysis {
+                scoreValueLabel.text = analysis.scoreSummary?.score.map(String.init) ?? "--"
+                scoreStateLabel.text = analysis.scoreSummary?.label ?? "--"
+            } else if HealthAnalysisService.shared.cachedMonthAnalysis(startDate: window.start, endDate: window.end) == nil {
                 scoreValueLabel.text = "--"
                 scoreStateLabel.text = "--"
             }
         }
     }
 
-    private func applyRealMonthData(metrics: HealthMetrics, aggregates: [HealthDataManager.SleepDailyAggregate], analysis: HealthAnalysisService.MonthAnalysis?) {
+    private func applyRealMonthData(window: HealthChartWindow, metrics: HealthMetrics, aggregates: [HealthDataManager.SleepDailyAggregate], vitals: HealthDataManager.SleepVitalsAverages?, analysis: HealthAnalysisService.MonthAnalysis?, fallbackSleepMetrics: HealthAnalysisService.PeriodSleepMetrics? = nil) {
         let tracked = aggregates.filter(\.hasData)
-        scoreValueLabel.text = analysis?.scoreSummary?.score.map(String.init) ?? "--"
-        scoreStateLabel.text = analysis?.scoreSummary?.label ?? "--"
+        // 评分不在这里设置：中间态（analysis==nil）会把已显示的评分清成 "--" 造成闪烁。
+        // 由 loadRealData 在最终拿到 analysis 后统一设置。
 
-        chartView.setRealValues(aggregates.map { CGFloat(min(max($0.totalSleepHours, 0), 10)) })
+        // 值和日期出自同一个窗口：aggregates 就是按 window 取的，横轴与气泡也用 window.days。
+        chartView.setRealValues(aggregates.map { CGFloat(min(max($0.totalSleepHours, 0), 10)) }, days: window.days)
         if let scoreSeries = analysis?.sleepTrends?.scoreSeries {
             trendChartView.setScoreSeries(scoreSeries)
         }
 
-        let avgTotal = average(tracked.map(\.totalSleepHours)) ?? 0
-        let avgAwake = average(tracked.map(\.awakeMinutes)) ?? 0
-        let avgDeep = average(tracked.map(\.deepSleepHours)) ?? 0
-        let deepRatio = avgTotal > 0 ? (avgDeep / avgTotal) * 100.0 : 0
-
-        insightsBodyLabel.text = analysis?.sleepTrends?.body ?? String(format: "Average sleep %@ this month", formatHours(avgTotal))
-        insightsDescLabel.text = analysis?.sleepTrends?.description ?? String(format: "Deep sleep averaged %.0f%% of total sleep, with %@ awake time per night.", deepRatio, formatMinutesText(avgAwake))
+        // 同 Week：服务端返回空串 = 明确没有分析内容，客户端不再用本地数字凑一段顶上，
+        // 缺失一律 "--"。空串≠缺字段，所以仍要先过 nonBlank 再判断。
+        insightsBodyLabel.text = analysis?.sleepTrends?.body.nonBlank ?? "--"
+        insightsDescLabel.text = analysis?.sleepTrends?.description.nonBlank ?? "--"
 
         if let scenarioList = analysis?.onsetEfficiency?.scenarioList, !scenarioList.isEmpty {
             setBestListText(scenarioList.joined(separator: "\n"))
         } else {
-            setBestListText("\(tracked.count) tracked nights")
+            setBestListText("--")
         }
-        if let description = analysis?.onsetEfficiency?.description, !description.isEmpty {
-            bestContentLabel.text = description
-        } else if let avgOnset = average(tracked.compactMap(\.sleepOnsetMinutes)) {
-            bestContentLabel.text = "Average sleep onset this month was \(formatMinutesText(avgOnset))."
-        } else {
-            bestContentLabel.text = "Sleep onset will appear here after Apple Health provides enough time in bed records."
-        }
+        bestContentLabel.text = analysis?.onsetEfficiency?.description.nonBlank ?? "--"
 
-        rebuildContent(showMock: false, aggregates: tracked, metrics: metrics)
+        rebuildContent(showMock: false, aggregates: tracked, metrics: metrics, vitals: vitals, sleepMetrics: analysis?.sleepMetrics ?? fallbackSleepMetrics)
     }
+
+    /// 上一次拿到的服务端日均兜底值。本地读不到、服务端这次还没应答时先用它顶着，
+    /// 否则 Time in bed 卡会先闪一下 "--" 再填上（见 `feedback_cache_async_data_avoid_flicker`）。
+    private var cachedSleepMetrics: HealthAnalysisService.PeriodSleepMetrics?
 
     private func average(_ values: [Double]) -> Double? {
         guard !values.isEmpty else { return nil }
@@ -345,17 +415,11 @@ class HealthMonthView: UIView {
     }
 
     private func formatHours(_ hours: Double) -> String {
-        let totalMinutes = Int((hours * 60.0).rounded())
-        let hourPart = totalMinutes / 60
-        let minutePart = totalMinutes % 60
-        if minutePart == 0 {
-            return "\(hourPart)hr"
-        }
-        return "\(hourPart)hr \(minutePart)min"
+        UnitDisplay.duration(hours: hours)
     }
 
     private func formatMinutesText(_ minutes: Double) -> String {
-        "\(Int(minutes.rounded()))min"
+        UnitDisplay.minutes(Int(minutes.rounded()))
     }
 
     // MARK: - Setup UI
@@ -507,7 +571,7 @@ class HealthMonthView: UIView {
         contentStackView.addArrangedSubview(efficiencyContainer)
     }
     
-    private func rebuildContent(showMock: Bool, aggregates: [HealthDataManager.SleepDailyAggregate] = [], metrics: HealthMetrics? = nil) {
+    private func rebuildContent(showMock: Bool, aggregates: [HealthDataManager.SleepDailyAggregate] = [], metrics: HealthMetrics? = nil, vitals: HealthDataManager.SleepVitalsAverages? = nil, sleepMetrics: HealthAnalysisService.PeriodSleepMetrics? = nil) {
         let mockLocal = HealthMockDataService.shared.monthLocalData()
         insightsContainer.isHidden = false
         bestContainer.isHidden = false
@@ -516,33 +580,41 @@ class HealthMonthView: UIView {
         efficiencyContainer.isHidden = false
 
         let trackedDays = aggregates.count
-        let totalSleep = aggregates.map(\.totalSleepHours).reduce(0, +)
         let avgAwake = average(aggregates.map(\.awakeMinutes)) ?? 0
         let avgRem = average(aggregates.map(\.remSleepHours)) ?? 0
         let avgCore = average(aggregates.map(\.coreSleepHours)) ?? 0
         let avgDeep = average(aggregates.map(\.deepSleepHours)) ?? 0
         let avgTotal = average(aggregates.map(\.totalSleepHours)) ?? 0
+        // 不可测的夜晚 sleepOnsetMinutes 已是 nil，compactMap 直接跳过，不参与平均
         let avgOnset = average(aggregates.compactMap(\.sleepOnsetMinutes))
-        let avgTimeInBed = average(aggregates.map(\.timeInBedHours)) ?? 0
-        let heartRateValue = metrics?.heartRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--"
-        let respiratoryValue = metrics?.respiratoryRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--"
-        let restingHeartRateValue = metrics?.restingHeartRate.map { "\(Int($0.value.rounded()))bpm" } ?? "--"
-        let wristTemperatureMetric = metrics?.sleepingWristTemperature ?? metrics?.bodyTemperature
-        let wristTemperatureValue = wristTemperatureMetric.map { String(format: "%.1f°C", $0.value) } ?? "--"
+        // Apple Watch 不写 inBed 样本，只戴表的用户这两项本地恒空（不是「卧床 0 分钟」）。
+        // 本地求得出就用本地的，一晚都求不出才用服务端估算的日均值，两者都没有才显示 --。
+        // 口径见 Tools/doc/服务端分析接口.md「睡眠指标估算（sleep_metrics）」。
+        let localAvgTimeInBed = average(aggregates.map(\.timeInBedHours)).flatMap { $0 > 0 ? $0 : nil }
+        let avgTimeInBedText = (localAvgTimeInBed ?? sleepMetrics?.avgTimeInBedMinutes.map { Double($0) / 60.0 })
+            .map(formatHours) ?? "--"
+        let avgOnsetText = (avgOnset ?? sleepMetrics?.avgSleepOnsetMinutes.map(Double.init))
+            .map(formatMinutesText) ?? "--"
+        // 生命体征卡：全部取自 fetchSleepVitalsAverages —— 限定睡眠期间、按晚等权平均。
+        // 心率是周期内的平均值（单值），不是某一晚的区间；区间只在日视图展示。
+        let sleepHeartRateValue = vitals?.sleepHeartRate.map { UnitDisplay.bpm($0) } ?? "--"
+        let respiratoryValue = vitals?.respiratoryRate.map { UnitDisplay.breathsPerMinute($0) } ?? "--"
+        let restingHeartRateValue = vitals?.restingHeartRate.map { UnitDisplay.bpm($0) } ?? "--"
+        let wristTemperatureValue = vitals?.wristTemperature.map { UnitDisplay.temperature(celsius: $0) } ?? "--"
         let vitalsDetailRows: [(String, String, String?)] = showMock ? [
-            (L("health.week.respiratory_rate"), mockLocal.respiratoryRangeText, nil),
-            (L("health.week.avg_heart_rate"), mockLocal.averageHeartRateRangeText, nil),
-            (L("health.week.avg_skin_temp"), mockLocal.skinTemperatureDeltaText, L("health.week.metric.from_baseline"))
+            (L("health.week.respiratory_rate"), mockLocal.respiratoryRateText, nil),
+            (L("health.sleep.resting_heart_rate"), mockLocal.restingHeartRateText, nil),
+            (L("health.week.avg_wrist_temp"), mockLocal.wristTemperatureText, nil)
         ] : [
             (L("health.week.respiratory_rate"), respiratoryValue, nil),
-            (L("health.week.avg_heart_rate"), restingHeartRateValue, nil),
-            (L("health.week.avg_skin_temp"), wristTemperatureValue, L("health.week.metric.from_baseline"))
+            (L("health.sleep.resting_heart_rate"), restingHeartRateValue, nil),
+            (L("health.week.avg_wrist_temp"), wristTemperatureValue, nil)
         ]
 
         let vitalsCard = WeekExpandableCard(
             icon: "sleep_week_heartrate",
-            title: L("health.month.avg_heart_rate"),
-            value: showMock ? mockLocal.heartRateText : heartRateValue,
+            title: L("health.sleep.sleep_heart_rate"),
+            value: showMock ? mockLocal.heartRateText : sleepHeartRateValue,
             detailRows: vitalsDetailRows
         )
         configureCard(vitalsCard, in: vitalsContainer)
@@ -550,7 +622,8 @@ class HealthMonthView: UIView {
         let trendsCard = WeekExpandableCard(
             icon: "sleep_week_sleep",
             title: L("health.month.total_sleep"),
-            value: showMock ? mockLocal.totalSleepText : formatHours(totalSleep),
+            // 苹果健康月视图给的是「日均」，这里跟它对齐；卡片里的明细行本来就是均值
+            value: showMock ? mockLocal.totalSleepText : formatHours(avgTotal),
             detailRows: showMock ? [
                 (L("health.week.avg_awake"), mockLocal.averageAwakeText, nil),
                 (L("health.week.avg_rem"), mockLocal.averageRemText, nil),
@@ -558,9 +631,9 @@ class HealthMonthView: UIView {
                 (L("health.week.avg_deep"), mockLocal.averageDeepText, nil)
             ] : [
                 (L("health.week.avg_awake"), formatMinutesText(avgAwake), nil),
-                (L("health.week.avg_rem"), formatHours(avgRem), nil),
-                (L("health.week.avg_core"), formatHours(avgCore), nil),
-                (L("health.week.avg_deep"), formatHours(avgDeep), nil)
+                (L("health.week.avg_rem"), avgRem > 0 ? formatHours(avgRem) : "--", nil),
+                (L("health.week.avg_core"), avgCore > 0 ? formatHours(avgCore) : "--", nil),
+                (L("health.week.avg_deep"), avgDeep > 0 ? formatHours(avgDeep) : "--", nil)
             ]
         )
         configureCard(trendsCard, in: trendsContainer)
@@ -568,15 +641,15 @@ class HealthMonthView: UIView {
         let efficiencyCard = WeekExpandableCard(
             icon: "sleep_week_timeinbed",
             title: L("health.week.header.time_in_bed"),
-            value: showMock ? mockLocal.timeInBedText : formatHours(avgTimeInBed),
+            value: showMock ? mockLocal.timeInBedText : avgTimeInBedText,
             detailRows: showMock ? [
                 (L("health.month.days_tracked"), mockLocal.trackedDaysText, nil),
                 (L("health.week.avg_total"), mockLocal.averageTotalText, nil),
                 (L("health.week.avg_onset"), mockLocal.averageOnsetText, nil)
             ] : [
-                (L("health.month.days_tracked"), "\(trackedDays)/30days", nil),
+                (L("health.month.days_tracked"), UnitDisplay.daysTracked(trackedDays, of: 30), nil),
                 (L("health.week.avg_total"), formatHours(avgTotal), nil),
-                (L("health.week.avg_onset"), avgOnset.map(formatMinutesText) ?? "--", nil)
+                (L("health.week.avg_onset"), avgOnsetText, nil)
             ]
         )
         configureCard(efficiencyCard, in: efficiencyContainer)
@@ -598,7 +671,7 @@ class HealthMonthView: UIView {
         insightsContainer.addSubview(trendChartView)
         insightsContainer.addSubview(insightsDescLabel)
         
-        var imgView = UIImageView(image: UIImage(named: "icon_arrow_right"))
+        let imgView = UIImageView(image: UIImage(named: "icon_arrow_right"))
         imgView.contentMode = .scaleAspectFit
         insightsContainer.addSubview(imgView)
         
@@ -659,7 +732,7 @@ class HealthMonthView: UIView {
         bestContainer.addSubview(bestListLabel)
         bestContainer.addSubview(bestContentLabel)
         
-        var imgView = UIImageView(image: UIImage(named: "icon_arrow_right"))
+        let imgView = UIImageView(image: UIImage(named: "icon_arrow_right"))
         imgView.contentMode = .scaleAspectFit
         bestContainer.addSubview(imgView)
         
@@ -718,14 +791,16 @@ class HealthMonthView: UIView {
     
     private func setupExpandableCards() {
         // Card 1
+        // 数据加载前的占位。口径必须与加载后一致：睡眠心率/呼吸/静息心率都是
+        // 周期平均的单值，不是区间，否则加载完成的一瞬间数字形态会跳变。
         let card1 = WeekExpandableCard(
             icon: "sleep_week_heartrate",
-            title: L("health.month.avg_heart_rate"),
-            value: "92bpm",
+            title: L("health.sleep.sleep_heart_rate"),
+            value: UnitDisplay.bpm(92),
             detailRows: [
-                (L("health.week.respiratory_rate"), "9-27bpm", nil),
-                (L("health.week.avg_heart_rate"), "49-84bpm", nil),
-                (L("health.week.avg_skin_temp"), "+0.06°C", L("health.week.metric.from_baseline"))
+                (L("health.week.respiratory_rate"), UnitDisplay.breathsPerMinute(14), nil),
+                (L("health.sleep.resting_heart_rate"), UnitDisplay.bpm(58), nil),
+                (L("health.week.avg_wrist_temp"), UnitDisplay.temperature(celsius: 34.1), nil)
             ]
         )
         vitalsContainer.addSubview(card1)
@@ -738,10 +813,10 @@ class HealthMonthView: UIView {
             title: L("health.month.total_sleep"),
             value: "240hrs",
             detailRows: [
-                (L("health.week.avg_awake"), "18min", nil),
-                (L("health.week.avg_rem"), "1hr 50min", nil),
-                (L("health.week.avg_core"), "4hr 3min", nil),
-                (L("health.week.avg_deep"), "51min", nil)
+                (L("health.week.avg_awake"), UnitDisplay.duration(minutes: 18), nil),
+                (L("health.week.avg_rem"), UnitDisplay.duration(minutes: 110), nil),
+                (L("health.week.avg_core"), UnitDisplay.duration(minutes: 243), nil),
+                (L("health.week.avg_deep"), UnitDisplay.duration(minutes: 51), nil)
             ]
         )
         trendsContainer.addSubview(card2)
@@ -752,10 +827,10 @@ class HealthMonthView: UIView {
         let card3 = WeekExpandableCard(
             icon: "sleep_week_timeinbed",
             title: L("health.week.header.time_in_bed"),
-            value: "7hr 45min",
+            value: UnitDisplay.duration(minutes: 465),
             detailRows: [
-                (L("health.month.days_tracked"), "15/30days", nil),
-                (L("health.week.avg_total"), "7hr 2min", nil),
+                (L("health.month.days_tracked"), UnitDisplay.daysTracked(15, of: 30), nil),
+                (L("health.week.avg_total"), UnitDisplay.duration(minutes: 422), nil),
                 (L("health.week.avg_onset"), "5–10min", nil)
             ]
         )
@@ -779,10 +854,26 @@ class HealthMonthChartView: UIView {
         let value: CGFloat // 0-10
         let label: String
         let dateString: String
+        /// 原始日期。星期几从它直接取，不再拿 `dateString` 反解 ——
+        /// dateString 现在按 App 语言渲染（「8月6日」/「Aug 6, 2026」），
+        /// 固定格式的 parser 一换语言就解不出来了。
+        let date: Date
     }
     
     private var items: [BarData] = []
     private var realValues: [CGFloat] = []
+
+    /// 本图这一个月的每一天，来自页头窗口。**必须由外部传进来。**
+    ///
+    /// 原来 `buildItems()` 用 `Date()` 往前推 30 天，而页头区间和取数窗口都锚在
+    /// 「最近睡眠日」。今天 9/9、最近数据在 9/5 时，页头显示 8/7–9/5，柱子却被标成
+    /// 8/11–9/9：整条曲线的日期集体偏了 4 天，末尾还落到了未来。
+    ///
+    /// 长度不再是定值 30 ——「一个月」是日历运算，2 月只有 28 格（见 HealthChartWindow）。
+    private var realDays: [Date] = []
+
+    /// 假数据以今天收尾。`Date()` 只允许出现在这一条路径上。
+    private static var mockDays: [Date] { HealthChartWindow.month(anchor: Date()).days }
     
     private var chartContainer: UIView!
     private var tooltipView: UIView?
@@ -792,17 +883,11 @@ class HealthMonthChartView: UIView {
     // Track selected index
     private var selectedIndex: Int?
 
-    private static func weekdayText(for text: String) -> String? {
-        let parser = DateFormatter()
-        parser.calendar = Calendar(identifier: .gregorian)
-        parser.locale = Locale(identifier: "en_US_POSIX")
-        parser.dateFormat = "MMM d, yyyy"
-
-        guard let date = parser.date(from: text) else { return nil }
-
+    /// 星期几缩写。是给用户看的，跟着 App 语言走（「周三」/「Wed」/「水」）。
+    private static func weekdayText(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.locale = LocalizationManager.shared.currentLocale
         formatter.dateFormat = "EEE"
         return formatter.string(from: date)
     }
@@ -814,8 +899,12 @@ class HealthMonthChartView: UIView {
         }
     }
 
-    func setRealValues(_ values: [CGFloat]) {
+    /// - Parameters:
+    ///   - values: 每天的睡眠小时数，与 `days` 一一对应。
+    ///   - days: 页头窗口的那些天（`HealthChartWindow.month(anchor:).days`）。
+    func setRealValues(_ values: [CGFloat], days: [Date]) {
         realValues = values
+        realDays = days
         if !showMockData {
             buildItems()
             rebuildChart()
@@ -829,7 +918,7 @@ class HealthMonthChartView: UIView {
     ]
 
     func setMockValues(_ values: [CGFloat]) {
-        guard values.count == 30 else { return }
+        guard !values.isEmpty else { return }
         mockValues = values
         if showMockData {
             buildItems()
@@ -839,27 +928,30 @@ class HealthMonthChartView: UIView {
     
     private func buildItems() {
         items.removeAll()
-        let now = Date()
         let calendar = Calendar.current
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "MMM d, yyyy"
-        
+
+        let days = showMockData ? Self.mockDays : realDays
+        guard !days.isEmpty else { return }
+
+        // 值与日期必须等长：拿不到真实值时铺 0，格子数仍按窗口走。
         let values: [CGFloat]
         if showMockData {
-            values = mockValues
-        } else if realValues.count == 30 {
+            values = mockValues.count == days.count ? mockValues : Array(repeating: 0.0, count: days.count)
+        } else if realValues.count == days.count {
             values = realValues
         } else {
-            values = Array(repeating: 0.0, count: 30)
+            values = Array(repeating: 0.0, count: days.count)
         }
-        
-        for (i, val) in values.enumerated() {
-            let date = calendar.date(byAdding: .day, value: -(29 - i), to: now)!
+
+        // 刻度**从最后一格往回**每 7 天一个，而不是从头 `i % 4`：
+        // 窗口右端贴着锚点，从头数会让最后一个刻度落在随机位置，和页头终点对不上；
+        // 从尾数则末刻度恒等于页头终点，且每个刻度都落在同一个星期几上。
+        let tickIndices = Set(stride(from: days.count - 1, through: 0, by: -7))
+
+        for (i, date) in days.enumerated() {
             let day = calendar.component(.day, from: date)
-            let showLabel = (i) % 4 == 0
-            let labelText = showLabel ? String(format: "%02d", day) : ""
-            items.append(BarData(value: val, label: labelText, dateString: formatter.string(from: date)))
+            let labelText = tickIndices.contains(i) ? String(format: "%02d", day) : ""
+            items.append(BarData(value: values[i], label: labelText, dateString: DateDisplay.date(date), date: date))
         }
     }
     
@@ -1117,14 +1209,13 @@ class HealthMonthChartView: UIView {
         let titleLabel = UILabel()
         let hours = Int(item.value)
         let minutes = Int((item.value - CGFloat(hours)) * 60)
-        titleLabel.text = String(format: "%dhr %dm", hours, minutes)
+        titleLabel.text = String(format: L("health.chart.tooltip.duration"), "\(hours)", "\(minutes)")
         titleLabel.textColor = .white
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         titleLabel.textAlignment = .left
         
         let dateSubtitle = UILabel()
-        let dayName = Self.weekdayText(for: item.dateString)
-        dateSubtitle.text = dayName.map { "\($0), \(item.dateString)" } ?? item.dateString
+        dateSubtitle.text = "\(Self.weekdayText(for: item.date)), \(item.dateString)"
         dateSubtitle.textColor = .lightGray
         dateSubtitle.font = UIFont.systemFont(ofSize: 10)
         dateSubtitle.textAlignment = .left
@@ -1228,12 +1319,10 @@ class HealthMonthTrendsChartView: UIView {
         return ""
     }
 
+    /// tooltip 上的日期，是给用户看的 → 跟 App 语言。
+    /// （下面的 `parsedDate` 解析的是服务端的 `yyyy-MM-dd`，那个必须留 POSIX。）
     private static func tooltipDateText(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "MMM d, yyyy"
-        return formatter.string(from: date)
+        DateDisplay.date(date)
     }
 
     private static func parsedDate(from text: String) -> Date? {

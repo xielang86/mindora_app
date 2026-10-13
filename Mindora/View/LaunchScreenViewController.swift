@@ -33,7 +33,7 @@ class LaunchScreenViewController: UIViewController {
         deviceLogoImageView.image = UIImage(named: "device_logo")
         deviceLogoImageView.contentMode = .scaleAspectFit
         
-        logoImageView.image = UIImage(named: "logo")
+        logoImageView.image = UIImage(named: "logo_dream")
         logoImageView.contentMode = .scaleAspectFit
         
         // Layout Config
@@ -43,30 +43,34 @@ class LaunchScreenViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             // Logo (Primary Anchor) - Center in Screen
-            // logo width 300px -> 150pt
-            // logo height 36px -> 18pt
+            // logo width 344px -> 172pt
+            // logo height 24.7px -> 12.4pt
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor), // 垂直居中
-            logoImageView.widthAnchor.constraint(equalToConstant: 150),
-            logoImageView.heightAnchor.constraint(equalToConstant: 18),
+            logoImageView.widthAnchor.constraint(equalToConstant: 172),
+            logoImageView.heightAnchor.constraint(equalToConstant: 12.4),
             
             // Device Logo - Positioned relative to Logo
-            // device_logo width 167px -> 83.5pt
-            // device_logo height 151px -> 75.5pt
-            // Gap is 38px -> 19pt
+            // 按设计图与 MINDORA DREAM 字标的比例：73 x 66.5pt，间距 19.5pt
             deviceLogoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            deviceLogoImageView.bottomAnchor.constraint(equalTo: logoImageView.topAnchor, constant: -19),
-            deviceLogoImageView.widthAnchor.constraint(equalToConstant: 83.5),
-            deviceLogoImageView.heightAnchor.constraint(equalToConstant: 75.5)
+            deviceLogoImageView.bottomAnchor.constraint(equalTo: logoImageView.topAnchor, constant: -19.5),
+            deviceLogoImageView.widthAnchor.constraint(equalToConstant: 73),
+            deviceLogoImageView.heightAnchor.constraint(equalToConstant: 66.5)
         ])
     }
     
     // MARK: - Transition
     
     func transition(to root: UIViewController, in window: UIWindow, duration: TimeInterval = 0.35) {
-        // 平滑淡出 & 缩放动画
-        UIView.transition(with: window, duration: duration, options: [.transitionCrossDissolve]) {
-            window.rootViewController = root
-        } completion: { _ in }
+        // 直接替换 rootViewController，不做窗口级动画。
+        window.rootViewController = root
+        window.makeKeyAndVisible()
+
+        // 强制一次布局，避免某些情况下 window 不刷新
+        window.setNeedsLayout()
+        window.layoutIfNeeded()
+
+        let rootView = root.view
+        Log.info("LaunchTransition", "done root=\(type(of: root)) rootViewFrame=\(rootView?.frame ?? .zero) windowFrame=\(window.frame) windowHidden=\(window.isHidden) windowAlpha=\(window.alpha) isKey=\(window.isKeyWindow)")
     }
 }

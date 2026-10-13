@@ -75,6 +75,7 @@ final class StoreSearchViewController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
         setupUI()
         updateHistoryView()
+        installTapToDismissKeyboard()
     }
     
     override func viewWillAppear(_ animated: Bool) {

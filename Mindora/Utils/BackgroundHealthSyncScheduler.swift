@@ -59,7 +59,10 @@ final class BackgroundHealthSyncScheduler {
         }
 
         let request = BGAppRefreshTaskRequest(identifier: Self.taskIdentifier)
-        let earliestBeginDate = Date().addingTimeInterval(derivedBackgroundInterval(from: cfg.interval))
+        // 间隔加 ±20% 抖动：系统唤醒时机本就受调度器影响，这里再散一次，
+        // 避免大批设备的后台同步窗口挤在同一时刻。
+        let earliestBeginDate = Date()
+            .addingTimeInterval(NetworkPacing.jittered(derivedBackgroundInterval(from: cfg.interval)))
         request.earliestBeginDate = earliestBeginDate
         Log.info(
             "BGTask",
@@ -153,7 +156,7 @@ final class BackgroundHealthSyncScheduler {
             case .notPermitted:
                 reasons.append("identifier not permitted")
                 reasons.append("check Info.plist BGTaskSchedulerPermittedIdentifiers and target capabilities")
-            @unknown default:
+            default:
                 reasons.append("unknown BGTaskScheduler error code=\(nsError.code)")
             }
         } else {

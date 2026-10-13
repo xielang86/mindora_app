@@ -43,7 +43,7 @@ final class ConnectViewController: UIViewController {
         return b
     }()
 
-    private let discovery = BonjourDiscovery.shared
+    private let discovery = UnifiedDeviceDiscovery.shared
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,18 +84,19 @@ final class ConnectViewController: UIViewController {
     }
 
     @objc private func didTapConnect() {
-        Log.info("Connect", "tap connect: start scanning")
-        discovery.startContinuous(rescanInterval: 20)
-        let selector = LiveDeviceSelectionViewController(discovery: discovery) { [weak self] selected in
+        Log.info("Connect", "tap connect: start scanning (Bonjour + BLE)")
+        discovery.startContinuous()
+        let selector = LiveDeviceSelectionViewController { [weak self] selected in
             guard let self else { return }
-            Log.info("Connect", "selected service name=\(selected.name) type=\(selected.type)")
+            Log.info("Connect", "selected device=\(selected.displayName) transport=\(selected.transportLabel) device_id=\(selected.deviceID ?? "nil")")
             self.dismiss(animated: true) {
-                // 解析后的 NetService 包含主机信息（iOS 会在 resolve 后提供）
-                let host = selected.hostName ?? selected.name
-                Log.info("Connect", "resolved host=\(host)")
-                DeviceSession.shared.host = host
-                DeviceSession.shared.port = 9102
-                Log.info("Connect", "session saved host=\(host) port=9102")
+                // Bonjour service (if any) is already resolved by LiveDeviceSelectionViewController.
+                DeviceSession.shared.connect(
+                    bonjour: selected.bonjour,
+                    bleIdentifier: selected.ble?.identifier,
+                    deviceID: selected.deviceID,
+                    displayName: selected.displayName
+                )
                 // UI 立即跳转，不等待任何健康数据上传完成
                 self.switchToMainTab()
                 Task.detached(priority: .background) {
@@ -121,7 +122,7 @@ final class ConnectViewController: UIViewController {
             .compactMap({ $0 as? UIWindowScene })
             .first?.windows.first {
             window.rootViewController = tab
-            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: nil)
+            window.makeKeyAndVisible()
         } else {
             navigationController?.setViewControllers([tab], animated: true)
         }

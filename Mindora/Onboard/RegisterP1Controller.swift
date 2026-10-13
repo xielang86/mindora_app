@@ -9,6 +9,10 @@ import UIKit
 
 final class RegisterP1Controller: UIViewController {
 
+    /// 设为 true 表示这次进入是因为 token 过期 / 401 → 走 re-auth 流程，
+    /// P2 验证码通过后会跳过 P3/P4 直接进 MainTabBar，本地用户数据保留。
+    var isReauthMode: Bool = false
+
     // MARK: - Design Constants
     private let designWidth: CGFloat = 750
     private let designHeight: CGFloat = 1624
@@ -146,10 +150,17 @@ final class RegisterP1Controller: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupActions()
-        
+
         if let savedEmail = AuthStorage.shared.email, !savedEmail.isEmpty {
             emailTextField.text = savedEmail
             emailTextFieldChanged(emailTextField)
+
+            // 本地有 email + 走过 onboarding + 当前未登录 → 判定为 re-auth：
+            // 验证码通过后跳过 P3/P4，回主界面，本地用户数据全部保留。
+            let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+            if hasSeenOnboarding && !AuthStorage.shared.isLoggedIn {
+                isReauthMode = true
+            }
         }
     }
     
@@ -176,9 +187,27 @@ final class RegisterP1Controller: UIViewController {
         
         view.addSubview(continueButton)
         continueButton.addSubview(activityIndicator)
-        
+
+        addTopBannerFadeIfNeeded()
+
         setupFontsAndCornerRadii()
         setupConstraints()
+    }
+
+    /// iPad 上给顶部横幅图底部补一层淡出到背景色的渐变，掩盖 .scaleAspectFill 裁掉的
+    /// 烘焙渐变（详见 BottomFadeView）。iPhone 不加，保持原样。
+    private func addTopBannerFadeIfNeeded() {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return }
+        let fade = BottomFadeView(color: UIColor(red: 24/255.0, green: 24/255.0, blue: 24/255.0, alpha: 1.0))
+        fade.translatesAutoresizingMaskIntoConstraints = false
+        // 插在横幅图上方、其它内容下方，只盖住图不盖住表单。
+        view.insertSubview(fade, aboveSubview: backgroundImageView)
+        NSLayoutConstraint.activate([
+            fade.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor),
+            fade.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor),
+            fade.bottomAnchor.constraint(equalTo: backgroundImageView.bottomAnchor),
+            fade.heightAnchor.constraint(equalTo: backgroundImageView.heightAnchor, multiplier: 0.55)
+        ])
     }
     
     private func setupFontsAndCornerRadii() {
@@ -254,7 +283,7 @@ final class RegisterP1Controller: UIViewController {
         // CSS Section 2 Padding Left: 40px
         // CSS Group 2 Margin Left: 40px
         // Total Leading: 40 + 40 = 80px relative to view
-        let infoLeadingMargin = scale(80, basedOn: view.bounds.width, designDimension: designWidth)
+        _ = scale(80, basedOn: view.bounds.width, designDimension: designWidth) // infoLeadingMargin: 现由邮箱框对齐替代，保留以对照设计
         
         NSLayoutConstraint.activate([
             // 1. Background (Top Section Only)
@@ -293,8 +322,12 @@ final class RegisterP1Controller: UIViewController {
             emailTextField.heightAnchor.constraint(greaterThanOrEqualToConstant: scale(44, basedOn: view.bounds.height, designDimension: designHeight)),
 
             // 4. Info Group
+            // 说明文字对齐到「居中的邮箱框」左沿 + 设计内缩，而不是钉在屏幕左边缘——
+            // 否则 iPad 上邮箱框居中、说明文字却贴在最左边，整体错位、没有水平居中。
+            // 设计里 info 距屏左 80px、邮箱框距屏左 40px，故 info 相对邮箱框内缩 40px。
+            // iPhone 上邮箱框也是居中，换算后位置与原来完全一致（无回归）。
             infoContainerView.topAnchor.constraint(equalTo: emailContainerView.bottomAnchor, constant: infoGroupTop),
-            infoContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: infoLeadingMargin),
+            infoContainerView.leadingAnchor.constraint(equalTo: emailContainerView.leadingAnchor, constant: scale(40, basedOn: view.bounds.width, designDimension: designWidth)),
             infoContainerView.widthAnchor.constraint(equalToConstant: infoWidth), // Fixed width from design
             
             infoIconImageView.topAnchor.constraint(equalTo: infoContainerView.topAnchor),
@@ -365,22 +398,26 @@ final class RegisterP1Controller: UIViewController {
                 self.activityIndicator.stopAnimating()
                 let p2Controller = RegisterP2Controller()
                 p2Controller.email = email
+                p2Controller.isReauthMode = self.isReauthMode
                 self.navigationController?.pushViewController(p2Controller, animated: true)
                 return
             }
-            
+
             AuthService.shared.sendVerifyCode(email: email) { [weak self] result in
                 DispatchQueue.main.async {
                     self?.continueButton.isEnabled = true
                     self?.continueButton.setTitle(originalTitle, for: .normal) // 恢复文字
                     self?.activityIndicator.stopAnimating()
-                    
+
                     switch result {
-                    case .success:
-                        let p2Controller = RegisterP2Controller()
-                        p2Controller.email = email
-                        self?.navigationController?.pushViewController(p2Controller, animated: true)
-                        
+                    case .success(let retryAfter):
+                        self?.pushCodePage(email: email, resendCooldown: retryAfter)
+
+                    case .failure(let error) where error.retryAfter != nil:
+                        // 刚给这个邮箱发过（比如返回上一页又点继续）：之前那封验证码仍有效，
+                        // 直接进验证码页，倒计时接着服务端剩余的秒数走
+                        self?.pushCodePage(email: email, resendCooldown: error.retryAfter ?? AuthService.defaultResendSeconds)
+
                     case .failure(let error):
                         let alert = CustomAlertViewController(
                             title: L("common.error"),
@@ -394,6 +431,14 @@ final class RegisterP1Controller: UIViewController {
         }
     }
     
+    private func pushCodePage(email: String, resendCooldown: Int) {
+        let p2Controller = RegisterP2Controller()
+        p2Controller.email = email
+        p2Controller.isReauthMode = isReauthMode
+        p2Controller.resendCooldown = resendCooldown
+        navigationController?.pushViewController(p2Controller, animated: true)
+    }
+
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
@@ -407,6 +452,7 @@ final class RegisterP1Controller: UIViewController {
     }
     
     private func scale(_ designValue: CGFloat, basedOn dimension: CGFloat, designDimension: CGFloat) -> CGFloat {
-        return designValue * (dimension / designDimension)
+        let capped = iPadAdaptiveScale.capped(dimension, widthReference: view.bounds.width)
+        return designValue * (capped / designDimension)
     }
 }
